@@ -16,6 +16,9 @@
    " "
    "+http://boston.lti.cs.cmu.edu/crawler/clueweb12pp/"))
 
+(def lemurproject-header
+  {"User-Agent" lemurproject-ua-string})
+
 (defn handle-response
   "Response is a value returned by our wrapper around
 clj-http's get call. We have a couple of statuses that we use"

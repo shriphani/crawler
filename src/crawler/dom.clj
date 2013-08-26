@@ -5,7 +5,7 @@
 
 (ns crawler.dom
   (:require [crawler.core :as core])
-  (:import (net.sourceforge.htmlcleaner/htmlcleaner HtmlCleaner)))
+  (:import (org.htmlcleaner HtmlCleaner)))
 
 (defn process-page
   [page-src]
@@ -21,11 +21,11 @@
 (defn path-root-seq
   "A sequence of nodes from current node to root"
   ([a-tagnode]
-     (path-seq a-tagnode []))
+     (path-root-seq a-tagnode []))
   
   ([a-tagnode cur-path]
      (let [parent (.getParent a-tagnode)]
        (if parent
-         (recur parent (cons cur-path a-tagnode))
-         cur-path))))
+         (recur parent (cons a-tagnode cur-path))
+         (cons a-tagnode cur-path)))))
 

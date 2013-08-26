@@ -11,3 +11,6 @@ pom.xml.asc
 .lein-repl-history
 \#*\#
 .#*
+*.txt
+*.gz
+*.com.sample

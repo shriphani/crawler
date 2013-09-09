@@ -34,3 +34,17 @@ is linear unfortunately"
     (try (client/get page-link
                      {:headers headers})
          (catch Exception e {:status :download-failed}))))
+
+(defn cross-product
+  "Compute the cross product of 2 lists"
+  [l1 l2]
+  (reduce
+   concat
+   []
+   (map
+    (fn [l1-item]
+      (map 
+       (fn [l2-item]
+         (list l1-item l2-item))
+       l2))
+    l1)))

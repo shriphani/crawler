@@ -2,8 +2,7 @@
 ;;;; Author: spalakod@cs.cmu.edu
 
 (ns crawler.core
-  (:require [clj-robots.core :as robots]
-            [clojure.tools.cli :as cli]
+  (:require [clojure.tools.cli :as cli]
             [org.bovinegenius [exploding-fish :as uri]]
 
             [crawler.page-utils :as page-utils]
@@ -72,11 +71,4 @@ Args:
          (cons next-link visited)
          doc-writer)))))
 
-(defn -main
-  [& args]
-  (let [[optional [site num-docs-str output-file] banner] (cli/cli args)]
-    (random-sample
-     [site]
-     (java.lang.Integer/parseInt num-docs-str)
-     []
-     (clojure.java.io/writer output-file))))
+

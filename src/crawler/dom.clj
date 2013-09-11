@@ -7,8 +7,9 @@
   (:require [clojure.set :as clj-set] 
             [clojure.string :as str]
             [crawler.core :as core]
-            [crawler.utils :as utils])
-  (:use [clj-xpath.core :only [$x]])
+            [crawler.utils :as utils]
+            [misc.dates :as dates])
+  (:use [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]])
   (:import (org.htmlcleaner HtmlCleaner DomSerializer CleanerProperties)
            (org.w3c.dom Document)))
 
@@ -130,12 +131,11 @@ id and class tag constraints are also added"
     (-> dom-serializer
         (.createDOM tag-node))))
 
-(defn maximal-xpath
-  "A maximal xpath is a minimal set of xpaths
+(defn minimum-maximal-xpath-set
+  "A maximal xpath set is a set of xpaths
 sufficient to span all the anchor tags on a 
-page. This allows us to deal with fewer xpaths
-and minimize the amount of work the scout needs
-to engage in."
+page. The minimum here refers to the cardinality
+of the xpath set."
   [page-src]
   (let [a-tags        (anchor-tags page-src)
 
@@ -154,16 +154,125 @@ to engage in."
                         (sort-by
                          second
                          (anchor-tag-xpaths page-src))))]
-    (reduce
-     (fn [acc xpath]
-       (let [xpath-links (set
-                          (map #(-> % :attrs :href)
-                               ($x xpath processed-pg)))]
-        (if (= (clj-set/intersection (:links acc) xpath-links)
-               xpath-links)
-          acc
-          (merge-with clj-set/union acc {:links  xpath-links
-                                 :xpaths #{xpath}}))))
-     {:xpaths (set [])
-      :links  (set [])}
-     xpaths-a-tags)))
+    (-> (reduce
+         (fn [acc xpath]
+           (let [xpath-links (set
+                              (map #(-> % :attrs :href)
+                                   ($x xpath processed-pg)))]
+             (if (= (clj-set/intersection (:links acc) xpath-links)
+                    xpath-links)
+               acc
+               (merge-with clj-set/union acc {:links  xpath-links
+                                              :xpaths #{xpath}}))))
+         {:xpaths (set [])
+          :links  (set [])}
+         xpaths-a-tags))))
+
+(defn xpath-freq
+  [xpath page-src]
+  (let [processed (html->xml-doc page-src)]
+    (count ($x xpath processed))))
+
+(defn node-path-to-root
+  "A version of path-root-seq for
+org.w3c.dom.Node objects"
+  ([a-node]
+     (node-path-to-root a-node []))
+  
+  ([a-node cur-path]
+     (let [parent (.getParentNode a-node)]
+       (if parent
+         (recur parent (cons a-node cur-path))
+         (cons a-node cur-path)))))
+
+(defn xpath->records
+  "Nodes that are immediate children of the LCA 
+of the nodes returned by an xpath.
+Processed page is the output of html->xml-doc.
+This routine is not correct and we don't really
+care about its correctness for now"
+  [xpath processed-page]
+  (let [nodes ($x:node+ xpath processed-page)]
+    (loop [cur-nodes nodes prev-nodes []]
+      (let [potential-parent (reduce (fn [acc v]
+                                       (if (and acc
+                                                (.isSameNode acc v))
+                                         acc
+                                         nil))
+                                     cur-nodes)]
+        (if-not potential-parent
+          (recur (map #(.getParentNode %) cur-nodes) cur-nodes)
+          (reduce (fn [acc v] 
+                    (if (empty? acc)
+                      [v]
+                      (if (.isSameNode (last acc) v)
+                        acc
+                        (conj acc v))))
+                  []
+                  prev-nodes))))))
+
+(defn tooltips
+  [a-node]
+  ($x:text+ "//@title" a-node))
+
+(defn relative-dates
+  [a-node]
+  (filter
+   #(= (count %) 1)
+   (map
+    dates/dates-in-text
+    (tooltips a-node))))
+
+(defn neighborhood-text
+  "Text from the neighborhood of the elements
+returned by this xpath on our page"
+  [xpath page-src]
+  (map #(dates/dates-in-text
+         (str/join
+          " "
+          (str/split (.getTextContent %) #"\s+")))
+       (xpath->records xpath
+                       (html->xml-doc page-src))))
+
+(defn date-indexed-xpath?
+  "Checks if the xpath returns objects
+that are indexed by dates. This requires us to
+get to the LCA of the xpath's nodes and "
+  [xpath page-src]
+  (let [num-records      (count 
+                          (xpath->records 
+                           xpath 
+                           (html->xml-doc page-src)))
+
+        records          (first
+                          (map
+                           #(list
+                             (.getNodeName %)
+                             (.getNamedItem (.getAttributes %) "id")
+                             (.getNamedItem (.getAttributes %) "class"))
+                           (xpath->records
+                            xpath
+                            (html->xml-doc page-src))))
+
+        dategroups-found (count
+                          (filter 
+                           (fn [x] (> (count x) 0))
+                           (neighborhood-text
+                            xpath
+                            page-src)))]
+    (when-not (= num-records 0)
+      {:ratio (/ dategroups-found num-records)
+       :num-records num-records
+       :records records})))
+
+(defn xpaths-ranked
+  [page-src]
+  (let [xpaths (:xpaths (minimum-maximal-xpath-set page-src))]
+    (filter
+     #(> (:ratio (second %)) 0)
+     (filter
+      #(identity (second %))
+      (map (fn [xpath] (list
+                        xpath
+                        (date-indexed-xpath? xpath page-src))) 
+           xpaths)))))

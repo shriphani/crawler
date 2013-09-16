@@ -234,25 +234,14 @@ returned by this xpath on our page"
        (xpath->records xpath
                        (html->xml-doc page-src))))
 
-(defn date-indexed-xpath?
-  "Checks if the xpath returns objects
-that are indexed by dates. This requires us to
-get to the LCA of the xpath's nodes and "
+(defn xpath-recods-dates
+  "An xpath returns nodes. We check how many of these
+result in nodes that are indexed by a clear date"
   [xpath page-src]
   (let [num-records      (count 
                           (xpath->records 
                            xpath 
                            (html->xml-doc page-src)))
-
-        records          (first
-                          (map
-                           #(list
-                             (.getNodeName %)
-                             (.getNamedItem (.getAttributes %) "id")
-                             (.getNamedItem (.getAttributes %) "class"))
-                           (xpath->records
-                            xpath
-                            (html->xml-doc page-src))))
 
         dategroups-found (count
                           (filter 
@@ -262,17 +251,22 @@ get to the LCA of the xpath's nodes and "
                             page-src)))]
     (when-not (= num-records 0)
       {:ratio (/ dategroups-found num-records)
-       :num-records num-records
-       :records records})))
+       :num-records num-records})))
 
 (defn xpaths-ranked
   [page-src]
   (let [xpaths (:xpaths (minimum-maximal-xpath-set page-src))]
     (filter
-     #(> (:ratio (second %)) 0)
+     #(= (:ratio (second %)) 1)
      (filter
       #(identity (second %))
-      (map (fn [xpath] (list
-                        xpath
-                        (date-indexed-xpath? xpath page-src))) 
+      (map (fn [xpath]
+             (list
+              xpath
+              (xpath-recods-dates xpath page-src))) 
            xpaths)))))
+
+(defn equal-xpaths?
+  "Xpaths are equal either if the strings are the same
+or the returned records/nodes in the page are the same"
+  [xpath1 xpath2])

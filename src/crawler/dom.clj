@@ -266,7 +266,51 @@ result in nodes that are indexed by a clear date"
               (xpath-recods-dates xpath page-src))) 
            xpaths)))))
 
+(defn same-node-set?
+  "Checks if the nodes returned are the same"
+  [node-set1 node-set2]
+  (reduce
+   (fn [out-acc a-node]
+     (and
+      out-acc
+      (reduce
+       (fn [acc another-node]
+         (or acc (.isEqualNode a-node another-node)))
+       false
+       node-set2)))
+   true
+   node-set1))
+
+(defn xpath-nodes
+  [xpath page-src]
+  (let [processed (html->xml-doc page-src)]
+    ($x:node+ xpath processed)))
+
 (defn equal-xpaths?
   "Xpaths are equal either if the strings are the same
 or the returned records/nodes in the page are the same"
-  [xpath1 xpath2])
+  [xpath1 xpath2 page-src]
+  (or (= xpath1 xpath2)
+      (same-node-set? (xpath-nodes xpath1 page-src)
+                      (xpath-nodes xpath2 page-src))))
+
+(defn minimum-maximal-xpath-records
+  "Given a set of xpaths, we compute the xpaths that
+are sufficient to generate all the date-indexed records
+on the page that we are interested in.
+The returned item is the record nodes"
+  [xpaths page-src]
+  (map
+   #(xpath->records % (html->xml-doc page-src))
+   (:xpaths
+    (let [xml-doc (html->xml-doc page-src)]
+      (reduce
+       (fn [acc v]
+         (let [v-records (xpath->records v xml-doc)]
+           (if (some #(same-node-set? v-records %)
+                     (:record-sets acc))
+             acc
+             (merge-with concat acc {:xpaths [v] :record-sets [v-records]}))))
+       {:xpaths      []
+        :record-sets []}
+       xpaths)))))

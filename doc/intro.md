@@ -12,3 +12,14 @@ commits to wtetzner's uri library that we use so we have to run
  lein install
 </pre>
 
+Next, install natty:
+
+<pre>
+git clone https://github.com/joestelmach/natty.git
+cd natty
+export MAVEN_OPTS=-Xmx1024m
+mvn install
+</pre>
+
+After this, this project can be run from the repl (currently the only
+way to use it).

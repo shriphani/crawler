@@ -300,17 +300,36 @@ are sufficient to generate all the date-indexed records
 on the page that we are interested in.
 The returned item is the record nodes"
   [xpaths page-src]
-  (map
-   #(xpath->records % (html->xml-doc page-src))
-   (:xpaths
-    (let [xml-doc (html->xml-doc page-src)]
-      (reduce
-       (fn [acc v]
-         (let [v-records (xpath->records v xml-doc)]
-           (if (some #(same-node-set? v-records %)
-                     (:record-sets acc))
-             acc
-             (merge-with concat acc {:xpaths [v] :record-sets [v-records]}))))
-       {:xpaths      []
-        :record-sets []}
-       xpaths)))))
+  (first ;;; big assumption here.!!!! FIX
+   (map
+    #(xpath->records % (html->xml-doc page-src))
+    (:xpaths
+     (let [xml-doc (html->xml-doc page-src)]
+       (reduce
+        (fn [acc v]
+          (let [v-records (xpath->records v xml-doc)]
+            (if (some #(same-node-set? v-records %)
+                      (:record-sets acc))
+              acc
+              (merge-with concat acc {:xpaths [v] :record-sets [v-records]}))))
+        {:xpaths      []
+         :record-sets []}
+        xpaths))))))
+
+;; Node-set operations.
+(defn node-set-anchor-invariants
+  "In a collection of node objects, the local DOM
+can have invariant anchor-tags (in text and not targets).
+We check just the text representation of the subtree and nuke it. Say
+share, save, hide links in a reddit record.
+A node in a node-set is an org.w3c.<blah blah>.Node object"
+  [node-set]
+  (let [node-anchors (map #($x:text+ ".//a" %) node-set)]
+    (reduce
+     (fn [acc xs]
+       (if (empty? acc)
+         xs
+         (filter
+          #(some #{%} acc)
+          xs)))
+     node-anchors)))

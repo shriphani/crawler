@@ -333,3 +333,115 @@ A node in a node-set is an org.w3c.<blah blah>.Node object"
           #(some #{%} acc)
           xs)))
      node-anchors)))
+
+(defn node-text
+  "Text = text nodes + tooltips"
+  [a-node]
+  (apply
+   str
+   (.getTextContent a-node)
+   (str/join " " ($x:text+ ".//@title" a-node))))
+
+(defn inner-xml
+  "Returns a string representation
+of a node. This is an imperfect representation of
+the result of innerHTML() in javascript."
+  [a-node]
+  (let [ls-implementation (-> a-node
+                              (.getOwnerDocument)
+                              (.getImplementation)
+                              (.getFeature "LS" "3.0"))
+
+        ls-serializer     (.createLSSerializer ls-implementation)
+
+        child-nodes       (.getChildNodes a-node)]
+
+    (map
+     (fn [i]
+       (.writeToString
+        ls-serializer
+        (.item child-nodes i)))
+     (range (.getLength child-nodes)))))
+
+(defn dates-neighboring-texts
+  "The dategroups list contains dategroups
+that natty has found in our time-range. This
+is then grepped for in the XML and we try
+to find some patterns.
+i and j are used to tweak how far we consider
+substrings in the supplied html"
+  [xml dategroups i j]
+  (filter
+   identity
+   (map
+    (fn [text]
+      (let [start (.indexOf xml text)]
+        (try
+          (list (subs
+                 xml
+                 (- start i)
+                 start)
+                (subs
+                 xml
+                 (+ start (- (count text) 1))
+                 (+ start (- (count text) 1) j)))
+          (catch Exception e nil))))
+    (filter
+     (fn [text] (> (count text) 3)) ; more than 3 chars per date
+     (map #(.getText %) dategroups)))))
+
+(defn node-set-dates
+  [node-set]
+  (map
+   identity
+   (map list
+        (map #(apply str (inner-xml %)) node-set)
+        (map #(dates/dategroups-in-text
+               (node-text %)) node-set))))
+
+(defn date-pattern
+  [node-set left-bdry right-bdry]
+  (let [xml-dategroups (node-set-dates node-set)]
+    (first
+     (last
+      (sort-by
+       second
+       (reduce
+        (fn [acc v]
+          (merge-with +' acc (reduce merge (map (fn [x] {x 1}) v))))
+        {}
+        (map
+         (fn [[xml dategroups]]
+           (dates-neighboring-texts xml dategroups left-bdry right-bdry))
+         xml-dategroups)))))))
+
+(defn extract-dates
+  [node-set date-pattern]
+  (let [[date-start date-end] date-pattern
+        xml-dategroups        (node-set-dates node-set)]
+    (map
+     vector
+     (map #(str/join
+            " "
+            (str/split
+             (.getTextContent %)
+             #"\s+")) node-set)
+     (map
+      (fn [[xml dategroups]]
+        (first
+         (dates/dates-in-text
+          (second
+           (re-find
+            (re-pattern (format "%s(.*)%s" date-start date-end)) xml)))))
+      xml-dategroups))))
+
+(defn site-model
+  [xpaths records page-src]
+  {:date-pattern (date-pattern records 7 3)})
+
+(defn date-indexed-records
+  [page-src]
+  (let [xpaths  (map first (xpaths-ranked page-src))
+        records (minimum-maximal-xpath-records xpaths page-src)
+        model   (site-model xpaths records page-src)]
+    (extract-dates records (:date-pattern model))))

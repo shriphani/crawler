@@ -4,7 +4,8 @@
 ;;;; Code to work with the DOM (XPath etc)
 
 (ns crawler.dom
-  (:require [clojure.set :as clj-set] 
+  (:require [clj-time.core :as core-time]
+            [clojure.set :as clj-set] 
             [clojure.string :as str]
             [crawler.core :as core]
             [crawler.utils :as utils]
@@ -445,3 +446,34 @@ substrings in the supplied html"
         records (minimum-maximal-xpath-records xpaths page-src)
         model   (site-model xpaths records page-src)]
     (extract-dates records (:date-pattern model))))
+
+(defn sort-order
+  [dates-list]
+  (let [timeline
+        (reduce
+         (fn [acc v]
+           (if (and (empty? (:asc acc))
+                    (empty? (:dsc acc)))
+             (merge-with concat acc {:asc [v] :dsc [v]})
+             (if (core-time/after? v (last (:asc [v])))
+               (merge-with conj acc {:asc [v]})
+               (merge-with conj acc {:dsc [v]}))))
+         {:asc []
+          :dsc []}
+         dates-list)]
+    (cond (> (count (:asc timeline))
+               (* 2 (count (:dsc timeline))))
+          'asc
+
+          (> (count (:dsc timeline))
+             (* 2 (count (:asc timeline))))
+          'dsc
+
+          :else 'unsorted)))
+
+(defn page-model
+  [page-src]
+  (let [records-dates (date-indexed-records page-src)
+        dates         (map second records-dates)]
+    {:num-records (count records-dates)
+     :sort-order  (sort-order dates)}))

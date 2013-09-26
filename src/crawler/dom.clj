@@ -36,10 +36,24 @@
          (recur parent (cons a-tagnode cur-path))
          (cons a-tagnode cur-path)))))
 
+(defn path-root-seq-nodes
+  "Operates on node objects"
+  ([a-w3c-node]
+     (path-root-seq-nodes a-w3c-node []))
+
+  ([a-w3c-node cur-path]
+     (let [parent (.getParentNode a-w3c-node)]
+       (if parent
+         (recur parent (cons a-w3c-node cur-path))
+         (cons a-w3c-node cur-path)))))
+
 (defn format-attr
   "Cleans up the value of an id attribute"
   [attr-str]
-  (try (str/replace attr-str #"\d+$" "")
+  (try (first
+        (str/split
+         (str/replace attr-str #"\d+$" "")
+         #"-|_"))
        (catch Exception e nil)))
 
 (defn tag-id-class
@@ -57,6 +71,29 @@
           (-> a-tagnode
              (.getAttributeByName "class")
              (silent-fail-split #"\s+"))))))
+
+(defn tag-id-class-node
+  "Returns a list containing a tag's name, its id
+- formatted slightly - and its classes - formatted slightly"
+  [a-w3c-node]
+  (let [silent-fail-split (fn [s regex] (try (str/split s regex)
+                                            (catch Exception e nil)))
+
+        silent-fail-attr  (fn [attr key] (try (.getValue
+                                              (.getNamedItem attr key))
+                                             (catch Exception e nil)))
+        
+        attributes        (.getAttributes a-w3c-node)]
+
+    (list (.getNodeName a-w3c-node)
+          (-> attributes
+              (silent-fail-attr "id")
+              format-attr)
+          (map
+           format-attr
+           (-> attributes
+               (silent-fail-attr "class")
+               (silent-fail-split #"\s+"))))))
 
 (defn tag-id-class->xpath
   "Args:
@@ -91,6 +128,12 @@
       tag-id-class
       tag-id-class->xpath))
 
+(defn w3c-node->xpath
+  [a-w3c-node]
+  (-> a-w3c-node
+      tag-id-class-node
+      tag-id-class->xpath))
+
 (defn tags->xpath
   "Given a sequence of tags, we construct an XPath
 this basically means:
@@ -107,6 +150,17 @@ id and class tag constraints are also added"
       (utils/cross-product acc x)))
    ["/"]
    (map tag-node->xpath tag-nodes-seq)))
+
+(defn nodes->xpath
+  [nodes-seq]
+  (reduce
+   (fn [acc x]
+     (map 
+      #(str/join "/" %) 
+      (utils/cross-product acc x)))
+   ["/"]
+   (concat (map w3c-node->xpath (drop-last nodes-seq))
+           (list (list (.getNodeName (last nodes-seq)))))))
 
 (defn anchor-tag-xpaths
   "Compute a list of paths to anchor tags"
@@ -214,7 +268,9 @@ care about its correctness for now"
 
 (defn tooltips
   [a-node]
-  ($x:text+ "//@title" a-node))
+  (try
+    ($x:text+ ".//@title" a-node)
+    (catch RuntimeException e '())))
 
 (defn relative-dates
   [a-node]
@@ -257,15 +313,18 @@ result in nodes that are indexed by a clear date"
 (defn xpaths-ranked
   [page-src]
   (let [xpaths (:xpaths (minimum-maximal-xpath-set page-src))]
-    (filter
-     #(= (:ratio (second %)) 1)
-     (filter
-      #(identity (second %))
-      (map (fn [xpath]
-             (list
-              xpath
-              (xpath-recods-dates xpath page-src))) 
-           xpaths)))))
+    (reverse
+     (sort-by
+      (fn [x] (second (:num-records x)))
+      (filter
+       #(> (:ratio (second %)) 0.75)
+         (filter
+          #(identity (second %))
+          (map (fn [xpath]
+                 (list
+                  xpath
+                  (xpath-recods-dates xpath page-src))) 
+               xpaths)))))))
 
 (defn same-node-set?
   "Checks if the nodes returned are the same"
@@ -317,31 +376,13 @@ The returned item is the record nodes"
          :record-sets []}
         xpaths))))))
 
-;; Node-set operations.
-(defn node-set-anchor-invariants
-  "In a collection of node objects, the local DOM
-can have invariant anchor-tags (in text and not targets).
-We check just the text representation of the subtree and nuke it. Say
-share, save, hide links in a reddit record.
-A node in a node-set is an org.w3c.<blah blah>.Node object"
-  [node-set]
-  (let [node-anchors (map #($x:text+ ".//a" %) node-set)]
-    (reduce
-     (fn [acc xs]
-       (if (empty? acc)
-         xs
-         (filter
-          #(some #{%} acc)
-          xs)))
-     node-anchors)))
-
 (defn node-text
   "Text = text nodes + tooltips"
   [a-node]
   (apply
    str
    (.getTextContent a-node)
-   (str/join " " ($x:text+ ".//@title" a-node))))
+   (str/join " " (tooltips a-node))))
 
 (defn inner-xml
   "Returns a string representation
@@ -403,18 +444,32 @@ substrings in the supplied html"
 (defn date-pattern
   [node-set left-bdry right-bdry]
   (let [xml-dategroups (node-set-dates node-set)]
-    (first
-     (last
-      (sort-by
-       second
-       (reduce
-        (fn [acc v]
-          (merge-with +' acc (reduce merge (map (fn [x] {x 1}) v))))
-        {}
-        (map
-         (fn [[xml dategroups]]
-           (dates-neighboring-texts xml dategroups left-bdry right-bdry))
-         xml-dategroups)))))))
+    
+    
+    (sort-by
+     second
+     (reduce
+      (fn [acc v]
+        (merge-with +' acc (reduce merge (map (fn [x] {x 1}) v))))
+      {}
+      (map
+       (fn [[xml dategroups]]
+         (dates-neighboring-texts xml dategroups left-bdry right-bdry))
+       xml-dategroups)))))
+
+(defn find-date-pattern
+  "We are given a set of date-indexed records.
+We return a string path that tells us what the date
+indexed records are"
+  [node-set]
+  (-> (filter
+       #(= (count node-set)
+           (second (last %)))
+       (for [left-bdry  (range 1 7)
+             right-bdry (range 1 7)]
+         (date-pattern node-set left-bdry right-bdry)))
+      last
+      last))
 
 (defn extract-dates
   [node-set date-pattern]
@@ -422,23 +477,21 @@ substrings in the supplied html"
         xml-dategroups        (node-set-dates node-set)]
     (map
      vector
-     (map #(str/join
-            " "
-            (str/split
-             (.getTextContent %)
-             #"\s+")) node-set)
+     node-set
      (map
-      (fn [[xml dategroups]]
-        (first
-         (dates/dates-in-text
-          (second
-           (re-find
-            (re-pattern (format "%s(.*)%s" date-start date-end)) xml)))))
+      (fn [[xml date-groups]]
+        (-> (re-pattern (format "%s(.*)%s"
+                                (utils/str->pattern date-start)
+                                (utils/str->pattern date-end)))
+            (re-find xml)
+            second
+            dates/dates-in-text
+            first))
       xml-dategroups))))
 
 (defn site-model
   [xpaths records page-src]
-  {:date-pattern (date-pattern records 7 3)})
+  {:date-pattern (first (find-date-pattern records))})
 
 (defn date-indexed-records
   [page-src]
@@ -455,9 +508,10 @@ substrings in the supplied html"
            (if (and (empty? (:asc acc))
                     (empty? (:dsc acc)))
              (merge-with concat acc {:asc [v] :dsc [v]})
-             (if (core-time/after? v (last (:asc [v])))
-               (merge-with conj acc {:asc [v]})
-               (merge-with conj acc {:dsc [v]}))))
+             (when v
+              (if (core-time/after? v (last (:asc [v])))
+                (merge-with concat acc {:asc [v]})
+                (merge-with concat acc {:dsc [v]})))))
          {:asc []
           :dsc []}
          dates-list)]
@@ -474,6 +528,14 @@ substrings in the supplied html"
 (defn page-model
   [page-src]
   (let [records-dates (date-indexed-records page-src)
-        dates         (map second records-dates)]
-    {:num-records (count records-dates)
-     :sort-order  (sort-order dates)}))
+        dates         (map second records-dates)
+        records       (map first records-dates)
+        record-xpath  (-> (first records)
+                          path-root-seq-nodes
+                          nodes->xpath
+                          first)]
+    {:num-records   (count records-dates)
+     :sort-order    (try (sort-order dates)
+                         (catch Exception e 'failed))
+     :records-xpath record-xpath
+     :date-pattern  (find-date-pattern records)}))

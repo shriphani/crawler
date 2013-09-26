@@ -27,14 +27,6 @@ is linear unfortunately"
       (list (first sequence) (rest sequence))
       (list (last sequence) (butlast sequence)))))
 
-(defn download-page
-  [page-link headers]
-  (do
-    (. Thread sleep delay-ms)
-    (try (client/get page-link
-                     {:headers headers})
-         (catch Exception e {:status :download-failed}))))
-
 (defn cross-product
   "Compute the cross product of 2 lists"
   [l1 l2]
@@ -48,3 +40,22 @@ is linear unfortunately"
          (list l1-item l2-item))
        l2))
     l1)))
+
+(defn file-exists?
+  [a-filename]
+  (-> (java.io.File. a-filename)
+      (.exists)))
+
+(def regex-char-esc-smap
+  (let [esc-chars "()*&^%$#!"]
+    (zipmap esc-chars
+            (map #(str "\\" %) esc-chars))))
+
+(defn str->pattern
+  "re-pattern doesn't generate the correct
+regex patterns we need. Use this to correctly
+escape characters. then call re-pattern on it"
+  [s]
+  (->> s
+       (replace regex-char-esc-smap)
+       (reduce str)))

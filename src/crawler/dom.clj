@@ -315,9 +315,9 @@ result in nodes that are indexed by a clear date"
   (let [xpaths (:xpaths (minimum-maximal-xpath-set page-src))]
     (reverse
      (sort-by
-      (fn [x] (second (:num-records x)))
+      (fn [x] (:num-records (second x)))
       (filter
-       #(> (:ratio (second %)) 0.75)
+       #(> (:ratio (second %)) 0.70)
          (filter
           #(identity (second %))
           (map (fn [xpath]

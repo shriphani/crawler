@@ -1,0 +1,415 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>vBulletin 5 Connect, The World's Leading Community Software</title>
+<meta name="description" content="Build a Forum Community with vBulletin 5 Connect." />
+<meta name="robots" content="INDEX,FOLLOW" />
+<link rel="icon" href="http://www.vbulletin.com/magento/skin/frontend/vbulletin/default/favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="http://www.vbulletin.com/magento/skin/frontend/vbulletin/default/favicon.ico" type="image/x-icon" />
+
+<!--[if lt IE 7]>
+<script type="text/javascript">
+//<![CDATA[
+    var BLANK_URL = 'http://www.vbulletin.com/magento/js/blank.html';
+    var BLANK_IMG = 'http://www.vbulletin.com/magento/js/spacer.gif';
+//]]>
+</script>
+<![endif]-->
+
+<link rel="stylesheet" type="text/css" href="http://www.vbulletin.com/magento/media/css/207f65a9a8fd9213ab417b4ab158fd2a.css" media="all" />
+<link rel="stylesheet" type="text/css" href="http://www.vbulletin.com/magento/media/css/873a71926f775a6024ba0cc5f03566b4.css" media="print" />
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/prototype/prototype.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/lib/ccard.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/prototype/validation.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/scriptaculous/builder.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/scriptaculous/effects.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/scriptaculous/dragdrop.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/scriptaculous/controls.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/scriptaculous/slider.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/scriptaculous/accordion.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/varien/js.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/varien/form.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/varien/menu.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/mage/translate.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/mage/cookies.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/prototype/floating_menu.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/prototype/window.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/learn-more.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/orbit.min.js"></script>
+<!--[if lt IE 8]>
+<link rel="stylesheet" type="text/css" href="http://www.vbulletin.com/magento/media/css/136ec7ea4d684705ee4587d87a24b7f0.css" media="all" />
+<![endif]-->
+<!--[if lt IE 7]>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/js/lib/ds-sleight.js"></script>
+<script type="text/javascript" src="http://www.vbulletin.com/magento/skin/frontend/base/default/js/ie6.js"></script>
+<![endif]-->
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+  <script type="text/javascript">
+	jQuery.noConflict();
+ </script>
+
+<script type="text/javascript">
+//<![CDATA[
+Mage.Cookies.path     = '/';
+Mage.Cookies.domain   = '.vbulletin.com';
+//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+optionalZipCountries = ["HK","IE","MO","PA"];
+//]]>
+</script>
+<script type="text/javascript">//<![CDATA[
+        var Translator = new Translate([]);
+        //]]></script>
+<script type="text/javascript">
+     jQuery(window).load(function() {
+		jQuery('#slider').orbit({
+			animation: 'fade',                  // fade, horizontal-slide, vertical-slide, horizontal-push
+			animationSpeed: 800,                // how fast animtions are
+			timer: true, 			 // true or false to have the timer
+			advanceSpeed: 4000, 		 // if timer is enabled, time between transitions 
+			pauseOnHover: false, 		 // if you hover pauses the slider
+			bullets: true,			 // true or false to activate the bullet navigation
+			bulletThumbs: false		 // thumbnails for the bullets        
+         });
+     });
+</script>
+
+<script type="text/javascript">     
+    jQuery(window).load(function() {
+		jQuery('#home-slider').orbit({
+			animationSpeed: 1000,     // how fast animtions are
+			timer: true, 			 // true or false to have the timer
+			advanceSpeed: 6000 		 // if timer is enabled, time between transitions 
+		});
+	});
+     
+
+
+jQuery(document).ready(function() {
+
+jQuery('.customer-name-link').click(function() {
+	if (jQuery('#customer-dropdown').hasClass('hidden')) {
+		jQuery(this).addClass('selected');
+		jQuery('#customer-dropdown').removeClass('hidden');
+		event.preventDefault();			
+	} else {
+		jQuery('#customer-dropdown').addClass('hidden');
+		jQuery(this).removeClass('selected');
+		event.preventDefault();					
+	}
+	
+
+});
+
+});	
+
+
+
+</script>
+
+<script type="text/javascript">
+
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-8282320-1']);
+	_gaq.push(['_setDomainName', 'vbulletin.com']);
+	_gaq.push(['_trackPageview']);
+
+	(function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })();
+
+</script>
+</head>
+<body class=" cms-index-index cms-home">
+<div class="wrapper">
+        <noscript>
+        <div class="global-site-notice noscript">
+            <div class="notice-inner">
+                <p>
+                    <strong>JavaScript seems to be disabled in your browser.</strong><br />
+                    You must have JavaScript enabled in your browser to utilize the functionality of this website.                </p>
+            </div>
+        </div>
+    </noscript>
+    <div class="page">
+        <div ><a name="Top" id="Top"></a></div>
+<div class="header-container">
+    <div class="header">
+
+<div id="login-nav-box">
+				
+                					<a id="login-link" href="https://www.vbulletin.com/customer/account/login/ ">Log In Here.</a><p>Already a member?</p>					
+				
+
+
+				            </div><!-- /#login-nav-box -->
+            <div class="newsletter-signup">
+				<a id="vbHlink04" href="http://www.vbulletin.com/vbnewsletter/index/">Get FREE Tips & Updates</a>
+			</div>
+            <div class="clear"></div>
+                <h1 class="logo"><strong>vBulletin 5 Connect</strong><a id="vbHlink05" href="http://www.vbulletin.com/" class="logo" title="vBulletin5"><img src="http://www.vbulletin.com/magento/skin/frontend/vbulletin/default/images/logo.gif" alt="vBulletin5" border="0" /></a></h1>
+               
+            <div id="vbnavbarMenu">
+			<ul id="vbnavbar">
+                <li><a id="vbHlink11" href="http://www.vbulletin.com/features/">vBulletin 5 CONNECT</a></li>
+                <li><a id="vbHlink21" href="http://www.vbulletin.com/vb4-features/">vBulletin 4</a></li>
+                <li><a id="vbHlink31" href="http://www.vbulletin.com/learn-more/">Support</a></li>                                
+                <li><a id="vbHlink41" href="http://www.vbulletin.com/forum/">Forum</a>
+				<li><a id="vbHlink51" href="http://www.vbulletin.com/vb5-trial/">Try It Now</a></li>
+                <li><a id="vbHlink61" href="http://www.vbulletin.com/faq/">FAQ</a>
+					
+				</li>
+				<li class="purchase radiusCorner4pxTopL radiusCorner4pxTopR radiusCorner4pxBottomL radiusCorner4pxBottomR"><a id="vbHlink71" class="purchase" href="http://www.vbulletin.com/purchases/">PURCHASE</a></li>			
+			
+			</ul>
+			
+			
+	
+                    </div>
+            </div>
+</div>
+
+    
+     
+                               
+
+        <div class="main-container col1-layout">
+            <div class="main">
+                                <div class="col-main">
+                                        <div class="std"><div id="vbhpcontainer">
+
+</div></div></div></div> <!-- These close divs to get out of the centered .main div -->
+
+	<div id="vbhptopblock">
+
+		<div class="new-wrapper">
+			<div id="hometext">
+				<h1><span class="firstline">Build your site on the world's leading community software</span><span class="secondline">vBulletin 5 Connect</span>&#0153;</h1>
+				<!-- http://www.youtube.com/watch?v=YTjlRoLdmxI -->
+
+				
+				<h3 id="home-coupon"></h3>
+				<h4 id="home-expiration">&nbsp;</h4>
+				
+				<p class="price">New License: USD$249.00 <span>|</span> Upgrade: USD$209.00</p>
+				<p class="price">With Mobile Suite: USD$399.00 <span>|</span> Upgrade: USD$359.00</p>
+				
+				<button onclick="setLocation('/order')" class="button" id="hpbuynow" title="Buy Now" type="button"><span><span>Buy Now</span></span></button>
+				<a id="vid-button" href="/vb5-trial">Try It<span></span></a>
+				<div class="clear"></div>
+
+				<p class="home-includes top-include">vBulletin 4.2 included with the purchase of vBulletin 5 Connect</p>
+
+			</div><!-- /#hometext -->
+			<a class="vid-link" href="http://www.youtube.com/watch?v=5h8JJRH_UgI" id="view-features">View Features</a>
+			<div class="clear"></div>
+			
+		</div> <!-- /.wrapper -->
+
+		<div class="clear"></div>
+	</div> <!-- /vbhptopblock -->
+
+<div class="main">
+<div class="col-main">
+	<div class="std">
+	
+	<div id="vbhpmidblock">
+	
+		<div id="vbhpattributescontainer">
+			<div class="vbattributesbox">
+				<div class="attribute-text-box">
+					<h4>Social</h4>
+					<ul>
+						<li><span></span>Engaging social functionality</li>
+						<li><span></span>Extensive personalization</li>
+						<li><span></span>Real-time interaction</li>
+						<li><span></span>Facebook integration</li>
+					</ul>
+				</div><!-- /.attribute-text-box -->
+				<img src="/magento/skin/frontend/vbulletin/default/images/vb_tile_social.jpg" alt=""/>
+
+			</div>
+		
+			<div class="vbattributesbox">
+				<div class="attribute-text-box">
+				<h4>Engaging</h4>
+				<ul>
+					<li><span></span>Enticing content discovery</li>
+					<li><span></span>More content generation</li>
+					<li><span></span>Optimized mobile experience</li>
+					<li><span></span>Streamlined photos & videos</li>
+					
+				</ul>
+				<div class="clear"></div>
+				</div><!-- /.attribute-text-box -->
+				<img src="/magento/skin/frontend/vbulletin/default/images/vb_tile_engaging.jpg" alt=""/>
+			</div>
+			<div id="easyattributebox" class="vbattributesbox">
+				<div class="attribute-text-box">
+				<h4>Easy</h4>
+				<ul>
+					<li><span></span>Launch site in as little as 15 min.</li>
+					<li><span></span>Streamlined and easy editing</li>
+					<li><span></span>Easily customized page templates</li>
+					<li><span></span>Built-in SEO</li>
+				</ul>
+				<div class="clear"></div>
+				</div><!-- /.attribute-text-box -->
+				<img src="/magento/skin/frontend/vbulletin/default/images/vb_tile_easy.jpg" alt=""/>
+			</div>
+			<div id="lastattributesbox" class="vbattributesbox">
+				<div class="attribute-text-box">
+				<h4>Robust</h4>
+				<ul>
+					<li><span></span>Excellent moderation control</li>
+					<li><span></span>Strong security</li>
+					<li><span></span>World-class support</li>
+					<li><span></span>API Extension System</li>
+				</ul>
+				<div class="clear"></div>
+				</div><!-- /.attribute-text-box -->
+				<img src="/magento/skin/frontend/vbulletin/default/images/vb_tile_robust.jpg" alt=""/>
+			</div>
+			<div class="clear"></div>
+		</div>
+	
+	</div>
+	
+	<div id="vbhpbotblock">
+		<h4>vBulletin Customers</h4>
+		<p>At the core of vBulletin is the forum software. This software powers many of the largest social sites on the web. Over 100,000 sites are built on vBulletin, including:</p>
+		
+		<div id="vbhplogocontainer">
+				<div id="vbhplogosubcontainer">
+			<a class="logo-btn" id="left-logo-btn" href="#"></a>
+				<div id="home-slider">
+					<img src="/magento/skin/frontend/vbulletin/default/images/vb_home_logo1.png" alt="EA"/>
+					<img src="/magento/skin/frontend/vbulletin/default/images/vb_home_logo2.png" alt="EA"/>	 
+				</div><!-- /#home-slider -->			
+			<a class="logo-btn" id="right-logo-btn" href="#"></a>
+		<div class="clear"></div>
+		</div>
+		</div>
+	</div>
+
+
+
+
+</div></div>                </div>
+            </div>
+        </div>
+        <div class="footer-container">
+    <div class="footer">
+		        <!--<p class="bugs"> - <a href="http://www.magentocommerce.com/bug-tracking" onclick="this.target='_blank'"><strong></strong></a> </p>
+        <address></address>
+		-->
+		<div class="new-wrapper">
+			<div class="footer-GoToTop"><a href="#Top" title="Go to top" target="_self"><img src="http://www.vbulletin.com/magento/skin/frontend/vbulletin/default/images/spacer.gif" class="footer-img-GoToTop"></a></div>
+			<div class="footer-block">
+				<ul class="FooterLinks">
+	                <li><a id="vbFlink01" href="http://www.vbulletin.com/features/">vBulletin 5 CONNECT</a></li>
+					<li><div class="divider"></div></li>
+	                <li><a id="vbFlink02" href="http://www.vbulletin.com/overview/">Overview</a></li>
+					<li><div class="dividersmall"></div></li>
+	                <li><a id="vbFlink03" href="http://www.vbulletin.com/features/">Features</a></li>
+					<li><div class="dividersmall"></div></li>
+	                <li><a id="vbFlink04" href="http://www.vbulletin.com/upgrade/">Upgrade</a></li>
+					<li><div class="dividersmall"></div></li>
+	                <li><a id="vbFlink05" href="http://www.vbulletin.com/add-ons/">Add-Ons</a></li>
+					<li><div class="dividersmall"></div></li>
+					<li><a id="vbFlink06" href="http://www.vbulletin.com/mobile/">Mobile</a></li>
+				</ul>
+			</div>
+			<div class="footer-block">
+				<ul class="FooterLinks">
+	                <li><a id="vbFlink11" href="http://www.vbulletin.com/learn-more/">LEARN MORE</a></li>
+					<li><div class="divider"></div></li>
+	                <li><a id="vbFlink12" href="http://www.vbulletin.com/learn-more/">Video Tutorials</a></li>
+					<li><div class="dividersmall"></div></li>
+	                <li><a id="vbFlink13" href="http://www.vbulletin.com/faq/">FAQ</a></li>
+					<li><div class="dividersmall"></div></li>
+	                <li><a id="vbFlink14" href="http://www.vbulletin.com/support-forums/">Support Forums</a></li>
+					<li><div class="dividersmall"></div></li>
+					<li><a id="vbFlink15" href="http://www.vbulletin.com/manual/">Manual</a></li>
+				</ul>
+			</div>
+			<div class="footer-block">
+				<ul class="FooterLinks">
+	                <li><a id="vbFlink21" href="http://www.vbulletin.com/forum/">FORUM</a></li>
+					<li><div class="divider"></div></li>
+	                <li><a id="vbFlink22" href="http://www.vbulletin.com/contacts/">CONTACT US</a></li>
+					<li><div class="divider"></div></li>
+	                <li><a id="vbFlink23" href="http://www.vbulletin.com/purchases/">PURCHASE</a></li>
+					<li><div class="divider"></div></li>
+	                <li>
+						<a id="vbFlink25" href="https://www.vbulletin.com/customer/account/login/">LOG IN</a> </li>
+					<li><div class="divider"></div></li>
+					<li><a id="vbFlink26" href="http://www.vbulletin.com/about-us/">ABOUT US</a></li>
+				</ul>
+			</div>
+			<div class="footer-block">
+				<ul class="FooterLinks">
+	                <li><a id="vbFlink31" href="http://www.internetbrands.com/privacy/privacy-highlights.html?site=www.vbulletin.com">PRIVACY</a></li>
+					<li><div class="divider"></div></li>
+	                <li><a id="vbFlink32" href="http://www.vbulletin.com/terms/">TERMS & CONDITIONS</a></li>
+					<li><div class="divider"></div></li>
+	                <li><a id="vbFlink33" href="http://www.vbulletin.com/affiliate.php/">AFFILIATE PROGRAM</a></li>
+					<li><div class="divider"></div></li>
+	                <li><a id="vbFlink34" href="http://www.vbulletin.com/piracy.php/">PIRACY</a></li>
+					<li><div class="divider"></div></li>
+					<li><a id="vbFlink35" href="http://www.vbulletin.com/license-agreement/">LICENSE AGREEMENT</a></li>
+				</ul>
+			</div>
+			<div class="footer-block2">
+					<div id="fb-root"></div>
+					<script>(function(d, s, id) {
+						  var js, fjs = d.getElementsByTagName(s)[0];
+						  if (d.getElementById(id)) return;
+						  js = d.createElement(s); js.id = id;
+						  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+						  fjs.parentNode.insertBefore(js, fjs);
+						}(document, 'script', 'facebook-jssdk'));
+					</script>
+					<div class="fb-like footer-facebook-recommend" style="float:right; display:block;" data-href="http://www.facebook.com/vbulletin" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false" data-action="recommend"></div>
+				<div class="footer-social-imgs">
+					<a id="vbFlink41" href="http://www.google.com/+vbulletin" rel="publisher" style="text-decoration:none;"><img src="//ssl.gstatic.com/images/icons/gplus-32.png" alt="Google+" style="border:0;width:22px;height:22px;"/></a>
+					<a id="vbFlink42" href="http://www.facebook.com/vbulletin"><img src="http://www.vbulletin.com/magento/skin/frontend/vbulletin/default/images/spacer.gif" class="footer-social-img fsi_facebook"></a>
+					<a id="vbFlink43" href="http://twitter.com/vbulletin"><img src="http://www.vbulletin.com/magento/skin/frontend/vbulletin/default/images/spacer.gif" class="footer-social-img fsi_twiter"></a>
+					<a id="vbFlink44" href="http://www.youtube.com/user/vbulletin"><img src="http://www.vbulletin.com/magento/skin/frontend/vbulletin/default/images/spacer.gif" class="footer-social-img fsi_youtube"></a>
+		
+			<div class="clear"></div>
+			</div>
+				</div>	
+			<div class="footer-copyright">
+				Copyright &copy; 2013 vBulletin Solutions. All Rights Reserved. vBulletin&reg; is a registered trademark of vBulletin Solutions.
+			</div>
+			<div class="clear"></div>
+		</div> <!-- /new-wrapper -->	
+
+		
+
+    </div>
+</div>
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1064440605;
+var google_conversion_language = "en";
+var google_conversion_format = "3";
+var google_conversion_color = "666666";
+var google_conversion_label = "LvsLCN-0wQIQnabI-wM";
+var google_conversion_value = 0;
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+	<div style="display:inline;">
+	<img height="1" width="1" style="border-style:none;" alt="" src="https://www.googleadservices.com/pagead/conversion/1064440605/?label=LvsLCN-0wQIQnabI-wM&amp;guid=ON&amp;script=0"/>
+	</div>
+</noscript>
+            </div>
+</div>
+</body>
+</html>

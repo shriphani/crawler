@@ -12,4 +12,5 @@
                  [net.sourceforge.htmlcleaner/htmlcleaner "2.6"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.cli "0.2.4"]
-                 [org.bovinegenius/exploding-fish "0.3.3"]])
+                 [org.bovinegenius/exploding-fish "0.3.3"]]
+  :main crawler.test-system)

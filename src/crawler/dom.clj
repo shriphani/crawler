@@ -159,8 +159,7 @@ id and class tag constraints are also added"
       #(str/join "/" %) 
       (utils/cross-product acc x)))
    ["/"]
-   (concat (map w3c-node->xpath (drop-last nodes-seq))
-           (list (list (.getNodeName (last nodes-seq)))))))
+   (map w3c-node->xpath nodes-seq)))
 
 (defn anchor-tag-xpaths
   "Compute a list of paths to anchor tags"
@@ -537,5 +536,6 @@ indexed records are"
     {:num-records   (count records-dates)
      :sort-order    (try (sort-order dates)
                          (catch Exception e 'failed))
-     :records-xpath record-xpath
+     :records-xpath (clojure.string/replace
+                     record-xpath #"/\#document" "")
      :date-pattern  (find-date-pattern records)}))

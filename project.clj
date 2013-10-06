@@ -8,6 +8,7 @@
                  [clj-time "0.6.0"]
                  [com.github.kyleburton/clj-xpath "1.4.2"]
                  [enlive "1.1.4"]
+                 [incanter "1.2.3-SNAPSHOT"]
                  [misc "0.1.0-SNAPSHOT"]
                  [net.sourceforge.htmlcleaner/htmlcleaner "2.6"]
                  [org.clojure/clojure "1.5.1"]

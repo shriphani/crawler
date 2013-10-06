@@ -4,10 +4,12 @@
 (ns crawler.test-system
   (:gen-class :main true)
   (:require [clojure.tools.cli :as cli]
-            [crawler.dom :as dom]))
+            [crawler.dom :as dom]
+            [crawler.records :as records])
+  (:use     [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]]))
 
-(defn -main
-  [& args]
+(defn test-xpath
+  []
   (println
    "<html>
        <body>
@@ -28,7 +30,7 @@
                          dom/page-model
                          :records-xpath)
                      (catch Exception e nil))
-
+          
           fail  (if
                     (and
                      xpath
@@ -48,3 +50,30 @@
    "</ul>
       </body>
       </html>"))
+
+(defn test-records
+  []
+  (let [data-dir "resources/records"]
+    (doseq [filename (filter
+                      #(re-find #".html" %)
+                      (map
+                       #(.getAbsolutePath %)
+                       (file-seq
+                        (clojure.java.io/file data-dir))))]
+      (let [page-src  (slurp filename)
+            xpath     (:records-xpath
+                       (dom/page-model page-src))
+            rs        (records/records page-src xpath)
+            
+            rs2       
+            (nth
+             (map
+              (fn
+                [[r1 r2]]
+               (records/records-seq-expt r1 r2))
+              (partition 2 rs)) 2)]
+        (println rs2)))))
+
+(defn -main
+  [& args]
+  (test-records))

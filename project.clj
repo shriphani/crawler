@@ -6,7 +6,7 @@
   :dependencies [[clj-http "0.7.6"]
                  [clj-robots "0.6.0"]
                  [clj-time "0.6.0"]
-                 [com.rubiconproject.oss "0.2.6"]
+                 [com.rubiconproject.oss/jchronic "0.2.6"]
                  [com.github.kyleburton/clj-xpath "1.4.2"]
                  [enlive "1.1.4"]
                  [incanter "1.2.3-SNAPSHOT"]

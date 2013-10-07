@@ -25,6 +25,18 @@
   (-> (process-page page-src)
      (.getElementsByName "a" true)))
 
+(defn node-children
+  [a-node]
+  (let [child-node-list (.getChildNodes a-node)
+        child-nodes-cnt (.getLength child-node-list)]
+    (map #(.item child-node-list %) (range child-nodes-cnt))))
+
+(defn record-signature
+  [a-record]
+  (map
+   #(.getNodeName %)
+   (node-children a-record)))
+
 (defn path-root-seq
   "A sequence of nodes from current node to root"
   ([a-tagnode]
@@ -43,7 +55,7 @@
 
   ([a-w3c-node cur-path]
      (let [parent (.getParentNode a-w3c-node)]
-       (if parent
+       (if (not= (.getNodeName parent) "#document")
          (recur parent (cons a-w3c-node cur-path))
          (cons a-w3c-node cur-path)))))
 
@@ -161,16 +173,30 @@ id and class tag constraints are also added"
    ["/"]
    (map w3c-node->xpath nodes-seq)))
 
-(defn anchor-tag-xpaths
-  "Compute a list of paths to anchor tags"
-  [page-src]
-  (let [tags          (anchor-tags page-src)
-        paths-to-root (map path-root-seq tags)]
+(defn anchor-tag-xpaths-nodes
+  [nodes]
+  (let [paths-to-root (map path-root-seq-nodes nodes)]
+    (reduce
+     (fn [acc v] (merge-with +' acc {v 1}))
+     {}
+     (flatten
+      (map nodes->xpath paths-to-root)))))
+
+(defn anchor-tag-xpaths-tags
+  [tags]
+  (let [paths-to-root (map path-root-seq tags)]
     (reduce
      (fn [acc v] (merge-with +' acc {v 1}))
      {}
      (flatten
       (map tags->xpath paths-to-root)))))
+
+(defn anchor-tag-xpaths
+  "Compute a list of paths to anchor tags"
+  [page-src]
+  (let [tags          (anchor-tags page-src)]
+    (anchor-tag-xpaths-tags tags)))
+
 
 (defn html->xml-doc
   "Take the html and produce an xml version"
@@ -185,29 +211,27 @@ id and class tag constraints are also added"
     (-> dom-serializer
         (.createDOM tag-node))))
 
-(defn minimum-maximal-xpath-set
-  "A maximal xpath set is a set of xpaths
-sufficient to span all the anchor tags on a 
-page. The minimum here refers to the cardinality
-of the xpath set."
-  [page-src]
-  (let [a-tags        (anchor-tags page-src)
+(defn minimum-maximal-xpath-set-processed
+  "This helper routine exists so we don't reparse
+the page several times"
+  [processed-pg]
+  (let [a-tags        ($x:node+ ".//a" processed-pg)
 
-        ; forced to use links for maximal
-        ; since the xpath lib doesn't like
-        ; TagNode objects
-        links         (set (map #(-> %
-                                     (.getAttributeByName "href"))
-                                a-tags))
-
-        processed-pg  (html->xml-doc page-src)
+        href-nodes    (filter
+                       identity (map #(-> %
+                                          (.getAttributes)
+                                          (.getNamedItem "href"))
+                                     a-tags))
+        
+        links         (set (map #(.getNodeValue %) href-nodes))
 
         xpaths-a-tags (map
                        first
                        (reverse
                         (sort-by
                          second
-                         (anchor-tag-xpaths page-src))))]
+                         (anchor-tag-xpaths-nodes a-tags))))]
+
     (-> (reduce
          (fn [acc xpath]
            (let [xpath-links (set
@@ -222,10 +246,13 @@ of the xpath set."
           :links  (set [])}
          xpaths-a-tags))))
 
-(defn xpath-freq
-  [xpath page-src]
-  (let [processed (html->xml-doc page-src)]
-    (count ($x xpath processed))))
+(defn minimum-maximal-xpath-set
+  "A maximal xpath set is a set of xpaths
+sufficient to span all the anchor tags on a 
+page. The minimum here refers to the cardinality
+of the xpath set."
+  [page-src]
+  (minimum-maximal-xpath-set-processed (html->xml-doc page-src)))
 
 (defn node-path-to-root
   "A version of path-root-seq for
@@ -282,48 +309,52 @@ care about its correctness for now"
 (defn neighborhood-text
   "Text from the neighborhood of the elements
 returned by this xpath on our page"
-  [xpath page-src]
+  [xpath processed-page]
   (map #(dates/dates-in-text
          (str/join
           " "
           (str/split (.getTextContent %) #"\s+")))
-       (xpath->records xpath
-                       (html->xml-doc page-src))))
+       (xpath->records xpath processed-page)))
 
-(defn xpath-recods-dates
-  "An xpath returns nodes. We check how many of these
-result in nodes that are indexed by a clear date"
-  [xpath page-src]
+(defn xpath-records-dates-processed-page
+  [xpath processed-page]
   (let [num-records      (count 
                           (xpath->records 
-                           xpath 
-                           (html->xml-doc page-src)))
+                           xpath processed-page))
 
         dategroups-found (count
                           (filter 
                            (fn [x] (> (count x) 0))
-                           (neighborhood-text
-                            xpath
-                            page-src)))]
+                           (neighborhood-text xpath processed-page)))]
+    
     (when-not (= num-records 0)
       {:ratio (/ dategroups-found num-records)
        :num-records num-records})))
 
+(defn xpath-records-dates
+  "An xpath returns nodes. We check how many of these
+result in nodes that are indexed by a clear date"
+  [xpath processed-pg]
+  (xpath-records-dates-processed-page xpath processed-pg))
+
 (defn xpaths-ranked
-  [page-src]
-  (let [xpaths (:xpaths (minimum-maximal-xpath-set page-src))]
-    (reverse
-     (sort-by
-      (fn [x] (:num-records (second x)))
-      (filter
-       #(> (:ratio (second %)) 0.70)
+  ([page-src]
+     (xpaths-ranked page-src 0.70))
+  ([page-src ratio]
+     (let [processed-pg (html->xml-doc page-src)
+           xpaths       (:xpaths (minimum-maximal-xpath-set-processed processed-pg))]
+       (reverse
+        (sort-by
+         (fn [x] (:num-records (second x)))
          (filter
-          #(identity (second %))
-          (map (fn [xpath]
-                 (list
-                  xpath
-                  (xpath-recods-dates xpath page-src))) 
-               xpaths)))))))
+          #(> (:ratio (second %)) ratio)
+          (filter
+           #(identity (second %))
+           (map (fn [xpath]
+                  (list
+                   xpath
+                   (xpath-records-dates xpath processed-pg))) 
+                xpaths))))))))
 
 (defn same-node-set?
   "Checks if the nodes returned are the same"
@@ -355,25 +386,40 @@ or the returned records/nodes in the page are the same"
 
 (defn minimum-maximal-xpath-records
   "Given a set of xpaths, we compute the xpaths that
-are sufficient to generate all the date-indexed records
-on the page that we are interested in.
-The returned item is the record nodes"
-  [xpaths page-src]
-  (first ;;; big assumption here.!!!! FIX
-   (map
-    #(xpath->records % (html->xml-doc page-src))
-    (:xpaths
-     (let [xml-doc (html->xml-doc page-src)]
-       (reduce
-        (fn [acc v]
-          (let [v-records (xpath->records v xml-doc)]
-            (if (some #(same-node-set? v-records %)
-                      (:record-sets acc))
-              acc
-              (merge-with concat acc {:xpaths [v] :record-sets [v-records]}))))
-        {:xpaths      []
-         :record-sets []}
-        xpaths))))))
+are sufficient to generate all the distinct records"
+  [xpaths processed-page]
+  (reverse (sort-by
+            count
+            (:record-sets
+             (reduce
+              (fn [acc record-set]
+                (if (= (clojure.set/union
+                        (:records acc) (set record-set))
+                       (:records acc))
+                  acc
+                  {:record-sets
+                   (conj
+                    (:record-sets acc) record-set)
+                   
+                   :records
+                   (clojure.set/union
+                    (:records acc) (set record-set))}))
+              
+              {:record-sets []
+               :records     (set [])}
+              (reverse
+               (sort-by
+                count (map
+                       #(xpath->records % processed-page)
+                       xpaths))))))))
+
+(defn date-indexed-records-filter
+  "records-sets: returned by minimum-maximal-xpath-records"
+  [records-sets]
+  (first
+   (filter
+    #(> (count %) 5)
+    records-sets)))
 
 (defn node-text
   "Text = text nodes + tooltips"
@@ -382,147 +428,6 @@ The returned item is the record nodes"
    str
    (.getTextContent a-node)
    (str/join " " (tooltips a-node))))
-
-(defn inner-xml
-  "Returns a string representation
-of a node. This is an imperfect representation of
-the result of innerHTML() in javascript."
-  [a-node]
-  (let [ls-implementation (-> a-node
-                              (.getOwnerDocument)
-                              (.getImplementation)
-                              (.getFeature "LS" "3.0"))
-
-        ls-serializer     (.createLSSerializer ls-implementation)
-
-        child-nodes       (.getChildNodes a-node)]
-
-    (map
-     (fn [i]
-       (.writeToString
-        ls-serializer
-        (.item child-nodes i)))
-     (range (.getLength child-nodes)))))
-
-(defn dates-neighboring-texts
-  "The dategroups list contains dategroups
-that natty has found in our time-range. This
-is then grepped for in the XML and we try
-to find some patterns.
-i and j are used to tweak how far we consider
-substrings in the supplied html"
-  [xml dategroups i j]
-  (filter
-   identity
-   (map
-    (fn [text]
-      (let [start (.indexOf xml text)]
-        (try
-          (list (subs
-                 xml
-                 (- start i)
-                 start)
-                (subs
-                 xml
-                 (+ start (- (count text) 1))
-                 (+ start (- (count text) 1) j)))
-          (catch Exception e nil))))
-    (filter
-     (fn [text] (> (count text) 3)) ; more than 3 chars per date
-     (map #(.getText %) dategroups)))))
-
-(defn node-set-dates
-  [node-set]
-  (map
-   identity
-   (map list
-        (map #(apply str (inner-xml %)) node-set)
-        (map #(dates/dategroups-in-text
-               (node-text %)) node-set))))
-
-(defn date-pattern
-  [node-set left-bdry right-bdry]
-  (let [xml-dategroups (node-set-dates node-set)]
-    
-    
-    (sort-by
-     second
-     (reduce
-      (fn [acc v]
-        (merge-with +' acc (reduce merge (map (fn [x] {x 1}) v))))
-      {}
-      (map
-       (fn [[xml dategroups]]
-         (dates-neighboring-texts xml dategroups left-bdry right-bdry))
-       xml-dategroups)))))
-
-(defn find-date-pattern
-  "We are given a set of date-indexed records.
-We return a string path that tells us what the date
-indexed records are"
-  [node-set]
-  (-> (filter
-       #(= (count node-set)
-           (second (last %)))
-       (for [left-bdry  (range 1 7)
-             right-bdry (range 1 7)]
-         (date-pattern node-set left-bdry right-bdry)))
-      last
-      last))
-
-(defn extract-dates
-  [node-set date-pattern]
-  (let [[date-start date-end] date-pattern
-        xml-dategroups        (node-set-dates node-set)]
-    (map
-     vector
-     node-set
-     (map
-      (fn [[xml date-groups]]
-        (-> (re-pattern (format "%s(.*)%s"
-                                (utils/str->pattern date-start)
-                                (utils/str->pattern date-end)))
-            (re-find xml)
-            second
-            dates/dates-in-text
-            first))
-      xml-dategroups))))
-
-(defn site-model
-  [xpaths records page-src]
-  {:date-pattern (first (find-date-pattern records))})
-
-(defn date-indexed-records
-  [page-src]
-  (let [xpaths  (map first (xpaths-ranked page-src))
-        records (minimum-maximal-xpath-records xpaths page-src)
-        model   (site-model xpaths records page-src)]
-    (extract-dates records (:date-pattern model))))
-
-(defn sort-order
-  [dates-list]
-  (let [timeline
-        (reduce
-         (fn [acc v]
-           (if (and (empty? (:asc acc))
-                    (empty? (:dsc acc)))
-             (merge-with concat acc {:asc [v] :dsc [v]})
-             (when v
-              (if (core-time/after? v (last (:asc [v])))
-                (merge-with concat acc {:asc [v]})
-                (merge-with concat acc {:dsc [v]})))))
-         {:asc []
-          :dsc []}
-         dates-list)]
-    (cond (> (count (:asc timeline))
-               (* 2 (count (:dsc timeline))))
-          'asc
-
-          (> (count (:dsc timeline))
-             (* 2 (count (:asc timeline))))
-          'dsc
-
-          :else 'unsorted)))
 
 (defn page-model
   [page-src]

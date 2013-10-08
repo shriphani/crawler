@@ -8,13 +8,20 @@
             [crawler.records :as records])
   (:use     [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]]))
 
+(defn rank-of-clueweb-string
+  [strs]
+  (.indexOf
+   (map
+    #(not= nil (re-find #"clueweb" %)) strs)
+   true))
+
 (defn test-xpath
   []
   (println
    "<html>
        <body>
         Positive Examples:
-        Date-detection success threshold: 0.7
+        Best record is 1.5 x away from the mean
         <ul>")
   (doseq [f (rest
             (file-seq
@@ -26,54 +33,33 @@
                  "https://rawgithub.com/shriphani/crawler/master/resources/date-indexed-data/positive/")
                 (clojure.string/join ""))
 
-          xpath (try (-> (slurp f)
-                         dom/page-model
-                         :records-xpath)
-                     (catch Exception e nil))
+          results (-> (slurp f)
+                      records/record-signatures)
           
-          fail  (if
-                    (and
-                     xpath
-                     (re-find #"clueweb" xpath))
-                  "Success"
-                  "Failed")]
+          outlier-xpaths (-> results
+                             first
+                             :outlier-xpaths)
+          rank (+ (rank-of-clueweb-string (rest results))
+                  (count (seq outlier-xpaths)))
+          fail  (if (or (some
+                         #(re-find #"clueweb" %)
+                         (seq outlier-xpaths))
+                        (zero? rank))
+                  "Success!"
+                  (format "Failed. Correct value @ rank: %d" rank))]
       (println
        (format
         "
         <li>
          <p><a href=\"%s\">%s</a></p>
-         <p>XPath: %s</p>
          <p>Records Discovered? %s</p>
         </li>
-        " link (.getName f) xpath fail))))
+        " link (.getName f) fail))))
   (println
    "</ul>
       </body>
       </html>"))
 
-(defn test-records
-  []
-  (let [data-dir "resources/records"]
-    (doseq [filename (filter
-                      #(re-find #".html" %)
-                      (map
-                       #(.getAbsolutePath %)
-                       (file-seq
-                        (clojure.java.io/file data-dir))))]
-      (let [page-src  (slurp filename)
-            xpath     (:records-xpath
-                       (dom/page-model page-src))
-            rs        (records/records page-src xpath)
-            
-            rs2       
-            (nth
-             (map
-              (fn
-                [[r1 r2]]
-               (records/records-seq-expt r1 r2))
-              (partition 2 rs)) 2)]
-        (println rs2)))))
-
 (defn -main
   [& args]
-  (test-records))
+  (test-xpath))

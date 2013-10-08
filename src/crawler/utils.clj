@@ -59,3 +59,14 @@ escape characters. then call re-pattern on it"
   (->> s
        (replace regex-char-esc-smap)
        (reduce str)))
+
+(defn abs
+  [n]
+  (if (pos? n) n (- n)))
+
+(defn prefix-match
+  [s1 s2]
+  (count
+   (take-while
+    (fn [[x y]] (= x y))
+    (map vector s1 s2))))

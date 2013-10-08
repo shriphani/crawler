@@ -31,11 +31,11 @@
         child-nodes-cnt (.getLength child-node-list)]
     (map #(.item child-node-list %) (range child-nodes-cnt))))
 
-(defn record-signature
-  [a-record]
-  (map
-   #(.getNodeName %)
-   (node-children a-record)))
+(defn node-siblings
+  [a-node]
+  (let [left-siblings (take-while identity (iterate (fn [x] (.getNextSibling x)) a-node))
+        right-sibs    (take-while identity (iterate (fn [x] (.getPreviousSibling x)) a-node))]
+    (concat left-siblings right-sibs)))
 
 (defn path-root-seq
   "A sequence of nodes from current node to root"
@@ -48,6 +48,10 @@
          (recur parent (cons a-tagnode cur-path))
          (cons a-tagnode cur-path)))))
 
+(defn contained-anchor-tags
+  [a-node]
+  ($x:node+ ".//a" a-node))
+
 (defn path-root-seq-nodes
   "Operates on node objects"
   ([a-w3c-node]
@@ -58,6 +62,16 @@
        (if (not= (.getNodeName parent) "#document")
          (recur parent (cons a-w3c-node cur-path))
          (cons a-w3c-node cur-path)))))
+
+(defn distance
+  [node1 node2]
+  (let [path-to-root1 (reverse (path-root-seq-nodes node1))
+        path-to-root2 (reverse (path-root-seq-nodes node2))]
+    (.indexOf
+     (for [x path-to-root1
+           y path-to-root2]
+       (.isSameNode x y))
+     true)))
 
 (defn format-attr
   "Cleans up the value of an id attribute"
@@ -83,6 +97,15 @@
           (-> a-tagnode
              (.getAttributeByName "class")
              (silent-fail-split #"\s+"))))))
+
+(defn node-class
+  "Value of the class attribute of a node"
+  [a-node]
+  (try (-> a-node
+           (.getAttributes)
+           (.getNamedItem "class")
+           (.getValue))
+       (catch Exception e nil)))
 
 (defn tag-id-class-node
   "Returns a list containing a tag's name, its id
@@ -171,7 +194,13 @@ id and class tag constraints are also added"
       #(str/join "/" %) 
       (utils/cross-product acc x)))
    ["/"]
-   (map w3c-node->xpath nodes-seq)))
+   (concat (map w3c-node->xpath (drop-last nodes-seq))
+           (list (list (.getNodeName (last nodes-seq)))))))
+
+(defn xpath-to-node
+  [a-node]
+  (let [path-to-root (path-root-seq-nodes a-node)]
+    (nodes->xpath path-to-root)))
 
 (defn anchor-tag-xpaths-nodes
   [nodes]
@@ -428,19 +457,3 @@ are sufficient to generate all the distinct records"
    str
    (.getTextContent a-node)
    (str/join " " (tooltips a-node))))
-
-(defn page-model
-  [page-src]
-  (let [records-dates (date-indexed-records page-src)
-        dates         (map second records-dates)
-        records       (map first records-dates)
-        record-xpath  (-> (first records)
-                          path-root-seq-nodes
-                          nodes->xpath
-                          first)]
-    {:num-records   (count records-dates)
-     :sort-order    (try (sort-order dates)
-                         (catch Exception e 'failed))
-     :records-xpath (clojure.string/replace
-                     record-xpath #"/\#document" "")
-     :date-pattern  (find-date-pattern records)}))

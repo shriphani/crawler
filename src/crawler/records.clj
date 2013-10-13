@@ -34,7 +34,9 @@ and names + classes of the constituent elements"
    {}
    records))
 
-(defn record-signatures
+(defn page-xpaths-records
+  "Return a list of xpaths and records on a page
+ranked by just the frequency of a record on the page"
   [page-src]
   (let [xpaths          (:xpaths
                          (dom/minimum-maximal-xpath-set page-src))

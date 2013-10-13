@@ -5,8 +5,7 @@
   (:require [crawler.dom :as dom]
             [crawler.utils :as utils]
             [clojure.string :as string])
-  (:use     [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]]
-            (incanter stats)))
+  (:use     [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]]))
 
 (defn tag-only-children
   [a-node]
@@ -27,31 +26,6 @@ and names + classes of the constituent elements"
                 (map #(.getNodeName %)
                      (tag-only-children first-record)))}))
 
-(defn positive-outlier-records
-  "Outlier in terms of # of individual records"
-  [record-sets]
-  (let [mean-record-set-size  (/ (reduce +' 0 (map count record-sets))
-                                 (count record-sets))
-
-        differences           (map #(utils/abs (- (count %) mean-record-set-size))
-                                   record-sets)
-        
-        stdev-record-set-size (/ (reduce +' 0 differences)
-                                 (count differences))]
-    
-    (filter
-     #(> (count %) (+ mean-record-set-size
-                      (* 1.5 stdev-record-set-size)))
-     record-sets)))
-
-(defn records-diversity
-  [record-set]
-  (try (->> record-set
-            first
-            ($x:node+ ".//*[not(*)]")
-            count)
-       (catch Exception e 0)))
-
 (defn resolve-records
   [records]
   (reduce
@@ -62,68 +36,14 @@ and names + classes of the constituent elements"
 
 (defn record-signatures
   [page-src]
-  (let [xpaths                 (:xpaths
-                                (dom/minimum-maximal-xpath-set page-src))
+  (let [xpaths          (:xpaths
+                         (dom/minimum-maximal-xpath-set page-src))
 
-        records                (dom/minimum-maximal-xpath-records
-                                xpaths (dom/html->xml-doc page-src))
+        records         (dom/minimum-maximal-xpath-records
+                         xpaths (dom/html->xml-doc page-src))
 
-        anchor-records         (filter
-                                #(= "a" (.getNodeName (first %)))
-                                records)
-
-        resolved-records       (vals (resolve-records records))
-
-        not-anchor-only        (filter
-                                (fn [rs] (not= (.getNodeName (first rs))
-                                              "a"))
-                                resolved-records)
-
-        positive-outlier-recs  (positive-outlier-records not-anchor-only)]
+        resolved-records (resolve-records records)]
     
-    (if (seq positive-outlier-recs)
-      (cons {:outlier        positive-outlier-recs
-             :outlier-xpaths (map #(first
-                                    (dom/xpath-to-node (first %)))
-                                  positive-outlier-recs)}
-            (map
-             #(first
-               (dom/xpath-to-node
-                (first %)))
-             (reverse
-              (sort-by
-               records-diversity not-anchor-only))))
-      (cons
-       {:outlier nil
-        :outlier-xpaths nil}
-       (map
-        #(first
-          (dom/xpath-to-node
-           (first %)))
-        (reverse
-         (sort-by
-          records-diversity not-anchor-only)))))))
-
-(defn record-signatures-2
-  [page-src]
-  (let [xpaths                 (:xpaths
-                                (dom/minimum-maximal-xpath-set page-src))
-
-        records                (dom/minimum-maximal-xpath-records
-                                xpaths (dom/html->xml-doc page-src))
-
-        anchor-records         (filter
-                                #(= "a" (.getNodeName (first %)))
-                                records)
-
-        resolved-records       (vals (resolve-records records))
-
-        not-anchor-only        (reverse
-                                (sort-by
-                                 records-diversity resolved-records))]
-    
-    
-    {:outlier        (first not-anchor-only)
-     :outlier-xpaths (first
-                      (dom/xpath-to-node (first (first not-anchor-only))))
-     :records        (first not-anchor-only)}))
+    (->> resolved-records
+         (sort-by #(count (second %)))
+         reverse)))

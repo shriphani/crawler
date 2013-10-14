@@ -45,7 +45,10 @@ ranked by just the frequency of a record on the page"
                          xpaths (dom/html->xml-doc page-src))
 
         resolved-records (resolve-records records)]
-    
-    (->> resolved-records
-         (sort-by #(count (second %)))
-         reverse)))
+
+    (map
+     (fn [[xpath records]]
+       {:xpath xpath :records records})
+     (->> resolved-records
+          (sort-by #(count (second %)))
+          reverse))))

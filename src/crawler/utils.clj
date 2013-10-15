@@ -70,3 +70,7 @@ escape characters. then call re-pattern on it"
    (take-while
     (fn [[x y]] (= x y))
     (map vector s1 s2))))
+
+(defn atom-merge-with
+  [atom-value f other-value]
+  (merge-with f atom-value other-value))

@@ -52,3 +52,13 @@ ranked by just the frequency of a record on the page"
      (->> resolved-records
           (sort-by #(count (second %)))
           reverse))))
+
+(defn record-anchors
+  [a-record]
+  (if (= (.getNodeName a-record) "a")
+    (list
+     (dom/node-attribute "href"))
+    (filter
+     identity (map
+               #(-> % :attrs :href)
+               ($x ".//a" a-record)))))

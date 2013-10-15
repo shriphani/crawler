@@ -37,6 +37,12 @@
         right-sibs    (take-while identity (iterate (fn [x] (.getPreviousSibling x)) a-node))]
     (concat left-siblings right-sibs)))
 
+(defn node-attribute
+  [a-node attr]
+  (-> a-node
+      (.getAttributes)
+      (.getNamedItem attr)))
+
 (defn path-root-seq
   "A sequence of nodes from current node to root"
   ([a-tagnode]

@@ -55,10 +55,12 @@ ranked by just the frequency of a record on the page"
 
 (defn record-anchors
   [a-record]
-  (if (= (.getNodeName a-record) "a")
-    (list
-     (dom/node-attribute "href"))
-    (filter
-     identity (map
-               #(-> % :attrs :href)
-               ($x ".//a" a-record)))))
+  (set
+   (if (= (.getNodeName a-record) "a")
+     (list
+      (dom/node-attribute a-record "href"))
+     (filter
+      identity
+      (map
+       #(-> % :attrs :href)
+       ($x ".//a" a-record))))))

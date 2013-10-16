@@ -74,3 +74,23 @@ escape characters. then call re-pattern on it"
 (defn atom-merge-with
   [atom-value f other-value]
   (merge-with f atom-value other-value))
+
+(defn sample-proportional
+  [items-scores]
+  (let [sorted-items (sort-by second items-scores)
+        total-score  (apply + (map second sorted-items))
+        normalized   (map
+                      (fn [[x s]]
+                        [x (/ s total-score)])
+                      sorted-items)
+
+        sampled      (rand)]
+    (-> (reduce
+         (fn [acc v]
+           (if (>= (second acc) sampled)
+             acc
+             [v (+ (second acc) (second v))]))
+         ["" 0]
+         normalized)
+        first
+        first)))

@@ -41,7 +41,8 @@
   [a-node attr]
   (-> a-node
       (.getAttributes)
-      (.getNamedItem attr)))
+      (.getNamedItem attr)
+      (.getValue)))
 
 (defn path-root-seq
   "A sequence of nodes from current node to root"

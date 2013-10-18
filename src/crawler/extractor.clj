@@ -24,6 +24,12 @@ in the records"
   (map
    (fn [[xpath anchor]])))
 
+(defn explore-record-xpath
+  "For each record picked up we explore
+it and bubble scores up"
+  [[xpath records]]
+  records)
+
 (defn process-page
   "Store the page signature"
   [url body]
@@ -44,4 +50,19 @@ in the records"
              clojure.set/union
              (into
               {}
-              (map vector xpaths records-anchors))))))
+              (map vector xpaths records-anchors)))
+
+      ;; now the exploration begins
+      (let [explore-strategy (reverse
+                              (sort-by
+                               (fn [xpath]
+                                 (count (@*xpath-records* xpath)))
+                               xpaths))
+            explore-records  (map
+                              (fn [xpath]
+                                (map-xpaths-records xpath))
+                              explore-strategy)]
+        (map
+         vector
+         explore-strategy
+         explore-records)))))

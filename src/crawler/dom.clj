@@ -438,11 +438,47 @@ or the returned records/nodes in the page are the same"
       (same-node-set? (xpath-nodes xpath1 page-src)
                       (xpath-nodes xpath2 page-src))))
 
+(defn resolve-anchor-nodes
+  ([xpath node]
+     (resolve-anchor-nodes xpath node node))
+  ([xpath node stored]
+   (let [parent-node                (.getParentNode node)
+         anchor-children            ($x:node+ ".//a" parent-node)
+         xpaths-to-anchor-children  (reduce
+                                     (fn [acc x]
+                                       (merge-with + acc {x 1}))
+                                     {}
+                                     (map #(first (xpath-to-node %)) anchor-children))]
+
+     (cond (> (xpaths-to-anchor-children xpath) 1)
+           [(first (xpath-to-node node)) node]
+
+           (= (.getNodeName parent-node) "#document")
+           [xpath stored]
+
+           :else
+           (recur xpath parent-node stored)))))
+
 (defn minimum-maximal-xpath-records
   "Given a set of xpaths, we compute the xpaths that
 are sufficient to generate all the distinct records"
   [xpaths processed-page]
-  )
+
+  (let [xpath-nodes      (map #($x:node+ % processed-page) xpaths)
+        xpaths-nodes-map (into {} (map vector xpaths xpath-nodes))
+        potential-recs   (map (fn [[xpath nodes]]
+                                (map (fn [node]
+                                       (resolve-anchor-nodes xpath node)) nodes))
+                              xpaths-nodes-map)]
+    (into {}
+          (map
+           (fn [[xpath nodes]]
+             [xpath (distinct nodes)])
+           (reduce
+            (fn [acc [xpath node]]
+              (merge-with concat acc {xpath [node]}))
+            {}
+            (partition 2 (flatten potential-recs)))))))
 
 (defn date-indexed-records-filter
   "records-sets: returned by minimum-maximal-xpath-records"

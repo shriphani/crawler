@@ -4,7 +4,8 @@
 (ns crawler.records
   (:require [crawler.dom :as dom]
             [crawler.utils :as utils]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            (org.bovinegenius [exploding-fish :as uri]))
   (:use     [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]]))
 
 (defn tag-only-children
@@ -62,5 +63,8 @@ ranked by just the frequency of a record on the page"
      (filter
       identity
       (map
-       #(-> % :attrs :href)
+       #(-> %
+            :attrs
+            :href
+            (uri/fragment nil))
        ($x ".//a" a-record))))))

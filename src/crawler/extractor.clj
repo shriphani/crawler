@@ -43,16 +43,5 @@ in the records"
              utils/atom-merge-with
              clojure.set/union
              (into
-              {} (map vector xpaths records-anchors)))
-
-      ;; sample based on probability
-      ;  (utils/sample-proportional xpaths @*)
-      (let [sampled-xpath  (utils/sample-proportional
-                            (map
-                             (fn [xpath]
-                               [xpath
-                                (count (@*xpath-records* xpath))])
-                             xpaths))
-
-            sampled-record (nth (map-xpaths-records sampled-xpath))]
-        '*))))
+              {}
+              (map vector xpaths records-anchors))))))

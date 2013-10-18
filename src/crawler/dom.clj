@@ -442,30 +442,7 @@ or the returned records/nodes in the page are the same"
   "Given a set of xpaths, we compute the xpaths that
 are sufficient to generate all the distinct records"
   [xpaths processed-page]
-  (reverse (sort-by
-            count
-            (:record-sets
-             (reduce
-              (fn [acc record-set]
-                (if (= (clojure.set/union
-                        (:records acc) (set record-set))
-                       (:records acc))
-                  acc
-                  {:record-sets
-                   (conj
-                    (:record-sets acc) record-set)
-                   
-                   :records
-                   (clojure.set/union
-                    (:records acc) (set record-set))}))
-              
-              {:record-sets []
-               :records     (set [])}
-              (reverse
-               (sort-by
-                count (map
-                       #(xpath->records % processed-page)
-                       xpaths))))))))
+  )
 
 (defn date-indexed-records-filter
   "records-sets: returned by minimum-maximal-xpath-records"

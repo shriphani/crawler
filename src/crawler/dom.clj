@@ -70,6 +70,19 @@
          (recur parent (cons a-w3c-node cur-path))
          (cons a-w3c-node cur-path)))))
 
+(defn path-root-seq-nodes-2
+  "FIX"
+  ([a-w3c-node a-root]
+     (path-root-seq-nodes a-w3c-node []))
+
+  ([a-w3c-node a-root cur-path]
+     (let [parent (.getParentNode a-w3c-node)]
+       (if (and
+            (not (.isSameNode a-root parent))
+            (not= (.getNodeName parent) "#document"))
+         (recur parent a-root (cons a-w3c-node cur-path))
+         (cons a-w3c-node cur-path)))))
+
 (defn distance
   [node1 node2]
   (let [path-to-root1 (reverse (path-root-seq-nodes node1))
@@ -203,6 +216,11 @@ id and class tag constraints are also added"
    ["/"]
    (concat (map w3c-node->xpath (drop-last nodes-seq))
            (list (list (.getNodeName (last nodes-seq)))))))
+
+(defn xpath-to-custom-root
+  [a-node the-root]
+  (let [path-to-root (path-root-seq-nodes-2 a-node the-root)]
+    (nodes->xpath path-to-root)))
 
 (defn xpath-to-node
   [a-node]

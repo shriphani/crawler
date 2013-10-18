@@ -40,19 +40,10 @@ and names + classes of the constituent elements"
 ranked by just the frequency of a record on the page"
   [page-src]
   (let [xpaths          (:xpaths
-                         (dom/minimum-maximal-xpath-set page-src))
+                         (dom/minimum-maximal-xpath-set page-src))]
 
-        records         (dom/minimum-maximal-xpath-records
-                         xpaths (dom/html->xml-doc page-src))
-
-        resolved-records (resolve-records records)]
-
-    (map
-     (fn [[xpath records]]
-       {:xpath xpath :records records})
-     (->> resolved-records
-          (sort-by #(count (second %)))
-          reverse))))
+    (dom/minimum-maximal-xpath-records
+     xpaths (dom/html->xml-doc page-src))))
 
 (defn record-anchors
   [a-record]

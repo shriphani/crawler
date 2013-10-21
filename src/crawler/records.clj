@@ -57,5 +57,5 @@ ranked by just the frequency of a record on the page"
        #(-> %
             :attrs
             :href
-            (uri/fragment nil))
+            (uri/fragment nil)) ; remove the fragment segment
        ($x ".//a" a-record))))))

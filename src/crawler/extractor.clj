@@ -24,45 +24,25 @@ in the records"
   (map
    (fn [[xpath anchor]])))
 
-(defn explore-record-xpath
-  "For each record picked up we explore
-it and bubble scores up"
-  [[xpath records]]
-  records)
+(defn record-explore-potential
+  "At first, we just use # of distinct links"
+  [a-record]
+  (-> a-record
+      (records/record-anchors)))
 
 (defn process-page
   "Store the page signature"
   [url body]
-  (let [xpaths-and-records (records/page-xpaths-records body)
-        xpaths             (map #(-> % :xpath) xpaths-and-records)
-        mined-records      (map #(-> % :records) xpaths-and-records)
-        map-xpaths-records (into {} (map vector xpaths mined-records))
-        records-anchors    (map (fn [rs]
-                                  (apply clojure.set/union
-                                         (flatten
-                                          (map records/record-anchors rs))))
-                                mined-records)]
-    (do
-
-      ;; update global xpath scores
-      (swap! *xpath-records*
-             utils/atom-merge-with
-             clojure.set/union
-             (into
-              {}
-              (map vector xpaths records-anchors)))
-
-      ;; now the exploration begins
-      (let [explore-strategy (reverse
-                              (sort-by
-                               (fn [xpath]
-                                 (count (@*xpath-records* xpath)))
-                               xpaths))
-            explore-records  (map
-                              (fn [xpath]
-                                (map-xpaths-records xpath))
-                              explore-strategy)]
-        (map
-         vector
-         explore-strategy
-         explore-records)))))
+  (let [xpaths-and-records (into [] (records/page-xpaths-records body))
+        xpaths             (map first xpaths-and-records)
+        records            (map second xpaths-and-records)
+        records-anchors    (map (fn [a-record-set]
+                                  (->> a-record-set
+                                       (map
+                                        #(record-explore-potential %))))
+                                records)
+        records-hrefs      (map
+                            (fn [a-record-set]
+                              (count (apply set/union a-record-set)))
+                            records-anchors)]
+    (map vector xpaths records-hrefs)))

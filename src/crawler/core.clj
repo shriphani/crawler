@@ -5,7 +5,6 @@
   (:require [clojure.tools.cli :as cli]
             [clj-http.client :as client]
             [org.bovinegenius [exploding-fish :as uri]]
-            [crawler.page-utils :as page-utils]
             [crawler.utils :as utils])
   (:use [clojure.pprint]))
 

@@ -336,9 +336,12 @@ of the xpath set."
                  (uri/resolve-uri
                   src-link
                   (uri/fragment
-                   (-> res
-                       :attrs
-                       :href)
+                   (let [a-href (-> res
+                                    :attrs
+                                    :href)]
+                     (if (= "javascript" (uri/scheme a-href))
+                       nil
+                       a-href))
                    nil))
                  (catch Exception e nil)))
              (filter

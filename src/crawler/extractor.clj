@@ -3,14 +3,18 @@
 
 (ns crawler.extractor
   "Code to operate on a webpage and lookup URLs"
-  (:require [clojure.set :as set]
+  (:require [clj-http.client :as client]
+            [clojure.set :as set]
             [crawler.dom :as dom]
+            [crawler.page :as page]
             [crawler.records :as records]
             [crawler.utils :as utils]
-            [itsy.core :as itsy]))
+            [itsy.core :as itsy]
+            [org.bovinegenius [exploding-fish :as uri]]))
 
-(def *xpath-scores* (atom {}))
-(def *xpath-records* (atom {}))
+(def *xpath-hrefs* (atom {})) ; hold the unique hrefs for each xpath
+(def *xpath-df* (atom {}))    ; hold the df score for each xpath
+(def *visited* (atom (set [])))
 
 (defn add-xpath
   [url-xpaths url xpath]
@@ -30,19 +34,81 @@ in the records"
   (-> a-record
       (records/record-anchors)))
 
-(defn process-page
+(defn sample
+  [urls host]
+  (let [candidates (filter
+                    (fn [url]
+                      (and (= host (uri/host url))
+                           (not (some #{url} @*visited*))))
+                    (into [] urls))
+        
+        sampled    (when (> (count candidates) 0)
+                     (rand-nth candidates))]
+    
+    (when sampled
+     (if (and (= (uri/host sampled) host)
+              (not (some #{sampled} @*visited*)))
+       sampled
+       (recur urls host)))))
+
+(defn update-df
+  [xpaths-hrefs]
+  (let [xpaths     (map first xpaths-hrefs)
+        xpaths-cnt (map (fn [x] {x 1}) xpaths)]
+    (doseq [xpath-cnt xpaths-cnt]
+      (swap! *xpath-df* utils/atom-merge-with +' xpath-cnt))))
+
+(defn update-hrefs
+  [xpaths-hrefs]
+  '*)
+
+(defn explore-xpath-and-update
+  "Sample a link from xpath-hrefs,
+make an update to the global table"
+  [xpath hrefs host signature]
+  (let [sampled          (sample hrefs host)
+        _                (swap! *visited* conj sampled)
+        body             (try (-> (client/get sampled) :body)
+                              (catch Exception e (do
+                                                   (println xpath))))
+        xpaths-hrefs'    (if body
+                           (dom/minimum-maximal-xpath-set body sampled)
+                           nil)
+        in-host-xpath-hs (map
+                          first
+                          (filter
+                           (fn [[xpath hrefs]]
+                             (some (fn [a-href]
+                                     (= (uri/host sampled)
+                                        (uri/host a-href)))
+                                   hrefs))
+                           xpaths-hrefs'))]
+    (if xpaths-hrefs'
+     (do
+       (update-df xpaths-hrefs')
+       (println sampled)
+       (println
+        (clojure.set/difference
+         (set signature)
+         (set in-host-xpath-hs)))
+       (println "FOUND A POTENTIAL MATCH"))
+     sampled)))
+
+(defn process-new-page
   "Store the page signature"
-  [url body]
-  (let [xpaths-and-records (into [] (records/page-xpaths-records body))
-        xpaths             (map first xpaths-and-records)
-        records            (map second xpaths-and-records)
-        records-anchors    (map (fn [a-record-set]
-                                  (->> a-record-set
-                                       (map
-                                        #(record-explore-potential %))))
-                                records)
-        records-hrefs      (map
-                            (fn [a-record-set]
-                              (count (apply set/union a-record-set)))
-                            records-anchors)]
-    (map vector xpaths records-hrefs)))
+  [url body one-hop?]
+  (do
+    (swap! *visited* conj url)
+    (let [xpaths-hrefs        (dom/minimum-maximal-xpath-set
+                              body url)
+          in-host-xpath-hrefs (filter
+                               (fn [[xpath hrefs]]
+                                 (some (fn [a-href]
+                                         (= (uri/host url)
+                                            (uri/host a-href)))
+                                       hrefs))
+                               xpaths-hrefs)
+          in-host-xpaths      (map first in-host-xpath-hrefs)]
+      (doseq [[xpath hrefs] in-host-xpath-hrefs]
+        (explore-xpath-and-update
+         xpath hrefs (uri/host url) in-host-xpaths)))))

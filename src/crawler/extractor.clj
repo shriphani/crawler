@@ -88,9 +88,9 @@ make an update to the global table"
        (update-df xpaths-hrefs')
        (println sampled)
        (println
-        (clojure.set/difference
-         (set signature)
-         (set in-host-xpath-hs)))
+        (page/signature-similarity
+         signature
+         in-host-xpath-hs))
        (println "FOUND A POTENTIAL MATCH"))
      sampled)))
 

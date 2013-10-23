@@ -9,7 +9,8 @@
             [clojure.string :as str]
             [crawler.core :as core]
             [crawler.utils :as utils]
-            [misc.dates :as dates])
+            [misc.dates :as dates]
+            [org.bovinegenius [exploding-fish :as uri]])
   (:use [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]])
   (:import (org.htmlcleaner HtmlCleaner DomSerializer CleanerProperties)
            (org.w3c.dom Document)))
@@ -265,6 +266,8 @@ id and class tag constraints are also added"
     (-> dom-serializer
         (.createDOM tag-node))))
 
+(def file-format-ignore-regex #".jpg$|.css$|.gif$|.png$")
+
 (defn minimum-maximal-xpath-set-processed
   "This helper routine exists so we don't reparse
 the page several times"
@@ -286,27 +289,60 @@ the page several times"
                          second
                          (anchor-tag-xpaths-nodes a-tags))))]
 
-    (-> (reduce
-         (fn [acc xpath]
-           (let [xpath-links (set
-                              (map #(-> % :attrs :href)
-                                   ($x xpath processed-pg)))]
-             (if (= (clj-set/intersection (:links acc) xpath-links)
-                    xpath-links)
-               acc
-               (merge-with clj-set/union acc {:links  xpath-links
-                                              :xpaths #{xpath}}))))
-         {:xpaths (set [])
-          :links  (set [])}
-         xpaths-a-tags))))
+    (:xpaths (-> (reduce
+                  (fn [acc xpath]
+                    (let [xpath-links (set
+                                       (filter
+                                        #(not (re-find file-format-ignore-regex %))
+                                        (filter
+                                         identity
+                                         (map #(try (uri/fragment (-> % :attrs :href) nil)
+                                                    (catch Exception e nil))
+                                              ($x xpath processed-pg)))))]
+                      (if (= (clj-set/intersection (:links acc) xpath-links)
+                             xpath-links)
+                        acc
+                        (merge-with clj-set/union acc {:links  xpath-links
+                                                       :xpaths #{xpath}}))))
+                  {:xpaths (set [])
+                   :links  (set [])}
+                  xpaths-a-tags)))))
 
 (defn minimum-maximal-xpath-set
   "A maximal xpath set is a set of xpaths
 sufficient to span all the anchor tags on a 
 page. The minimum here refers to the cardinality
 of the xpath set."
-  [page-src]
-  (minimum-maximal-xpath-set-processed (html->xml-doc page-src)))
+  [page-src src-link]
+  (let [processed (html->xml-doc page-src)
+        xpaths    (minimum-maximal-xpath-set-processed processed)]
+    (reduce
+     (fn [acc [xpath hrefs]]
+       (merge-with clojure.set/union acc {xpath hrefs}))
+     {}
+     (map
+      vector
+      xpaths
+      (map
+       (fn [xpath]
+         (set
+          (filter
+           #(not (re-find file-format-ignore-regex %))
+           (filter
+            identity
+            (map
+             (fn [res]
+               (try
+                 (uri/resolve-uri
+                  src-link
+                  (uri/fragment
+                   (-> res
+                       :attrs
+                       :href)
+                   nil))
+                 (catch Exception e nil)))
+             (filter
+              identity ($x xpath processed))))))) xpaths)))))
 
 (defn node-path-to-root
   "A version of path-root-seq for

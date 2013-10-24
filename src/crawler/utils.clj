@@ -96,9 +96,11 @@ escape characters. then call re-pattern on it"
         first)))
 
 (defn and-fn
+  "Reduce using and"
   [x y]
   (and x y))
 
 (defn or-fn
+  "Reduce using or"
   [x y]
   (or x y))

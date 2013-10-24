@@ -15,9 +15,9 @@
 
 (def *page-sim-thresh* 0.90)
 
-(def *xpath-hrefs* (atom {}))     ; hold the unique hrefs for each xpath
-(def *xpath-df* (atom {}))        ; hold the df score for each xpath
-(def *visited* (atom (set [])))
+(def *xpath-hrefs* (atom {}))       ; hold the unique hrefs for each xpath
+(def *xpath-df* (atom {}))          ; hold the df score for each xpath
+(def *visited* (atom (set [])))     ; set of visited documents
 (def *url-documents* (atom {}))
 (def *enum-candidates* (atom {}))
 
@@ -129,6 +129,7 @@ make an update to the global table"
         (/ (Math/log (count (@*xpath-hrefs* xpath)))
            (@*xpath-df* xpath)))
       enum-xpath-candidates)))))
+
 (defn process-new-page
   "Store the page signature"
   [url body one-hop?]

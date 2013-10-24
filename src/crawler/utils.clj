@@ -94,3 +94,11 @@ escape characters. then call re-pattern on it"
          normalized)
         first
         first)))
+
+(defn and-fn
+  [x y]
+  (and x y))
+
+(defn or-fn
+  [x y]
+  (or x y))

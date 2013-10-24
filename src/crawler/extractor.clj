@@ -88,14 +88,11 @@ make an update to the global table"
 
         page-sim         (page/signature-similarity
                           signature in-host-xpath-hs)]
-    (if xpaths-hrefs'
+    (when xpaths-hrefs'
      (do
        (update-df xpaths-hrefs')
        (update-hrefs xpaths-hrefs')
-       (swap! *visited* conj sampled)
-
-       ;; do something about enumeration here)
-     nil)))
+       (swap! *visited* conj sampled)))))
 
 (defn process-new-page
   "Store the page signature"

@@ -67,10 +67,12 @@ in the records"
 make an update to the global table"
   [xpath hrefs host signature]
   (let [sampled          (sample hrefs host)
-        _                (swap! *visited* conj sampled)
+        
         body             (try (-> (client/get sampled) :body)
-                              (catch Exception e (do
-                                                   (println xpath))))
+                              (catch Exception e
+                                (do (println "Failed: " xpath)
+                                    (println "URL: " sampled)
+                                    (println (.getMessage e)))))
         xpaths-hrefs'    (if body
                            (dom/minimum-maximal-xpath-set body sampled)
                            nil)
@@ -82,17 +84,18 @@ make an update to the global table"
                                      (= (uri/host sampled)
                                         (uri/host a-href)))
                                    hrefs))
-                           xpaths-hrefs'))]
+                           xpaths-hrefs'))
+
+        page-sim         (page/signature-similarity
+                          signature in-host-xpath-hs)]
     (if xpaths-hrefs'
      (do
        (update-df xpaths-hrefs')
-       (println sampled)
-       (println
-        (page/signature-similarity
-         signature
-         in-host-xpath-hs))
-       (println "FOUND A POTENTIAL MATCH"))
-     sampled)))
+       (update-hrefs xpaths-hrefs')
+       (swap! *visited* conj sampled)
+
+       ;; do something about enumeration here)
+     nil)))
 
 (defn process-new-page
   "Store the page signature"

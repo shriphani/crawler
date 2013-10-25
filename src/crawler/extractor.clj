@@ -11,9 +11,17 @@
             [crawler.utils :as utils]
             [itsy.core :as itsy]
             [org.bovinegenius [exploding-fish :as uri]])
-  (:use [clojure.tools.logging :only (info error)]))
+  (:use [clojure.tools.logging :only (info error)]
+        [clj-logging-config.log4j]))
 
-(def *page-sim-thresh* 0.90)
+(set-logger! :level :debug
+             :out (org.apache.log4j.FileAppender.
+                   (org.apache.log4j.EnhancedPatternLayout.
+                    org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
+                   "logs/foo.log"
+                   true))
+
+(def *page-sim-thresh* 0.85)
 
 (def *xpath-hrefs* (atom {}))       ; hold the unique hrefs for each xpath
 (def *xpath-df* (atom {}))          ; hold the df score for each xpath
@@ -24,6 +32,18 @@
 (defn add-xpath
   [url-xpaths url xpath]
   (merge-with concat url-xpaths {url [xpath]}))
+
+(defn visit-and-record-page
+  [a-link]
+  (let [body (try
+               (-> a-link
+                   client/get
+                   :body)
+               (catch Exception e nil))]
+    (swap! *visited* conj a-link)
+    (swap!
+     *url-documents* utils/atom-merge-with set/union {a-link (set [body])})
+    body))
 
 (defn update-xpaths-productivities
   "Expected data structure:
@@ -93,7 +113,10 @@ make an update to the global table"
                                          (error "URL: " sampled)
                                          (error (.getMessage e)))))
              xpaths-hrefs'    (if body
-                                (dom/minimum-maximal-xpath-set body sampled)
+                                (try (dom/minimum-maximal-xpath-set body sampled)
+                                     (catch Exception e
+                                       (do (error "Failed to parse: " sampled)
+                                           (error "Error caused by: " xpath))))
                                 nil)
              in-host-xpath-hs (map
                                first
@@ -130,35 +153,34 @@ make an update to the global table"
            (@*xpath-df* xpath)))
       enum-xpath-candidates)))))
 
-(defn process-new-page
-  "Store the page signature"
-  [url body one-hop?]
-  (do
-    (swap! *visited* conj url)
-    (let [xpaths-hrefs          (dom/minimum-maximal-xpath-set
+(defn process-link
+  [url]
+  (let [body                  (visit-and-record-page url)
+        
+        xpaths-hrefs          (dom/minimum-maximal-xpath-set
                                  body url)
 
-          xpaths                (map first xpaths-hrefs)
-          
-          in-host-xpath-hrefs   (filter
-                                 (fn [[xpath hrefs]]
-                                   (some (fn [a-href]
-                                           (= (uri/host url)
-                                              (uri/host a-href)))
-                                         hrefs))
-                                 xpaths-hrefs)
-          
-          in-host-xpaths        (map first in-host-xpath-hrefs)
+        xpaths                (map first xpaths-hrefs)
+        
+        in-host-xpath-hrefs   (filter
+                               (fn [[xpath hrefs]]
+                                 (some (fn [a-href]
+                                         (= (uri/host url)
+                                            (uri/host a-href)))
+                                       hrefs))
+                               xpaths-hrefs)
+        
+        in-host-xpaths        (map first in-host-xpath-hrefs)
 
-          explorations          (map
-                                 (fn [[xpath hrefs]]
-                                   (explore-xpath-and-update
-                                    xpath hrefs (uri/host url) in-host-xpaths))
-                                 in-host-xpath-hrefs)
+        explorations          (map
+                               (fn [[xpath hrefs]]
+                                 (explore-xpath-and-update
+                                  xpath hrefs (uri/host url) in-host-xpaths))
+                               in-host-xpath-hrefs)
 
-          enum-candidate-xpaths (map
-                                 first
-                                 (filter
-                                  (fn [[k v]] (reduce utils/or-fn false v))
-                                  (map vector in-host-xpaths explorations)))]
-      (rank-enum-xpaths enum-candidate-xpaths))))
+        enum-candidate-xpaths (map
+                               first
+                               (filter
+                                (fn [[k v]] (reduce utils/or-fn false v))
+                                (map vector in-host-xpaths explorations)))]
+    (rank-enum-xpaths enum-candidate-xpaths)))

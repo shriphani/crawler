@@ -7,6 +7,7 @@
             [clojure.set :as set]
             [crawler.dom :as dom]
             [crawler.page :as page]
+            [crawler.rank :as rank]
             [crawler.records :as records]
             [crawler.utils :as utils]
             [itsy.core :as itsy]
@@ -16,14 +17,16 @@
 
 (utils/global-logger-config)
 
-(def *page-sim-thresh* 0.85)
+(def *page-sim-thresh* 0.9)
+(def *sample-fraction* (/ 1 4))   ; fraction of links to look at
+                                  ; before sampling
 
-(def *xpath-hrefs* (atom {}))     ; hold the unique hrefs for each xpath
-(def *xpath-df* (atom {}))        ; hold the df score for each xpath
-(def *xpath-tf* (atom {}))        ; per-page tf scores
-(def *visited* (atom (set [])))   ; set of visited documents
-(def *url-documents* (atom {}))
-(def *enum-candidates* (atom {}))
+(def *xpath-hrefs*   (atom {}))   ; hold the unique hrefs for each xpath
+(def *xpath-df*      (atom {}))   ; hold the df score for each xpath
+(def *xpath-tf*      (atom {}))   ; per-page tf scores
+(def *visited*       (atom
+                      (set [])))  ; set of visited documents
+(def *url-documents* (atom {}))   ; url -> body map
 
 (defn add-xpath
   [url-xpaths url xpath]
@@ -44,6 +47,11 @@ in the records"
   [records-anchors]
   (map
    (fn [[xpath anchor]])))
+
+(defn update-tf
+  [xpaths-tfs]
+  (doseq [[xpath tf] xpaths-tfs]
+    (swap! *xpath-tf* utils/atom-merge-with concat {xpath [tf]})))
 
 (defn record-explore-potential
   "At first, we just use # of distinct links"
@@ -77,6 +85,7 @@ in the records"
            (recur urls host 0 sampled-list))))))
 
 (defn update-df
+  "Each XPath's df score is incremented"
   [xpaths-hrefs]
   (let [xpaths     (map first xpaths-hrefs)
         xpaths-cnt (map (fn [x] {x 1}) xpaths)]
@@ -84,6 +93,7 @@ in the records"
       (swap! *xpath-df* utils/atom-merge-with +' xpath-cnt))))
 
 (defn update-hrefs
+  "Union of explored hrefs and observed hrefs"
   [xpaths-hrefs]
   (swap! *xpath-hrefs*
          utils/atom-merge-with
@@ -91,8 +101,7 @@ in the records"
          (into {} xpaths-hrefs)))
 
 (defn explore-xpath-and-update
-  "Sample a link from xpath-hrefs,
-make an update to the global table"
+  "Explore an xpath and its href links."
   [xpath hrefs host signature]
   (info :exploring-xpath xpath)
   (let [sampled-uris (sample hrefs host (Math/ceil
@@ -101,50 +110,45 @@ make an update to the global table"
                                           4)))]
     (map
      (fn [sampled]
+       
        (info :sampling-url sampled)
+       
        (let [body             (utils/get-and-log sampled {:xpath xpath})
              
              xpaths-hrefs'    (if body
-                                (try (dom/minimum-maximal-xpath-set body sampled)
-                                     (catch Exception e
-                                       (do (error "Failed to parse: " sampled)
-                                           (error "Error caused by: " xpath))))
+                                (try
+                                  (dom/minimum-maximal-xpath-set body sampled)
+                                  (catch Exception e
+                                    (do (error "Failed to parse: " sampled)
+                                        (error "Error caused by: " xpath))))
                                 nil)
-             
-             in-host-xpath-hs (map
-                               first
-                               (filter
-                                (fn [[xpath hrefs]]
-                                  (some (fn [a-href]
-                                          (= (uri/host sampled)
-                                             (uri/host a-href)))
-                                        hrefs))
-                                xpaths-hrefs'))
 
-             page-sim         (page/signature-similarity
-                               signature in-host-xpath-hs)]
+             in-host-map      (filter
+                               (fn [[xpath hrefs]]
+                                 (some (fn [a-href]
+                                         (= (uri/host sampled)
+                                            (uri/host a-href)))
+                                       hrefs))
+                               xpaths-hrefs')
+             
+             in-host-xpath-hs (map first in-host-map)
+
+             page-sim         (page/signature-similarity signature in-host-xpath-hs)
+
+             xpath-tfs        (map
+                               (fn [[xpath hrefs]]
+                                 [xpath (count hrefs)])
+                               in-host-map)]
+         
          (when xpaths-hrefs'
            (do
              (update-df xpaths-hrefs')
              (update-hrefs xpaths-hrefs')
+             (update-tf xpath-tfs)
              (swap! *visited* conj sampled)
              (when (> page-sim *page-sim-thresh*)
                [:enum-candidate page-sim sampled])))))
      sampled-uris)))
-
-(defn rank-enum-xpaths
-  [enum-xpath-candidates]
-  (reverse
-   (sort-by
-    second
-    (map
-     vector
-     enum-xpath-candidates
-     (map
-      (fn [xpath]
-        (/ (Math/log (count (@*xpath-hrefs* xpath)))
-           (@*xpath-df* xpath)))
-      enum-xpath-candidates)))))
 
 (defn process-link
   [url]
@@ -175,6 +179,14 @@ make an update to the global table"
                                first
                                (filter
                                 (fn [[k v]] (reduce utils/or-fn false v))
-                                (map vector in-host-xpaths explorations)))]
+                                (map vector in-host-xpaths explorations)))
+
+        enum-candidate-feats  (map
+                               (fn [xpath]
+                                 {:xpath xpath
+                                  :tf    (@*xpath-tf* xpath)
+                                  :df    (@*xpath-df* xpath)
+                                  :hrefs (@*xpath-hrefs* xpath)})
+                               enum-candidate-xpaths)]
     
-    (rank-enum-xpaths enum-candidate-xpaths)))
+    (rank/rank-enum-candidates enum-candidate-feats true)))

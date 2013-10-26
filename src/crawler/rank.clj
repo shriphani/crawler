@@ -24,5 +24,3 @@ info:
     (if with-info?
       ranked
       (map #(-> % :xpath) ranked))))
-
-

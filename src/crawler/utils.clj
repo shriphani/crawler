@@ -3,7 +3,19 @@
 
 (ns crawler.utils
   (:require [clj-http.client :as client]
-            [org.bovinegenius [exploding-fish :as uri]]))
+            [org.bovinegenius [exploding-fish :as uri]])
+  (:use [clojure.tools.logging :only (info error)]
+        [clj-logging-config.log4j]))
+
+(defn global-logger-config
+  []
+  (set-logger!
+   :level :debug
+   :out   (org.apache.log4j.FileAppender.
+           (org.apache.log4j.EnhancedPatternLayout.
+            org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
+           "logs/crawl.log"
+           true)))
 
 (def relative? #(not (uri/absolute? %))) ; relative-url?
 
@@ -104,3 +116,13 @@ escape characters. then call re-pattern on it"
   "Reduce using or"
   [x y]
   (or x y))
+
+(defn get-and-log
+  ([a-link]
+     (get-and-log a-link {}))
+  ([a-link info]
+     (try (-> (client/get a-link) :body)
+          (catch Exception e
+            (do (error :fetch-failed info)
+                (error :url a-link)
+                (error (.getMessage e)))))))

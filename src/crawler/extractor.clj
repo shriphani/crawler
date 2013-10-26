@@ -14,18 +14,14 @@
   (:use [clojure.tools.logging :only (info error)]
         [clj-logging-config.log4j]))
 
-(set-logger! :level :debug
-             :out (org.apache.log4j.FileAppender.
-                   (org.apache.log4j.EnhancedPatternLayout.
-                    org.apache.log4j.EnhancedPatternLayout/TTCC_CONVERSION_PATTERN)
-                   "logs/foo.log"
-                   true))
+(utils/global-logger-config)
 
 (def *page-sim-thresh* 0.85)
 
-(def *xpath-hrefs* (atom {}))       ; hold the unique hrefs for each xpath
-(def *xpath-df* (atom {}))          ; hold the df score for each xpath
-(def *visited* (atom (set [])))     ; set of visited documents
+(def *xpath-hrefs* (atom {}))     ; hold the unique hrefs for each xpath
+(def *xpath-df* (atom {}))        ; hold the df score for each xpath
+(def *xpath-tf* (atom {}))        ; per-page tf scores
+(def *visited* (atom (set [])))   ; set of visited documents
 (def *url-documents* (atom {}))
 (def *enum-candidates* (atom {}))
 
@@ -35,11 +31,7 @@
 
 (defn visit-and-record-page
   [a-link]
-  (let [body (try
-               (-> a-link
-                   client/get
-                   :body)
-               (catch Exception e nil))]
+  (let [body (utils/get-and-log a-link)]
     (swap! *visited* conj a-link)
     (swap!
      *url-documents* utils/atom-merge-with set/union {a-link (set [body])})
@@ -68,9 +60,10 @@ in the records"
        sampled-list
        (let [candidates (filter
                          (fn [url]
-                           (and (= host (uri/host url))
-                                (not (some #{url} @*visited*))
-                                (not (some #{url} sampled-list))))
+                           (and
+                            (= host (uri/host url))
+                            (not (some #{url} @*visited*))
+                            (not (some #{url} sampled-list))))
                          (into [] urls))
              
              sampled    (when (> (count candidates) 0)
@@ -101,23 +94,23 @@ in the records"
   "Sample a link from xpath-hrefs,
 make an update to the global table"
   [xpath hrefs host signature]
+  (info :exploring-xpath xpath)
   (let [sampled-uris (sample hrefs host (Math/ceil
                                          (/
                                           (count hrefs)
                                           4)))]
     (map
      (fn [sampled]
-       (let [body             (try (-> (client/get sampled) :body)
-                                   (catch Exception e
-                                     (do (error "Failed: " xpath)
-                                         (error "URL: " sampled)
-                                         (error (.getMessage e)))))
+       (info :sampling-url sampled)
+       (let [body             (utils/get-and-log sampled {:xpath xpath})
+             
              xpaths-hrefs'    (if body
                                 (try (dom/minimum-maximal-xpath-set body sampled)
                                      (catch Exception e
                                        (do (error "Failed to parse: " sampled)
                                            (error "Error caused by: " xpath))))
                                 nil)
+             
              in-host-xpath-hs (map
                                first
                                (filter
@@ -183,4 +176,5 @@ make an update to the global table"
                                (filter
                                 (fn [[k v]] (reduce utils/or-fn false v))
                                 (map vector in-host-xpaths explorations)))]
+    
     (rank-enum-xpaths enum-candidate-xpaths)))

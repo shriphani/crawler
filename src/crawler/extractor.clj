@@ -227,3 +227,12 @@
         enum-candidates-info  (map enum-candidate-info enum-candidates)]
     
     (rank/rank-enum-candidates enum-candidates-info)))
+
+(defn reset
+  "Flush all global atoms"
+  []
+  (utils/reset *xpath-hrefs* {})
+  (utils/reset *xpath-df* {})
+  (utils/reset *xpath-tf* {})
+  (utils/reset *visited* [])
+  (utils/reset *url-documents* {}))

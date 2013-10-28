@@ -126,3 +126,7 @@ escape characters. then call re-pattern on it"
             (do (error :fetch-failed info)
                 (error :url a-link)
                 (error (.getMessage e)))))))
+
+(defn reset
+  [an-atom value]
+  (swap! an-atom (fn [an-obj] value)))

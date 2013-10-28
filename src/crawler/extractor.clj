@@ -40,14 +40,6 @@
      *url-documents* utils/atom-merge-with set/union {a-link (set [body])})
     body))
 
-(defn update-xpaths-productivities
-  "Expected data structure:
-a vector of xpath and the associated anchor-tags
-in the records"
-  [records-anchors]
-  (map
-   (fn [[xpath anchor]])))
-
 (defn update-tf
   [xpaths-tfs]
   (doseq [[xpath tf] xpaths-tfs]
@@ -117,63 +109,64 @@ in the records"
                                          (/
                                           (count hrefs)
                                           4)))]
-    (map
-     (fn [sampled]
+    (doall
+     (map
+      (fn [sampled]
        
-;       (println :sampling-url sampled)
-       
-       (let [body             (utils/get-and-log sampled {:xpath xpath})
+        (let [body             (utils/get-and-log sampled {:xpath xpath})
              
-             xpaths-hrefs'    (if body
-                                (try
-                                  (dom/minimum-maximal-xpath-set body sampled)
-                                  (catch Exception e
-                                    (do (error "Failed to parse: " sampled)
-                                        (error "Error caused by: " xpath))))
-                                nil)
+              xpaths-hrefs'    (if body
+                                 (try
+                                   (dom/minimum-maximal-xpath-set body sampled)
+                                   (catch Exception e
+                                     (do (error "Failed to parse: " sampled)
+                                         (error "Error caused by: " xpath))))
+                                 nil)
 
-             in-host-map      (into
-                               {}
-                               (filter
-                                (fn [[xpath hrefs]]
-                                  (some (fn [a-href]
-                                          (= (uri/host sampled)
-                                             (uri/host a-href)))
-                                        hrefs))
-                                xpaths-hrefs'))
+              _                (update-df xpaths-hrefs')
+
+              _                (update-hrefs xpaths-hrefs')
+             
+              in-host-map      (into
+                                {}
+                                (filter
+                                 (fn [[xpath hrefs]]
+                                   (some (fn [a-href]
+                                           (= (uri/host sampled)
+                                              (uri/host a-href)))
+                                         hrefs))
+                                 xpaths-hrefs'))
                                
-             in-host-xpath-hs (map first in-host-map)
+              in-host-xpath-hs (map first in-host-map)
 
-             ;; similarity of page w/ source page
-             page-sim         (page/signature-similarity signature in-host-xpath-hs)
+              ;; similarity of page w/ source page
+              page-sim         (page/signature-similarity signature in-host-xpath-hs)
 
-             ;; xpaths of the source
-             src-xpaths       (map first in-host-xpath-hrefs)
+              ;; xpaths of the source
+              src-xpaths       (map first in-host-xpath-hrefs)
              
-             diff             (map vector
-                                   src-xpaths
-                                   (map
-                                    (fn [xpath]
-                                      (count
-                                       (set/difference
-                                        (set (in-host-map xpath))
-                                        (set (in-host-xpath-hrefs xpath)))))
-                                    src-xpaths))]
+              diff             (map vector
+                                    src-xpaths
+                                    (map
+                                     (fn [xpath]
+                                       (count
+                                        (set/difference
+                                         (set (in-host-xpath-hrefs xpath))
+                                         (set (in-host-map xpath)))))
+                                     src-xpaths))]
          
-         (when xpaths-hrefs'
-           (do
-             (update-df xpaths-hrefs')
-             (update-hrefs xpaths-hrefs')
-             (swap! *visited* conj sampled)
-             (if (> page-sim *page-sim-thresh*)
-               {:enum-candidate true
-                :page-sim       page-sim
-                :url            sampled
-                :novelty        (novelty diff)}
-               {:enum-candidate false
-                :url            sampled
-                :novelty        (novelty diff)})))))
-     sampled-uris)))            
+          (when xpaths-hrefs'
+            (do
+              (swap! *visited* conj sampled)
+              (if (> page-sim *page-sim-thresh*)
+                {:enum-candidate true
+                 :page-sim       page-sim
+                 :url            sampled
+                 :novelty        (novelty diff)}
+                {:enum-candidate false
+                 :url            sampled
+                 :novelty        (novelty diff)})))))
+      sampled-uris))))            
 
 (defn is-enum-candidate?
   [{xpath :xpath explorations :explorations}]

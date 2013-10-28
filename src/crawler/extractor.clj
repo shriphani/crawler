@@ -100,9 +100,18 @@ in the records"
          set/union
          (into {} xpaths-hrefs)))
 
+(defn novelty
+  [a-diff]
+  (reduce
+   +
+   0
+   (map
+    #(-> % second)
+    a-diff)))
+
 (defn explore-xpath-and-update
   "Explore an xpath and its href links."
-  [xpath hrefs host signature]
+  [xpath hrefs host signature in-host-xpath-hrefs]
   (info :exploring-xpath xpath)
   (let [sampled-uris (sample hrefs host (Math/ceil
                                          (/
@@ -111,7 +120,7 @@ in the records"
     (map
      (fn [sampled]
        
-       (info :sampling-url sampled)
+;       (println :sampling-url sampled)
        
        (let [body             (utils/get-and-log sampled {:xpath xpath})
              
@@ -123,32 +132,68 @@ in the records"
                                         (error "Error caused by: " xpath))))
                                 nil)
 
-             in-host-map      (filter
-                               (fn [[xpath hrefs]]
-                                 (some (fn [a-href]
-                                         (= (uri/host sampled)
-                                            (uri/host a-href)))
-                                       hrefs))
-                               xpaths-hrefs')
-             
+             in-host-map      (into
+                               {}
+                               (filter
+                                (fn [[xpath hrefs]]
+                                  (some (fn [a-href]
+                                          (= (uri/host sampled)
+                                             (uri/host a-href)))
+                                        hrefs))
+                                xpaths-hrefs'))
+                               
              in-host-xpath-hs (map first in-host-map)
 
+             ;; similarity of page w/ source page
              page-sim         (page/signature-similarity signature in-host-xpath-hs)
 
-             xpath-tfs        (map
-                               (fn [[xpath hrefs]]
-                                 [xpath (count hrefs)])
-                               in-host-map)]
+             ;; xpaths of the source
+             src-xpaths       (map first in-host-xpath-hrefs)
+             
+             diff             (map vector
+                                   src-xpaths
+                                   (map
+                                    (fn [xpath]
+                                      (count
+                                       (set/difference
+                                        (set (in-host-map xpath))
+                                        (set (in-host-xpath-hrefs xpath)))))
+                                    src-xpaths))]
          
          (when xpaths-hrefs'
            (do
              (update-df xpaths-hrefs')
              (update-hrefs xpaths-hrefs')
-             (update-tf xpath-tfs)
              (swap! *visited* conj sampled)
-             (when (> page-sim *page-sim-thresh*)
-               [:enum-candidate page-sim sampled])))))
-     sampled-uris)))
+             (if (> page-sim *page-sim-thresh*)
+               {:enum-candidate true
+                :page-sim       page-sim
+                :url            sampled
+                :novelty        (novelty diff)}
+               {:enum-candidate false
+                :url            sampled
+                :novelty        (novelty diff)})))))
+     sampled-uris)))            
+
+(defn is-enum-candidate?
+  [{xpath :xpath explorations :explorations}]
+  (some
+   (fn [an-exploration]
+     (-> an-exploration
+         :enum-candidate))
+   explorations))
+
+(defn enum-candidate-info
+  "Uses the information sent and the snapshot info"
+  [{xpath :xpath explorations :explorations}]
+  (let [df          (@*xpath-df* xpath)
+        hrefs       (@*xpath-hrefs* xpath)
+        avg-novelty (/ (apply + (map #(-> % :novelty) explorations))
+                       (count explorations))]
+    {:xpath       xpath
+     :df          df
+     :hrefs       hrefs
+     :avg-novelty avg-novelty}))
 
 (defn process-link
   [url]
@@ -157,6 +202,10 @@ in the records"
         xpaths-hrefs          (dom/minimum-maximal-xpath-set
                                  body url)
 
+        _                     (update-df xpaths-hrefs)
+
+        _                     (update-hrefs xpaths-hrefs)
+        
         xpaths                (map first xpaths-hrefs)
         
         in-host-xpath-hrefs   (filter
@@ -171,22 +220,17 @@ in the records"
 
         explorations          (map
                                (fn [[xpath hrefs]]
-                                 (explore-xpath-and-update
-                                  xpath hrefs (uri/host url) in-host-xpaths))
+                                 {:xpath        xpath
+                                  :explorations (explore-xpath-and-update
+                                                 xpath
+                                                 hrefs
+                                                 (uri/host url)
+                                                 in-host-xpaths
+                                                 (into {} in-host-xpath-hrefs))})
                                in-host-xpath-hrefs)
 
-        enum-candidate-xpaths (map
-                               first
-                               (filter
-                                (fn [[k v]] (reduce utils/or-fn false v))
-                                (map vector in-host-xpaths explorations)))
+        enum-candidates       (filter is-enum-candidate? explorations)
 
-        enum-candidate-feats  (map
-                               (fn [xpath]
-                                 {:xpath xpath
-                                  :tf    (@*xpath-tf* xpath)
-                                  :df    (@*xpath-df* xpath)
-                                  :hrefs (@*xpath-hrefs* xpath)})
-                               enum-candidate-xpaths)]
+        enum-candidates-info  (map enum-candidate-info enum-candidates)]
     
-    (rank/rank-enum-candidates enum-candidate-feats true)))
+    (rank/rank-enum-candidates enum-candidates-info)))

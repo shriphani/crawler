@@ -124,9 +124,9 @@
                                          (error "Error caused by: " xpath))))
                                  nil)
 
-              _                (update-df xpaths-hrefs')
+              _                (when xpaths-hrefs' (update-df xpaths-hrefs'))
 
-              _                (update-hrefs xpaths-hrefs')
+              _                (when xpaths-hrefs' (update-hrefs xpaths-hrefs'))
              
               in-host-map      (into
                                 {}
@@ -144,7 +144,9 @@
               page-sim         (page/signature-similarity signature in-host-xpath-hs)
 
               ;; xpaths of the source
-              src-xpaths       (map first in-host-xpath-hrefs)
+              src-xpaths       (filter
+                                #(not= % xpath)
+                                (map first in-host-xpath-hrefs))
              
               diff             (map vector
                                     src-xpaths

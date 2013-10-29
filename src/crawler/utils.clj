@@ -130,3 +130,4 @@ escape characters. then call re-pattern on it"
 (defn reset
   [an-atom value]
   (swap! an-atom (fn [an-obj] value)))
+

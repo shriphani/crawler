@@ -27,45 +27,40 @@
     :xpath "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a"}
 
    {:url   "http://gis.stackexchange.com/questions?pagesize=50&sort=newest"
-    :pagination-links ["http://gis.stackexchange.com/questions?page=2&sort=newest"
-                       "http://gis.stackexchange.com/questions?page=3&sort=newest"]}
+    :xpath "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a"}
 
-   {:url              "http://carsandetc.tumblr.com/"
-    :pagination-links ["http://carsandetc.tumblr.com/page/2"]}
+   {:url   "http://carsandetc.tumblr.com/"
+    :xpath "//html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@id,'navigation')]/a"}
 
-   {:url              "http://www.topix.com/forum/city/carrizo-springs-tx"
-    :pagination-links ["http://www.topix.com/forum/city/carrizo-springs-tx/p2"]}
+   {:url   "http://www.topix.com/forum/city/carrizo-springs-tx"
+    :xpath "//html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/div[contains(@class,'paging')]/div/a"}
 
-   {:url              "http://politicalticker.blogs.cnn.com/"
-    :pagination-links ["http://politicalticker.blogs.cnn.com/2013/10/01/"]}
-
-   {:url              "http://grails.1312388.n4.nabble.com/"
-    :pagination-links ["http://grails.1312388.n4.nabble.com/Grails-f1312388i35.html"]}])
+   {:url   "http://grails.1312388.n4.nabble.com/"
+    :xpath "//HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/span[contains(@class,'pages')]/span[contains(@class,'page')]/a"}])
 
 (defn test-enumeration
   []
-  (map
-   (fn [{url :url pagination-links :pagination-links}]
-     (do
-       (extractor/reset)
-       (println "Processing:" url)
-       (flush)
-       (let [ranked-pagination        (extractor/process-link url)
-             ranked-pagination-hrefs  (map #(-> % :hrefs) ranked-pagination)
-             ranked-pagination-detect (.indexOf
-                                       (map
-                                        (fn [a-href-set]
-                                          (some
-                                           (fn [a-link]
-                                             #{a-link}
-                                             (set a-href-set))
-                                           pagination-links))
-                                        ranked-pagination-hrefs)
-                                       true)]
-         (println (map #(-> % :xpath) ranked-pagination))
-         (flush)
-         ranked-pagination-detect)))
-   *enumerate-positives*))
+  (let [ranks
+        (into
+         []
+         (pmap
+          (fn [{url :url xpath :xpath}]
+            (do
+              (extractor/reset)
+             
+              (println "Processing:" url)
+              (flush)
+
+              (let [ranked-xpath (map #(-> % :xpath) (extractor/process-link url))]
+                (.indexOf ranked-xpath xpath))))
+          *enumerate-positives*))]
+    (println "Correctly Ranked:" (count (filter #(= 0 %) ranks)))
+    (println "Failed:" (count (filter #(not= 0 %) ranks)))
+
+    (doseq [i (range (count ranks))
+            {url :url xpath :url} *enumerate-positives*]
+      (println "URL" url)
+      (println "Correct enumeration xpath at rank:" (nth ranks i)))))
 
 (defn -main
   [& args]

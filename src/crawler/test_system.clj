@@ -40,28 +40,8 @@
 
 (defn test-enumeration
   []
-  (let [ranks
-        (into
-         []
-         (pmap
-          (fn [{url :url xpath :xpath}]
-            (do
-              (extractor/reset)
-             
-              (println "Processing:" url)
-              (flush)
-
-              (let [ranked-xpath (map #(-> % :xpath) (extractor/process-link url))]
-                (.indexOf ranked-xpath xpath))))
-          *enumerate-positives*))]
-    (println "Correctly Ranked:" (count (filter #(= 0 %) ranks)))
-    (println "Failed:" (count (filter #(not= 0 %) ranks)))
-
-    (doseq [i (range (count ranks))
-            {url :url xpath :url} *enumerate-positives*]
-      (println "URL" url)
-      (println "Correct enumeration xpath at rank:" (nth ranks i)))))
+  (extractor/process-link "http://www.topix.com/forum/city/carrizo-springs-tx"))
 
 (defn -main
   [& args]
-  (test-enumeration))
+  (println (test-enumeration)))

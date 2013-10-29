@@ -18,7 +18,7 @@
 
 (utils/global-logger-config)
 
-(def *page-sim-thresh* 0.9)
+(def *page-sim-thresh* 0.85)
 (def *sample-fraction* (/ 1 4))   ; fraction of links to look at
                                   ; before sampling
 
@@ -123,10 +123,6 @@
                                      (do (error "Failed to parse: " sampled)
                                          (error "Error caused by: " xpath))))
                                  nil)
-
-              _                (when xpaths-hrefs' (update-df xpaths-hrefs'))
-
-              _                (when xpaths-hrefs' (update-hrefs xpaths-hrefs'))
              
               in-host-map      (into
                                 {}
@@ -139,9 +135,14 @@
                                  xpaths-hrefs'))
                                
               in-host-xpath-hs (map first in-host-map)
-
+              
+              signature2       (into
+                                {} (map (fn [an-xpath]
+                                          [an-xpath (count (in-host-map an-xpath))])
+                                        in-host-xpath-hs))
+              
               ;; similarity of page w/ source page
-              page-sim         (page/signature-similarity signature in-host-xpath-hs)
+              page-sim         (page/signature-similarity2 signature signature2)
 
               ;; xpaths of the source
               src-xpaths       (filter
@@ -160,15 +161,21 @@
          
           (when xpaths-hrefs'
             (do
+              (update-df xpaths-hrefs')
+              (update-hrefs xpaths-hrefs')
               (swap! *visited* conj sampled)
+              (println sampled)
+              (println page-sim)
               (if (> page-sim *page-sim-thresh*)
                 {:enum-candidate true
                  :page-sim       page-sim
                  :url            sampled
-                 :novelty        (novelty diff)}
+                 :novelty        (novelty diff)
+                 :hrefs-table    xpaths-hrefs'}
                 {:enum-candidate false
                  :url            sampled
-                 :novelty        (novelty diff)})))))
+                 :novelty        (novelty diff)
+                 :hrefs-table    xpaths-hrefs'})))))
       sampled-uris))))            
 
 (defn is-enum-candidate?
@@ -191,6 +198,12 @@
      :hrefs       (map #(StringEscapeUtils/unescapeHtml %) hrefs)
      :avg-novelty avg-novelty}))
 
+(defn explorations->href-table
+  [explorations]
+  (filter
+   identity
+   (map #(-> % :explorations :href-table) explorations)))
+
 (defn process-link
   [url]
   (let [body                  (visit-and-record-page url)
@@ -211,9 +224,15 @@
                                             (uri/host a-href)))
                                        hrefs))
                                xpaths-hrefs)
+
+        ih-xp-map             (into {} in-host-xpath-hrefs)
         
         in-host-xpaths        (map first in-host-xpath-hrefs)
 
+        signature             (into
+                               {} (map (fn [an-xpath]
+                                         [an-xpath (count (ih-xp-map an-xpath))]) in-host-xpaths))
+        
         explorations          (map
                                (fn [[xpath hrefs]]
                                  {:xpath        xpath
@@ -221,14 +240,17 @@
                                                  xpath
                                                  (map #(StringEscapeUtils/unescapeHtml %) hrefs)
                                                  (uri/host url)
-                                                 in-host-xpaths
+                                        ;in-host-xpaths
+                                                 signature
                                                  (into {} in-host-xpath-hrefs))})
                                in-host-xpath-hrefs)
 
+        hrefs-table           (explorations->href-table explorations)
+        
         enum-candidates       (filter is-enum-candidate? explorations)
 
         enum-candidates-info  (map enum-candidate-info enum-candidates)]
-    
+    (println hrefs-table)
     (rank/rank-enum-candidates enum-candidates-info)))
 
 (defn reset

@@ -13,7 +13,8 @@
             [org.bovinegenius [exploding-fish :as uri]])
   (:use [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]])
   (:import (org.htmlcleaner HtmlCleaner DomSerializer CleanerProperties)
-           (org.w3c.dom Document)))
+           (org.w3c.dom Document)
+           (org.apache.commons.lang StringEscapeUtils)))
 
 (defn process-page
   [page-src]
@@ -296,7 +297,7 @@ the page several times"
                                         #(not (re-find file-format-ignore-regex %))
                                         (filter
                                          identity
-                                         (map #(try (uri/fragment (-> % :attrs :href) nil)
+                                         (map #(try (uri/fragment (-> % :attrs :href StringEscapeUtils/unescapeHtml) nil)
                                                     (catch Exception e nil))
                                               ($x xpath processed-pg)))))]
                       (if (= (clj-set/intersection (:links acc) xpath-links)
@@ -338,7 +339,8 @@ of the xpath set."
                   (uri/fragment
                    (let [a-href (-> res
                                     :attrs
-                                    :href)]
+                                    :href
+                                    StringEscapeUtils/unescapeHtml)]
                      (if (= "javascript" (uri/scheme a-href))
                        nil
                        a-href))

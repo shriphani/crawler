@@ -13,7 +13,8 @@
             [itsy.core :as itsy]
             [org.bovinegenius [exploding-fish :as uri]])
   (:use [clojure.tools.logging :only (info error)]
-        [clj-logging-config.log4j]))
+        [clj-logging-config.log4j])
+  (:import (org.apache.commons.lang StringEscapeUtils)))
 
 (utils/global-logger-config)
 
@@ -185,7 +186,7 @@
                        (count explorations))]
     {:xpath       xpath
      :df          df
-     :hrefs       hrefs
+     :hrefs       (map #(StringEscapeUtils/unescapeHtml %) hrefs)
      :avg-novelty avg-novelty}))
 
 (defn process-link
@@ -216,7 +217,7 @@
                                  {:xpath        xpath
                                   :explorations (explore-xpath-and-update
                                                  xpath
-                                                 hrefs
+                                                 (map #(StringEscapeUtils/unescapeHtml %) hrefs)
                                                  (uri/host url)
                                                  in-host-xpaths
                                                  (into {} in-host-xpath-hrefs))})

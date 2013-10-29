@@ -19,6 +19,7 @@
                    com.sun.jmx/jmxri]]
                  [misc "0.1.0-SNAPSHOT"]
                  [net.sourceforge.htmlcleaner/htmlcleaner "2.6"]
+                 [org.apache.commons/commons-lang3 "3.1"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.cli "0.2.4"]
                  [org.clojure/tools.logging "0.2.6"]

@@ -155,8 +155,8 @@
                                      (fn [xpath]
                                        (count
                                         (set/difference
-                                         (set (in-host-xpath-hrefs xpath))
-                                         (set (in-host-map xpath)))))
+                                         (set (in-host-map xpath))
+                                         (set (in-host-xpath-hrefs xpath)))))
                                      src-xpaths))]
          
           (when xpaths-hrefs'
@@ -166,6 +166,7 @@
               (swap! *visited* conj sampled)
               (println sampled)
               (println page-sim)
+              (println diff)
               (if (> page-sim *page-sim-thresh*)
                 {:enum-candidate true
                  :page-sim       page-sim

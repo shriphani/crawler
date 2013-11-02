@@ -22,9 +22,6 @@
 (def *sample-fraction* (/ 1 4))   ; fraction of links to look at
                                   ; before sampling
 
-(def *xpath-hrefs*   (atom {}))   ; hold the unique hrefs for each xpath
-(def *xpath-df*      (atom {}))   ; hold the df score for each xpath
-(def *xpath-tf*      (atom {}))   ; per-page tf scores
 (def *visited*       (atom
                       (set [])))  ; set of visited documents
 (def *url-documents* (atom {}))   ; url -> body map
@@ -44,17 +41,6 @@
        (swap!
         *url-documents* utils/atom-merge-with set/union {a-link (set [body])})
        body)))
-
-(defn update-tf
-  [xpaths-tfs]
-  (doseq [[xpath tf] xpaths-tfs]
-    (swap! *xpath-tf* utils/atom-merge-with concat {xpath [tf]})))
-
-(defn record-explore-potential
-  "At first, we just use # of distinct links"
-  [a-record]
-  (-> a-record
-      (records/record-anchors)))
 
 (defn sample
   ([urls host n]
@@ -80,23 +66,6 @@
                   (not (some #{sampled} sampled-list)))
            (recur urls host (dec n) (conj sampled-list sampled))
            (recur urls host 0 sampled-list))))))
-
-(defn update-df
-  "Each XPath's df score is incremented"
-  [xpaths-hrefs]
-  (let [xpaths     (map first xpaths-hrefs)
-        xpaths-cnt (map (fn [x] {x 1}) xpaths)]
-    (doseq [xpath-cnt xpaths-cnt]
-      (swap! *xpath-df* utils/atom-merge-with +' xpath-cnt))))
-
-(defn update-hrefs
-  "Union of explored hrefs and observed hrefs"
-  [xpaths-hrefs]
-  (swap!
-   *xpath-hrefs*
-   utils/atom-merge-with
-   set/union
-   (into {} xpaths-hrefs)))
 
 (defn novelty
   [a-diff]
@@ -172,7 +141,8 @@ nonsense"
                                 :similarity))
                           explorations)]
     (when (and (seq explorations) (< 0 (count explorations)))
-      (> (/ (apply + similarities) (count explorations)) *page-sim-thresh*))))
+      (try (> (/ (apply + similarities) (count explorations)) *page-sim-thresh*)
+           (catch Exception e nil)))))
 
 (defn enum-candidate-info
   "Uses the information sent and the snapshot info"

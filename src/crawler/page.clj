@@ -53,3 +53,10 @@
           mod2       (Math/sqrt (apply + (map #(-> second (Math/pow 2)) sign2-map)))]
 
       (/ inner-prod (* mod1 mod2)))))
+
+(defn page-signature
+  [xpaths xpath-hrefs]
+  (map
+   (fn [an-xpath]
+     [an-xpath (count (xpath-hrefs an-xpath))])
+   xpaths))

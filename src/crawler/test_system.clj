@@ -40,7 +40,7 @@
 
 (defn test-enumeration
   []
-  (extractor/process-link "http://www.topix.com/forum/city/carrizo-springs-tx"))
+  (extractor/process-link "http://boards.4chan.org/vg/"))
 
 (defn -main
   [& args]

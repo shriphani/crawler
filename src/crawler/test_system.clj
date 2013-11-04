@@ -21,7 +21,7 @@
     :xpath "//html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'pagination')]/span/a"}
 
    {:url   "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815"
-    :xpath "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a"}
+    :xpath "//html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'pagination')]/span/a"}
 
    {:url   "http://stackoverflow.com/questions?pagesize=50&sort=newest"
     :xpath "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a"}
@@ -32,7 +32,7 @@
    {:url   "http://carsandetc.tumblr.com/"
     :xpath "//html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@id,'navigation')]/a"}
 
-   {:url   "http://www.topix.com/forum/city/carrizo-springs-tx"
+   {:url   "http://www.topix.com/forum/city/carrizo-springs-tx/"
     :xpath "//html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/div[contains(@class,'paging')]/div/a"}
 
    {:url   "http://grails.1312388.n4.nabble.com/"
@@ -40,7 +40,12 @@
 
 (defn test-enumeration
   []
-  (extractor/process-link "http://boards.4chan.org/vg/"))
+  (pmap
+   (fn [{url :url xpath :xpath}]
+     (let [ranked-enums (extractor/process-link url)
+           xpaths       (map #(-> % :xpath) ranked-enums)]
+       (.indexOf xpaths xpath)))
+   *enumerate-positives*))
 
 (defn -main
   [& args]

@@ -97,7 +97,6 @@ nonsense"
   (let [sampled-uris     (sample
                           hrefs host (Math/ceil
                                       (/ (count hrefs) 4)))]
-    (println "Xpath:" xpath)
     (map
      (fn [sampled]
        (let [body             (visit-and-record-page sampled {:xpath xpath})
@@ -130,8 +129,7 @@ nonsense"
                                         (set (in-host-map xpath))
                                         (set (in-host-xpath-hrefs xpath)))))
                                     src-xpaths))]
-         (println "URI:" sampled)
-         (println similarity)
+
          (when xpaths-hrefs'
            (do
              (swap! *visited* conj sampled)

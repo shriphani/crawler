@@ -44,7 +44,15 @@
 
 (defn sample
   ([urls host n]
-     (sample urls host n []))
+     (let [candidates (filter
+                       (fn [url]
+                         (and
+                          (= host (uri/host url))
+                          (not (some #{url} @*visited*))))
+                       (into [] urls))]
+       (if (<= (count candidates) 5)
+         candidates
+         (sample urls host n []))))
   
   ([urls host n sampled-list]
      (if (zero? n)
@@ -59,7 +67,6 @@
              
              sampled    (when (> (count candidates) 0)
                           (rand-nth candidates))]
-         
          (if (and sampled
                   (= (uri/host sampled) host)
                   (not (some #{sampled} @*visited*))
@@ -91,7 +98,6 @@ nonsense"
                           hrefs host (Math/ceil
                                       (/ (count hrefs) 4)))]
     (println "Xpath:" xpath)
-    (println "URI:" sampled-uris)
     (map
      (fn [sampled]
        (let [body             (visit-and-record-page sampled {:xpath xpath})
@@ -124,6 +130,8 @@ nonsense"
                                         (set (in-host-map xpath))
                                         (set (in-host-xpath-hrefs xpath)))))
                                     src-xpaths))]
+         (println "URI:" sampled)
+         (println similarity)
          (when xpaths-hrefs'
            (do
              (swap! *visited* conj sampled)

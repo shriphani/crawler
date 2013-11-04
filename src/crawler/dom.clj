@@ -267,7 +267,7 @@ id and class tag constraints are also added"
     (-> dom-serializer
         (.createDOM tag-node))))
 
-(def file-format-ignore-regex #".jpg$|.css$|.gif$|.png$")
+(def file-format-ignore-regex #".jpg$|.css$|.gif$|.png$|.xml$")
 
 (defn minimum-maximal-xpath-set-processed
   "This helper routine exists so we don't reparse

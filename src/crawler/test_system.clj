@@ -39,14 +39,40 @@
     :xpath "//HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/span[contains(@class,'pages')]/span[contains(@class,'page')]/a"}])
 
 (defn test-enumeration
-  []
-  (pmap
-   (fn [{url :url xpath :xpath}]
-     (let [ranked-enums (extractor/process-link url)
-           xpaths       (map #(-> % :xpath) ranked-enums)]
-       (.indexOf xpaths xpath)))
-   *enumerate-positives*))
+  ([]
+     (test-enumeration {:verbose false}))
+  ([{verbose :verbose}]
+     (if verbose
+       (pmap
+        (fn [{url :url xpath :xpath}]
+          (let [ranked-enums (extractor/process-link url)
+                xpaths       (map #(-> % :xpath) ranked-enums)
+                ranks        (.indexOf xpaths xpath)
+                infos        (map
+                              vector ranks (map #(nth ranked-enums %) ranks))]
+            infos))
+        *enumerate-positives*)
+       (pmap
+        (fn [{url :url xpath :xpath}]
+          (let [ranked-enums (extractor/process-link url)
+                xpaths       (map #(-> % :xpath) ranked-enums)]
+            (.indexOf xpaths xpath)))
+        *enumerate-positives*))))
 
 (defn -main
   [& args]
-  (println (test-enumeration)))
+  (let [[optional _ _] (cli/cli args ["-v" "--verbose" "Print out info as well" :default false :flag true])]
+    (println optional)
+    (if (:verbose optional)
+      (doseq [[info url] (map
+                          vector
+                          (test-enumeration optional)
+                          (map #(-> % :url) *enumerate-positives*))]
+        (println "URL:" url)
+        (println "Rank:" info))
+      (doseq [[rank url] (map
+                          vector
+                          (test-enumeration optional)
+                          (map #(-> % :url) *enumerate-positives*))]
+        (println "URL:" url)
+        (println "Rank:" rank)))))

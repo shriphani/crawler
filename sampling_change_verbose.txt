@@ -1,0 +1,2033 @@
+{:verbose true}
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'droite')]/div[contains(@class,'part')]/div[contains(@id,'illustrated') and contains(@class,'box')]/a
+Xpath: //html/body/div[contains(@id,'wrapper')]/div[contains(@id,'sidebar')]/div[contains(@id,'top')]/div[contains(@id,'buttons')]/div[contains(@class,'row')]/div[contains(@id,'button') and contains(@class,'button')]/a
+URI: http://carsandetc.tumblr.com/mobile
+0.0
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/div[contains(@class,'top')]/div[contains(@class,'breadcrumbs')]/span[contains(@id,'breadcrumbs') and contains(@class,'weak')]/a
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/div[contains(@class,'action')]/a
+URI: http://grails.1312388.n4.nabble.com/Grails-f1312388.subapps.html
+0.27768827677589975
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'header') and contains(@class,'headeranon')]/div[contains(@id,'topbar')]/div[contains(@id,'hlinks')]/span[contains(@id,'hlinks')]/a
+URI: http://www.fmylife.com/kids/14164412?utm_source=fmylife&utm_medium=illustrated&utm_campaign=14164412
+0.6948912345395186
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'droite')]/div[contains(@class,'part')]/div[contains(@class,'box')]/ul/li/a
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=app_people&node=1312388
+0.003720057897765085
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'navbar')]/div[contains(@class,'inner')]/ul[contains(@class,'linklist')]/li[contains(@class,'icon')]/a
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'header') and contains(@class,'headeranon')]/div[contains(@id,'topbar')]/div[contains(@id,'hlinks')]/span[contains(@id,'hlinks')]/a
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=new_topic&node=1312388
+0.028849728275786402
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/span[contains(@class,'pages')]/span[contains(@class,'page')]/a
+URI: http://stackoverflow.com/users/login?returnurl=%2fquestions%3fpagesize%3d50%26sort%3dnewest
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'header') and contains(@class,'headeranon')]/div[contains(@id,'hmenus')]/div[contains(@class,'nav')]/ul/li/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'navbar')]/div[contains(@class,'inner')]/ul[contains(@class,'linklist')]/li[contains(@class,'icon')]/a
+URI: http://gis.stackexchange.com/users/login?returnurl=%2fquestions%3fpagesize%3d50%26sort%3dnewest
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'header') and contains(@class,'headeranon')]/div[contains(@id,'hmenus')]/div[contains(@class,'nav')]/ul/li/a
+URI: http://www.fmylife.com/termsofuse
+0.7103748934125266
+URI: http://carsandetc.tumblr.com/archive
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'dialog')]/div[contains(@id,'change')]/form/p/a
+URI: http://www.fmylife.com/modules/accessibility/switch.php?act=enable
+0.6719573295959766
+URI: http://stackoverflow.com/users
+0.0
+URI: http://www.fmylife.com/blog/1415
+0.6599465045979651
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'footer')]/div[contains(@id,'wrapper')]/div[contains(@class,'box')]/p/a
+URI: http://gis.stackexchange.com/users
+0.0
+URI: http://carsandetc.tumblr.com/random
+0.9971928236315621
+URI: http://carsandetc.tumblr.com/rss
+NaN
+Xpath: //html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@class,'post')]/div[contains(@class,'media')]/a
+URI: http://carsandetc.tumblr.com/image/65654248591
+0.0
+URI: http://carsandetc.tumblr.com/image/65559495123
+0.0
+Xpath: //html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@class,'post')]/div[contains(@class,'footer')]/div[contains(@class,'tags')]/a
+URI: https://www.phpbb.com/community/viewforum.php?f=49&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.8993395830719935
+URI: http://gis.stackexchange.com/questions
+0.8675063611141592
+URI: http://stackoverflow.com/questions
+0.8740586248082682
+URI: http://www.topix.com/pick-local?node=city/carrizo-springs-tx
+0.12755694968897272
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'topnav')]/ul[contains(@id,'topnav') and contains(@class,'topnavmenu')]/li/a
+URI: https://www.phpbb.com/community/viewforum.php?f=49&sid=3273876e814b26eeb6f3abdffb442f8e
+0.3297437969374457
+URI: http://grails.1312388.n4.nabble.com/Grails-f1312388i35.html
+0.9968502632346853
+URI: http://stackoverflow.com/about
+0.0
+URI: http://www.fmylife.com/search/result/?member=1
+0.48944984689522486
+URI: http://gis.stackexchange.com/about
+0.0
+URI: http://gis.stackexchange.com/questions/ask
+0.0
+URI: http://grails.1312388.n4.nabble.com/Grails-f1312388i70.html
+0.9988411193939861
+URI: https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+1.0000000000000002
+URI: http://stackoverflow.com/questions/ask
+0.0
+Xpath: //html/body[contains(@class,'board')]/div[contains(@id,'boardNavMobile') and contains(@class,'mobile')]/div[contains(@class,'pageJump')]/a
+Xpath: //html/body[contains(@class,'board')]/div[contains(@class,'pagelist')]/div[contains(@class,'pages')]/a
+URI: http://www.fmylife.com/health
+0.9881851525105845
+URI: http://gis.stackexchange.com/tags
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@id,'footer') and contains(@class,'categories')]/div[contains(@class,'footerwrap')]/div[contains(@id,'footer')]/div[contains(@class,'top')]/a
+URI: https://www.phpbb.com/community/memberlist.php?sid=3273876e814b26eeb6f3abdffb442f8e
+0.4774891469135407
+URI: http://carsandetc.tumblr.com/tagged/car
+1.0
+URI: http://gis.stackexchange.com/help
+0.0
+URI: https://www.phpbb.com/community/ucp.php?mode=login&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6547081183974465
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div/div/div/a
+URI: https://boards.4chan.org/vg/catalog
+0.0
+URI: http://stackoverflow.com/tags
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@id,'footer') and contains(@class,'categories')]/div[contains(@class,'footerwrap')]/div[contains(@id,'footer')]/div[contains(@class,'top')]/a
+URI: http://www.fmylife.com/money
+0.9787535811132133
+URI: https://www.phpbb.com/community/viewforum.php?f=81&sid=3273876e814b26eeb6f3abdffb442f8e
+0.7824131710792968
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'buttons')]/div[contains(@class,'locked')]/a
+URI: http://stackoverflow.com/help
+0.0
+URI: http://www.topix.com/books
+0.0
+URI: http://grails.1312388.n4.nabble.com/Grails-f1312388i105.html
+0.9979172642831113
+URI: http://gis.stackexchange.com/help/badges
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'subheader')]/div[contains(@id,'tabs')]/a
+URI: https://www.phpbb.com/customise/db
+0.5061711666465234
+URI: https://www.phpbb.com/community/posting.php?mode=reply&f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e
+0.8333681389238226
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div/div/a
+URI: http://stackoverflow.com/help/badges
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'subheader')]/div[contains(@id,'tabs')]/a
+URI: http://carsandetc.tumblr.com/tagged/m6
+0.998588936309953
+URI: http://gis.stackexchange.com/questions?sort=newest
+0.8675063611141592
+URI: http://www.fmylife.com/kids
+0.9962696918290335
+URI: http://grails.1312388.n4.nabble.com/Grails-f1312388i42770.html
+0.6206896720195119
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/table[contains(@class,'footer')]/tbody/tr/td[contains(@class,'footer')]/a
+URI: http://gis.stackexchange.com/questions?sort=featured
+0.4990526380899325
+URI: https://www.phpbb.com/community/posting.php?mode=post&f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6547081183974465
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=macro_viewer&id=view_topics%21nabble%3Aview_topics.naml&base=nabble.view.web.template.ServletNamespace
+0.015580634014574749
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/div[contains(@id,'forum') and contains(@class,'forum')]/a
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@id,'questions')]/div[contains(@id,'question') and contains(@class,'question')]/div[contains(@class,'summary')]/div[contains(@class,'t')]/a
+URI: http://stackoverflow.com/questions?sort=newest
+0.8693786055543319
+URI: https://www.phpbb.com/feeds/rss/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+NaN
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071
+0.009532542166174307
+URI: https://www.phpbb.com/community/
+0.46328213809932123
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=feeds&node=1312388
+0.03413545884005945
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/table[contains(@class,'main')]/tbody/tr[contains(@class,'main')]/td[contains(@class,'medium')]/table/tbody/tr/td/span[contains(@class,'avatarA')]/a
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=370507
+0.01290199071141124
+URI: http://www.fmylife.com/animals
+0.9933612782058624
+URI: http://gis.stackexchange.com/questions/tagged/geocoding
+0.0
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857
+0.009945629203796505
+URI: http://stackoverflow.com/questions?sort=unanswered
+0.916353724828671
+URI: http://carsandetc.tumblr.com/tagged/3.0
+0.9997013431296231
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=370506
+0.01290199071141124
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@id,'questions')]/div[contains(@id,'question') and contains(@class,'question')]/div[contains(@class,'summary')]/div[contains(@class,'t')]/a
+URI: https://www.phpbb.com/customise/db/modifications-1
+0.504361252031014
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'navbar')]/div[contains(@class,'inner')]/ul[contains(@class,'linklist')]/li[contains(@class,'rightside')]/a
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=233622
+0.009532542166174307
+URI: http://www.topix.com/forum/city/carrizo-springs-tx
+1.0000000000000002
+URI: https://www.phpbb.com/customise/db/modifications-1
+0.6410159650938821
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'post')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/h3/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'navbar')]/div[contains(@class,'inner')]/ul[contains(@class,'linklist')]/li[contains(@class,'rightside')]/a
+URI: http://www.fmylife.com/work
+0.9881851525105845
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'topbar')]/div[contains(@id,'contenttop')]/div[contains(@class,'menu')]/h1[contains(@class,'')]/a
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369764
+0.005522987540005154
+URI: http://gis.stackexchange.com/questions/tagged/arcmap
+0.0
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=370390
+0.006882372765772609
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369263
+0.009532542166174307
+URI: http://stackoverflow.com/questions/tagged/asp.net-mvc
+0.0
+URI: http://www.fmylife.com/applications/official
+0.7005590133687113
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369125
+0.004112739051193714
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/div[contains(@id,'forum')]/div[contains(@id,'search') and contains(@class,'search')]/form/div[contains(@id,'search') and contains(@class,'search')]/div/a
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=adv_search_page&node=1312388
+0.03413545884005945
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/table[contains(@class,'medium')]/tbody/tr[contains(@class,'main')]/td[contains(@class,'medium')]/table/tbody/tr/td[contains(@class,'adbayes')]/a
+URI: https://www.phpbb.com/community/memberlist.php?mode=leaders&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.4124600593026856
+URI: http://gis.stackexchange.com/questions/tagged/google-maps
+0.0
+URI: http://grails.1312388.n4.nabble.com/cannot-build-grails-core-master-on-windows-tp4651083.html
+0.02540389546384575
+URI: https://www.phpbb.com/community/memberlist.php?mode=leaders&sid=3273876e814b26eeb6f3abdffb442f8e
+0.5250142198371572
+URI: http://www.fmylife.com/tops/favorite/week
+0.7527633646236175
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'topbar')]/div[contains(@id,'contenttop')]/div[contains(@class,'menu')]/h1[contains(@class,'')]/div[contains(@class,'submenu')]/div[contains(@class,'submenu')]/ul/li/a
+URI: http://carsandetc.tumblr.com/tagged/exotic-cars
+0.9996865328230864
+URI: http://stackoverflow.com/questions/tagged/containers
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&view=print
+0.0
+URI: https://boards.4chan.org/vg/2
+0.9988532173166402
+Xpath: //html/body[contains(@class,'board')]/form[contains(@id,'delform')]/div[contains(@class,'board')]/div[contains(@id,'t') and contains(@class,'thread')]/div[contains(@id,'pc') and contains(@class,'postContainer')]/div[contains(@id,'p') and contains(@class,'post')]/div[contains(@id,'pi') and contains(@class,'postInfo')]/span[contains(@class,'postNum')]/a
+URI: https://www.phpbb.com/community/ucp.php?mode=delete_cookies&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6567303876718589
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'forumbg')]/div[contains(@class,'inner')]/ul[contains(@class,'topiclist')]/li[contains(@class,'bg')]/dl[contains(@class,'icon')]/dt/strong[contains(@class,'pagination')]/span/a
+URI: http://www.fmylife.com/signup
+0.7077748979428908
+URI: http://grails.1312388.n4.nabble.com/JVMVRFY007-on-controllers-with-injected-services-tp4651027.html
+0.013968113822488732
+URI: http://gis.stackexchange.com/questions/tagged/boundless
+0.0
+URI: http://www.fmylife.com/applications/other
+0.7022370014332658
+URI: https://www.phpbb.com/community/ucp.php?mode=delete_cookies&sid=3273876e814b26eeb6f3abdffb442f8e
+0.835942255135708
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div/div[contains(@class,'rules')]/div[contains(@class,'inner')]/span/a
+URI: http://grails.1312388.n4.nabble.com/Problem-with-multi-tenant-single-db-plugin-and-run-app-tp4646021.html
+0.010114980897462178
+URI: http://stackoverflow.com/questions/tagged/fragmentmanager
+0.0
+URI: http://www.fmylife.com/password
+0.7103748934125266
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'droite')]/div[contains(@class,'part')]/div[contains(@id,'categories') and contains(@class,'box')]/ul[contains(@class,'cf')]/li[contains(@class,'tooltips')]/h3/a
+URI: http://www.topix.com/tv
+0.0
+URI: http://grails.1312388.n4.nabble.com/GORM-methods-in-grails-integration-tests-tp4649929.html
+0.009114047889202339
+URI: http://gis.stackexchange.com/questions/tagged/polyline
+0.0
+URI: http://www.fmylife.com/map
+0.7082063365065427
+URI: http://grails.1312388.n4.nabble.com/Grails-2-3-0-RESTful-Webservice-including-extra-data-in-XML-tp4650694.html
+0.014666945884516456
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1521565&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=15
+0.6012686316294336
+URI: http://gis.stackexchange.com/questions/tagged/create
+0.0
+URI: http://grails.1312388.n4.nabble.com/cache-headers-1-1-6-release-tp4651033.html
+0.02540389546384575
+URI: http://stackoverflow.com/questions/tagged/bitmap
+0.0
+URI: http://www.phpbb.com/rules/
+0.7600919498401502
+URI: http://carsandetc.tumblr.com/tagged/chevy
+0.9999080822799034
+URI: http://grails.1312388.n4.nabble.com/hasMany-relation-using-checkboxes-rather-than-select-multiple-tp4651087.html
+0.02540389546384575
+URI: http://www.fmylife.com/authors
+0.9400864731315626
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'droite')]/div[contains(@class,'part')]/div[contains(@id,'illustrated') and contains(@class,'box')]/p[contains(@class,'no')]/a
+URI: http://gis.stackexchange.com/questions/tagged/wfs
+0.0
+URI: http://stackoverflow.com/questions/tagged/battery
+0.0
+URI: http://grails.1312388.n4.nabble.com/ANN-Grails-postgresql-extension-with-Hstore-support-tp4650956.html
+0.011539891310314562
+URI: http://www.phpbb.com/customise/db/modifications-1
+0.6410159650938821
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'pagination')]/span/a
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=90
+0.6059493464125493
+URI: http://www.topix.com/news/video-feeds
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/digitizing
+0.0
+URI: http://stackoverflow.com/questions/tagged/linux
+0.0
+URI: http://www.fmylife.com/illustrations
+0.10119979336972755
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'wrapper')]/div[contains(@class,'pagination')]/ul[contains(@class,'left')]/li/a
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=60
+0.9768335623255712
+URI: http://carsandetc.tumblr.com/tagged/classic-car
+0.9999460384691994
+URI: http://gis.stackexchange.com/questions/tagged/web-mapping
+0.0
+URI: http://stackoverflow.com/questions/tagged/serialization
+0.0
+URI: http://www.fmylife.com?page=2
+0.9945828975706407
+URI: http://grails.1312388.n4.nabble.com/H2-database-already-closed-tp4651058.html
+0.024479806199037422
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/table[contains(@class,'main')]/tbody/tr[contains(@class,'main')]/td[contains(@class,'adbayes')]/a
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1521565&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.5805854347700558
+URI: http://gis.stackexchange.com/questions/tagged/nviz
+0.0
+URI: http://stackoverflow.com/questions/tagged/mysql
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/subtype
+0.0
+URI: http://www.fmylife.com?page=8
+0.9901592355930571
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=30
+0.9870771012805772
+URI: http://grails.1312388.n4.nabble.com/Grails-dev-f1393096.html
+0.9970872722923233
+URI: http://www.topix.com/mlb
+0.0
+URI: https://boards.4chan.org/vg/res/51932213
+0.007630230426920541
+URI: http://gis.stackexchange.com/questions/tagged/format
+0.0
+URI: http://stackoverflow.com/questions/tagged/mobile
+0.0
+URI: http://carsandetc.tumblr.com/tagged/m3
+0.9996275956448835
+Xpath: //html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@id,'navigation')]/a
+URI: http://www.fmylife.com?page=4
+0.9963638687532091
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'cf')]/div[contains(@id,'') and contains(@class,'article')]/p/a
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.564956571652383
+URI: http://stackoverflow.com/questions/tagged/z-index
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=1185
+0.9488380033597676
+URI: http://gis.stackexchange.com/questions/tagged/pyqgis
+0.0
+URI: http://grails.1312388.n4.nabble.com/Grails-user-f1312389.html
+0.9991840336011399
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/table[contains(@class,'medium')]/tbody/tr[contains(@class,'main')]/td[contains(@class,'medium')]/table[contains(@class,'avatar')]/tbody/tr/td/span[contains(@class,'avatarB')]/a
+URI: http://www.fmylife.com/health/20943322
+0.779002154157313
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61286
+0.005022093073207714
+URI: http://gis.stackexchange.com/questions/tagged/correlation
+0.0
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958
+0.009532542166174307
+URI: http://www.fmylife.com/miscellaneous/20943997
+0.779002154157313
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=370500
+0.01290199071141124
+URI: http://stackoverflow.com/questions/tagged/django
+0.0
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=370502
+0.009058610215130993
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=370100
+0.010688226756491266
+URI: http://gis.stackexchange.com/questions/tagged/wordpress
+0.0
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=319023
+0.004112739051193714
+URI: http://carsandetc.tumblr.com/page/2
+0.9994514669463278
+Xpath: //html/body/div[contains(@id,'wrapper')]/div[contains(@id,'sidebar')]/div[contains(@id,'top')]/div[contains(@id,'pages') and contains(@class,'ask')]/a
+URI: http://www.fmylife.com/love/20944193
+0.779002154157313
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=45
+0.9738495281295172
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305
+0.009532542166174307
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=75
+0.5802460526180989
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div/div[contains(@class,'rules')]/div[contains(@class,'inner')]/span/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'pagination')]/span/a
+URI: http://stackoverflow.com/questions/tagged/jar
+0.0
+URI: http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=44383
+0.009532542166174307
+Xpath: //HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/table[contains(@class,'main')]/tbody/tr[contains(@class,'main')]/td[contains(@class,'weak')]/table[contains(@class,'avatar')]/tbody/tr/td/a
+URI: http://www.fmylife.com/love/20943458
+0.7626894406819793
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'wrapper')]/div[contains(@class,'cf')]/div[contains(@class,'post')]/a
+URI: http://gis.stackexchange.com/questions/tagged/google-maps-api
+0.0
+URI: http://www.topix.com/nascar
+0.0
+URI: http://grails.1312388.n4.nabble.com/dbCreate-update-in-Datasource-tp4651034p4651055.html
+0.010240637652017836
+URI: http://grails.1312388.n4.nabble.com/Problem-with-self-referenced-associations-tp4651084.html
+0.02540389546384575
+URI: http://www.fmylife.com/blog/1257?utm_source=fmylife&utm_medium=autopromo&utm_campaign=newtofmylife
+0.6599465045979651
+URI: http://carsandetc.tumblr.com/ask
+0.013238502351907521
+Xpath: //html/body/div[contains(@id,'wrapper')]/div[contains(@id,'sidebar')]/div[contains(@id,'top')]/div[contains(@id,'avatar')]/a
+Xpath: //html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@class,'post')]/div[contains(@class,'for')]/a
+URI: http://stackoverflow.com/questions/tagged/facebook
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=15
+0.9894600254229634
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'header')]/div[contains(@id,'top')]/div[contains(@id,'top')]/a
+URI: http://gis.stackexchange.com/questions/tagged/bathymetry
+0.0
+URI: http://grails.1312388.n4.nabble.com/Anyone-ever-sent-a-jms-message-to-a-remote-HornetQ-from-grails-tp4651073p4651080.html
+0.008396504255395471
+URI: http://www.fmylife.com/moderate?utm_source=fmylife&utm_medium=autopromo&utm_campaign=422&
+0.7099405461426846
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'cf')]/div[contains(@id,'') and contains(@class,'article')]/div[contains(@class,'date')]/div[contains(@class,'right')]/p/a
+URI: https://www.phpbb.com/feeds/rss/?sid=3273876e814b26eeb6f3abdffb442f8e
+NaN
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'copyright')]/a
+URI: http://grails.1312388.n4.nabble.com/Grails-2-3-0-RESTful-Webservice-including-extra-data-in-XML-tp4650694p4651035.html
+0.014666945884516456
+URI: https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=75
+0.99481777076079
+URI: http://www.topix.com/yp/carrizo-springs-tx
+0.0
+URI: http://grails.1312388.n4.nabble.com/createCriteria-with-hasMany-property-tp4650993p4651054.html
+0.014666945884516456
+URI: http://www.fmylife.com/country/Cyprus
+0.9133082812801623
+URI: http://gis.stackexchange.com/questions/tagged/maps
+0.0
+URI: https://www.phpbb.com/about/advertise/?sid=3273876e814b26eeb6f3abdffb442f8e
+0.03999581315745365
+URI: http://stackoverflow.com/questions/tagged/out-of-memory
+0.0
+URI: http://carsandetc.tumblr.com/post/65951321490/an-m3-coupe-from-the-e36-era
+0.9963866359824052
+URI: http://grails.1312388.n4.nabble.com/Problem-with-multi-tenant-single-db-plugin-and-run-app-tp4646021p4651046.html
+0.010114980897462178
+URI: http://grails.1312388.n4.nabble.com/Changing-groupId-value-and-mavenCache-location-not-working-with-release-plugin-tp4651086p4651088.html
+0.018319009538284577
+URI: http://gis.stackexchange.com/questions/tagged/sextante
+0.0
+URI: http://stackoverflow.com/questions/tagged/vectorization
+0.0
+URI: https://www.phpbb.com/about/contact_us.php?sid=3273876e814b26eeb6f3abdffb442f8e
+0.04005555301622655
+URI: http://www.fmylife.com/region/Hampshire
+0.9076289369965532
+URI: http://grails.1312388.n4.nabble.com/Possible-to-use-defineBeans-in-Grails-unit-test-tp4651078p4651092.html
+0.01295349586914207
+URI: https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=25
+0.998578072559824
+URI: http://gis.stackexchange.com/questions/tagged/arcgis-javascript-api
+0.0
+URI: http://stackoverflow.com/questions/tagged/mvc
+0.0
+URI: https://www.phpbb.com/about/?sid=3273876e814b26eeb6f3abdffb442f8e
+0.0388408154104562
+URI: http://www.fmylife.com/country/United Kingdom
+0.9864264848215447
+URI: http://carsandetc.tumblr.com/post/65952222147/the-new-class-bmws-of-the-60s-have-such
+0.9939433048506526
+URI: http://gis.stackexchange.com/questions/tagged/optimisation
+0.0
+URI: http://stackoverflow.com/questions/tagged/asp-classic
+0.0
+URI: https://www.phpbb.com/?sid=3273876e814b26eeb6f3abdffb442f8e
+0.7111759808849584
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'back2top')]/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/p[contains(@class,'lynkorama')]/strong/a
+URI: http://www.topix.com/world-soccer
+0.0
+URI: https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=100
+0.9630810505604672
+URI: http://www.fmylife.com/gender/woman
+0.9969706975937744
+URI: https://www.phpbb.com/hosting/r/bluehost-footer/
+0.0
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'post')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/div[contains(@class,'content')]/blockquote/div/dl[contains(@class,'codebox')]/dt/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/p[contains(@class,'lynkorama')]/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div/h2/a
+URI: http://stackoverflow.com/questions/tagged/svg
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/api
+0.0
+URI: http://grails.1312388.n4.nabble.com/Shiro-problems-in-WAR-since-2-3-1-tp4650918p4651070.html
+0.018319009538284577
+URI: http://www.topix.com/obits/carrizo-springs-tx
+0.1301509576820153
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'dialog')]/div[contains(@id,'change')]/p[contains(@class,'intl')]/a
+URI: http://carsandetc.tumblr.com/post/65950724884/this-bmw-318ti-is-a-real-throwback-to-the-early
+0.9965290167428239
+URI: http://www.fmylife.com/country/Denmark
+0.962307800822675
+URI: http://gis.stackexchange.com/questions/tagged/examples
+0.0
+URI: http://stackoverflow.com/questions/tagged/django-admin
+0.0
+URI: https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=600
+0.9695410449589321
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e
+1.0
+URI: http://www.fmylife.com/intimacy
+0.9910763838460908
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'droite')]/div[contains(@class,'part')]/div[contains(@id,'blog') and contains(@class,'box')]/p[contains(@class,'no')]/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'navbar')]/ul/li[contains(@class,'but')]/div[contains(@class,'sub')]/ul/li/h4/a
+URI: http://gis.stackexchange.com/questions/tagged/shapefile
+0.0
+URI: http://www.topix.com/pick-local
+0.0
+URI: http://stackoverflow.com/questions/tagged/knockout.js
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'footer')]/div[contains(@id,'footer')]/table[contains(@id,'footer')]/tbody/tr/td[contains(@class,'footer')]/ul[contains(@class,'site')]/li/a
+URI: http://www.fmylife.com/blog
+0.6270971012770421
+Xpath: //html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'topbar')]/div[contains(@id,'contenttop')]/div[contains(@id,'title')]/a
+URI: http://stackoverflow.com/questions/tagged/cllocationcoordinate2d
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/composer
+0.0
+URI: https://www.phpbb.com/ideas?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.7160771723325571
+URI: https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=50
+0.9975267126003742
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'header')]/div[contains(@id,'top')]/div[contains(@id,'top')]/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'copyright')]/a
+URI: http://stackoverflow.com/questions/tagged/oracle-sqldeveloper
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/wkb
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'fr')]/a
+URI: http://www.fmylife.com/
+0.9999999999999999
+(({:xpath
+   "//html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'wrapper')]/div[contains(@class,'pagination')]/ul[contains(@class,'left')]/li/a",
+   :df 17,
+   :hrefs
+   #{"http://www.fmylife.com/?page=61"
+     "http://www.fmylife.com/?page=83"
+     "http://www.fmylife.com/?page=62"
+     "http://www.fmylife.com/?page=76" "http://www.fmylife.com?page=10"
+     "http://www.fmylife.com/?page=22" "http://www.fmylife.com?page=11"
+     "http://www.fmylife.com/?page=250"
+     "http://www.fmylife.com?page=12" "http://www.fmylife.com?page=1"
+     "http://www.fmylife.com/?page=1" "http://www.fmylife.com?page=2"
+     "http://www.fmylife.com/gender/?page=1"
+     "http://www.fmylife.com/?page=111"
+     "http://www.fmylife.com/?page=2" "http://www.fmylife.com?page=3"
+     "http://www.fmylife.com/?page=189"
+     "http://www.fmylife.com/gender/?page=2"
+     "http://www.fmylife.com/?page=1943"
+     "http://www.fmylife.com/?page=3" "http://www.fmylife.com?page=4"
+     "http://www.fmylife.com/gender/?page=3"
+     "http://www.fmylife.com/gender/?page=740"
+     "http://www.fmylife.com/?page=158"
+     "http://www.fmylife.com/?page=4" "http://www.fmylife.com?page=5"
+     "http://www.fmylife.com/gender/?page=4"
+     "http://www.fmylife.com?page=1943"
+     "http://www.fmylife.com/?page=5" "http://www.fmylife.com?page=6"
+     "http://www.fmylife.com/gender/?page=5"
+     "http://www.fmylife.com/?page=6" "http://www.fmylife.com?page=7"
+     "http://www.fmylife.com/gender/?page=6"
+     "http://www.fmylife.com/?page=7" "http://www.fmylife.com?page=8"
+     "http://www.fmylife.com/gender/?page=7"
+     "http://www.fmylife.com/?page=8" "http://www.fmylife.com?page=9"
+     URI: https://www.phpbb.com/community/viewforum.php?from=submenu&f=80&sid=3273876e814b26eeb6f3abdffb442f8e
+0.8167396746602638
+"http://www.fmylife.com/gender/?page=8"
+     "http://www.fmylife.com/country/?page=1"
+     "http://www.fmylife.com/?page=9"
+     "http://www.fmylife.com/gender/?page=9"
+     "http://www.fmylife.com/country/?page=2"
+     "http://www.fmylife.com/country/?page=3"
+     "http://www.fmylife.com/country/?page=4"URI: https://www.phpbb.com/about/advertise/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.031469322916376066
+
+     "http://www.fmylife.com/country/?page=5"
+     "http://www.fmylife.com/country/?page=6" "http://www.fmylife.com/"
+     "http://www.fmylife.com/country/?page=7"
+     "http://www.fmylife.com/country/?page=117"
+     "http://www.fmylife.com/country/?page=8"
+     "http://www.fmylife.com/country/?page=9"},
+   :avg-novelty 73/3}
+  {:xpath
+   "//html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'content')]/div[contains(@class,'cf')]/div[contains(@id,'') and contains(@class,'article')]/div[contains(@class,'date')]/div[contains(@class,'right')]/p/a",
+   :df 22,
+   :hrefs
+   #{"http://www.fmylife.com/region/Nicosia"
+     "http://www.fmylife.com/work/20937756"
+     "http://www.fmylife.com/animals"
+     "http://www.fmylife.com/region/New Brunswick"
+     "http://www.fmylife.com/kids/20938765"
+     "http://www.fmylife.com/region/Seoul-t'ukpyolsi"
+     "http://www.fmylife.com/region/Arkansas"
+     "http://www.fmylife.com/region/British Columbia"
+     "http://www.fmylife.com/country/Zimbabwe"
+     "http://www.fmylife.com/country/Anguilla"
+     "http://www.fmylife.com/region/Victoria"
+     "http://www.fmylife.com/region/Ohio"
+     "http://www.fmylife.com/gender/man"
+     "http://www.fmylife.com/region/Syddanmark"
+     "http://www.fmylife.com/kids"
+     "http://www.fmylife.com/animals/20930350"
+     "http://www.fmylife.com/work/20930479"
+     "http://www.fmylife.com/country/Qatar"
+     "http://www.fmylife.com/country/Cyprus"
+     "http://www.fmylife.com/region/Indiana"
+     "http://www.fmylife.com/region/New Hampshire"
+     "http://www.fmylife.com/region/Hampshire"
+     "http://www.fmylife.com/country/China"
+     "http://www.fmylife.com/region/Vermont"
+     "http://www.fmylife.com/region/Oregon"
+     "http://www.fmylife.com/work"
+     "http://www.fmylife.com/region/Suffolk"
+     "http://www.fmylife.com/region/Maine"
+     "http://www.fmylife.com/region/Ontario"
+     "http://www.fmylife.com/kids/20942117"
+     "http://www.fmylife.com/region/Mississippi"
+     "http://www.fmylife.com/region/Virginia"
+     "http://www.fmylife.com/love" "http://www.fmylife.com/money"
+     "http://www.fmylife.com/region/Maryland"
+     "http://www.fmylife.com/region/North Carolina"
+     "http://www.fmylife.com/region/Utah"
+     "http://www.fmylife.com/kids/20936409"
+     "http://www.fmylife.com/country/Denmark"
+     "http://www.fmylife.com/region/Poitou-Charentes"
+     "http://www.fmylife.com/region/Kingston upon Hull, City of"
+     "http://www.fmylife.com/region/Tel Aviv"
+     "http://www.fmylife.com/gender/woman"
+     "http://www.fmylife.com/country/France"
+     "http://www.fmylife.com/region/Alberta"
+     "http://www.fmylife.com/region/Colorado"
+     "http://www.fmylife.com/country/Korea, Republic of"
+     "http://www.fmylife.com/region/Manitoba"
+     "http://www.fmylife.com/region/Pennsylvania"
+     "http://www.fmylife.com/region/Ad Dawhah"
+     "http://www.fmylife.com/region/Illinois"
+     "http://www.fmylife.com/region/Shanghai"
+     "http://www.fmylife.com/country/United States"
+     "http://www.fmylife.com/region/Michigan"
+     "http://www.fmylife.com/region/Oklahoma"
+     "http://www.fmylife.com/country/Israel"
+     "http://www.fmylife.com/country/"
+     "http://www.fmylife.com/country/Australia"
+     "http://www.fmylife.com/region/Kansas"
+     "http://www.fmylife.com/region/Oldham"
+     "http://www.fmylife.com/country/New Zealand"
+     "http://www.fmylife.com/region/Nordjylland"
+     "http://www.fmylife.com/region/Limassol"
+     "http://www.fmylife.com/health"
+     "http://www.fmylife.com/country/Belgium"
+     "http://www.fmylife.com/region/Wisconsin"
+     "http://www.fmylife.com/region/New York"
+     "http://www.fmylife.com/region/New Jersey"
+     "http://www.fmylife.com/region/Washington"
+     "http://www.fmylife.com/health/20943322"
+     "http://www.fmylife.com/region/Texas"
+     "http://www.fmylife.com/region/Milton Keynes"
+     "http://www.fmylife.com/region/Hovedstaden"
+     "http://www.fmylife.com/miscellaneous"
+     "http://www.fmylife.com/country/Ireland"
+     "http://www.fmylife.com/region/Midtjylland"
+     "http://www.fmylife.com/region/Manchester"
+     "http://www.fmylife.com/region/Antwerpen"
+     "http://www.fmylife.com/region/New South Wales"
+     "http://www.fmylife.com/region/New Mexico"
+     "http://www.fmylife.com/region/Florida"
+     "http://www.fmylife.com/region/Massachusetts"
+     "http://www.fmylife.com/region/Surrey"
+     "http://www.fmylife.com/health/20931008"
+     "http://www.fmylife.com/money/20913893"
+     "http://www.fmylife.com/intimacy"
+     "http://www.fmylife.com/region/Havering"
+     "http://www.fmylife.com/health/20940711"
+     "http://www.fmylife.com/kids/20941092"
+     "http://www.fmylife.com/region/California"
+     "http://www.fmylife.com/region/Leicester"
+     "http://www.fmylife.com/region/Missouri"
+     "http://www.fmylife.com/country/Canada"
+     "http://www.fmylife.com/country/United Kingdom"
+     "http://www.fmylife.com/region/Rhode Island"},
+   :avg-novelty 103/6}
+  {:xpath
+   "//html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'footer')]/div[contains(@id,'wrapper')]/div[contains(@class,'box')]/p/a",
+   :df 36,
+   :hrefs
+   #{"http://viedemerde.fr" "http://www.fmylife.com/animals"
+     "http://www.fmylife.com/applications/official"
+     "http://tr.fmylife.com" "http://www.fmylife.com/kids"
+     "http://ru.fmylife.com" "http://www.fmylife.com/work"
+     "http://www.fmylife.com/love" "http://feedpress.it/"
+     "http://www.fmylife.com/money" "http://www.fmylife.com/store"
+     "http://www.fmylife.com/search/result/?member=1"
+     "http://m.fmylife.com" "http://vayamierdadevida.com"
+     URI: http://stackoverflow.com/questions/tagged/dataannotations
+0.0
+"http://sialbangetgue.com" "http://feedpress.me/fmylife/comments"
+     "http://feedpress.me/fmylife" "http://www.fmylife.com/health"
+     "http://www.amazon.com/gp/product/0345518764"
+     "http://www.fmylife.com/miscellaneous" "http://se.fmylife.com"
+     "http://vitadimerda.it" "http://www.fmylife.com/intimacy"
+     "http://feedpress.me/fmylife/blog"},
+   :avg-novelty 59/2}
+  {:xpath
+   "//html/body[contains(@id,'top')]/div[contains(@id,'background')]/div[contains(@id,'topbar')]/div[contains(@id,'contenttop')]/div[contains(@id,'title')]/a",
+   URI: https://www.phpbb.com/about/contact_us.php?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.04005555301622655
+URI: https://www.phpbb.com/about/contact_us.php?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.031516327159027725
+URI: http://www.topix.com/world
+0.0
+URI: http://gis.stackexchange.com/questions?pagesize=30&sort=newest
+0.9792510456243946
+URI: http://stackoverflow.com/questions/tagged/object
+0.0
+URI: https://www.phpbb.com/about/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.03056055286774972
+URI: http://gis.stackexchange.com/questions?pagesize=15&sort=newest
+0.8675063611141592
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@id,'footer') and contains(@class,'categories')]/div[contains(@class,'footerwrap')]/div[contains(@id,'footer')]/div[contains(@id,'footer')]/table/tbody/tr/td/ol/li/a
+URI: https://www.phpbb.com/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.5595642350046446
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'pagination')]/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/p[contains(@class,'lynkorama')]/strong/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/p[contains(@class,'lynkorama')]/a
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'forumbg')]/div[contains(@class,'inner')]/ul[contains(@class,'topics')]/li[contains(@class,'bg')]/dl[contains(@class,'icon')]/dt/a
+URI: http://stackoverflow.com/questions/tagged/certificate
+0.0
+URI: http://gis.stackexchange.com
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'header') and contains(@class,'headeranon')]/div[contains(@id,'hlogo')]/a
+URI: https://www.phpbb.com/about/team/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.03775533280810637
+URI: https://boards.4chan.org/vg/res/51755162
+0.007630230426920541
+URI: http://gis.stackexchange.com/
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'sidebar')]/div[contains(@id,'related') and contains(@class,'module')]/a
+URI: http://stackoverflow.com/questions/tagged/sql-server
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2205181&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6531256653245551
+URI: http://www.topix.com/autos
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/javascript
+0.0
+URI: http://stackoverflow.com/questions/tagged/fragment
+0.0
+URI: https://www.phpbb.com/styles/demo/3.0/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2186368&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6488952278711255
+URI: http://stackoverflow.com/questions/tagged/grails
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/raster
+0.0
+URI: https://www.phpbb.com/downloads/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.03566190737334923
+URI: http://stackoverflow.com/questions/tagged/c%2b%2b
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/arcgis-server
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/arcgis
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1659365&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.5715430902090394
+URI: http://stackoverflow.com/questions/tagged/ios
+0.0
+URI: http://www.topix.com/health
+0.0
+URI: http://gis.stackexchange.com/questions/tagged/openlayers
+0.0
+URI: http://stackoverflow.com/questions/tagged/testing
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'fr')]/a
+URI: https://www.phpbb.com/support/documentation/3.0/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.02730674635879153
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2121336&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6510001377247656
+URI: http://gis.stackexchange.com/questions/tagged/openstreetmap
+0.0
+URI: https://www.phpbb.com/support/tutorials/3.0/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.037906657393810966
+URI: http://stackoverflow.com/questions?pagesize=30&sort=newest
+0.9789815163071012
+URI: http://gis.stackexchange.com/questions/tagged/arcpy
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@id,'questions')]/div[contains(@id,'question') and contains(@class,'question')]/div[contains(@class,'summary')]/h3/a
+URI: http://stackoverflow.com/questions?pagesize=15&sort=newest
+0.8644857627660584
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@id,'footer') and contains(@class,'categories')]/div[contains(@class,'footerwrap')]/div[contains(@id,'footer')]/div[contains(@id,'footer')]/table/tbody/tr/td/ol/li/a
+URI: https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=77503&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6564765788169027
+URI: https://www.phpbb.com/support/irc/?sid=3273876e814b26eeb6f3abdffb442f8e
+0.04005555301622655
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'community')]/div[contains(@id,'wrap')]/div[contains(@id,'navbar')]/ul/li[contains(@class,'but')]/div[contains(@class,'sub')]/div[contains(@class,'sub')]/a
+URI: http://gis.stackexchange.com/questions/76304/openlayers-tiles-source-with-poor-resolution-how-zoom-out
+0.0
+URI: http://www.topix.com/life
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2207616&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6531256653245551
+URI: http://gis.stackexchange.com/questions/76276/how-can-i-calculate-the-distances-between-my-points-in-sequence-automatically
+0.0
+URI: https://www.phpbb.com/support/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.03833237082482675
+URI: http://gis.stackexchange.com/questions/76284/how-to-find-shortest-route-for-cyclist-that-can-switch-between-road-layer-and-cy
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2189341&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6519422512968785
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'navbar')]/ul/li[contains(@class,'but')]/div[contains(@class,'sub')]/ul/li/h4/a
+URI: https://www.phpbb.com/about/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.0388408154104562
+URI: http://stackoverflow.com
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'header') and contains(@class,'headeranon')]/div[contains(@id,'hlogo')]/a
+URI: http://gis.stackexchange.com/questions/76297/loading-postgis-raster-layer-into-qgis
+0.0
+URI: https://www.phpbb.com/community/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.46704425108755093
+URI: http://gis.stackexchange.com/questions/76343/geotools-csv2shp-example-doesnt-work
+0.0
+URI: https://www.phpbb.com/community/viewforum.php?from=submenu&f=6&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.9342519604405048
+URI: http://www.topix.com/sports
+0.0
+URI: https://www.phpbb.com/development/?from=submenu&sid=3273876e814b26eeb6f3abdffb442f8e
+0.7785949349934818
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'community')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/div[contains(@class,'content')]/a
+URI: http://gis.stackexchange.com/questions/76305/district-heating-expansion-design-with-arcgis
+0.0
+URI: http://stackoverflow.com/
+0.0
+URI: https://www.phpbb.com/customise/db/modifications-1/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.504361252031014
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'sidebar')]/div[contains(@id,'related') and contains(@class,'module')]/a
+URI: https://www.phpbb.com/customise/db/author/rmcgirr83/
+0.7233787341967649
+URI: http://gis.stackexchange.com/questions/76319/what-is-the-most-common-way-of-displaying-geodata-from-postgis-on-leaflet
+0.0
+URI: http://stackoverflow.com/questions/tagged/ajax
+0.0
+URI: https://www.phpbb.com/about/contact_us.php?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.031516327159027725
+URI: http://gis.stackexchange.com/questions/76286/how-to-show-polyline-direction-in-arcgis-for-desktop-arcmap
+0.0
+URI: http://stackoverflow.com/questions/tagged/regex
+0.0
+URI: http://www.topix.com/videogame
+0.0
+URI: http://www.phpbb.com/mods/db/index.php?i=misc&mode=display&contrib_id=13475
+0.6875869016703299
+URI: http://gis.stackexchange.com/questions/76281/generating-vineyards-rows-in-a-polygon
+0.0
+URI: https://boards.4chan.org/vg/res/52035953
+0.007626410536605084
+URI: http://gis.stackexchange.com/questions/76252/india-urbanization
+0.0
+URI: http://stackoverflow.com/questions/tagged/android
+0.0
+URI: https://www.phpbb.com/customise/db/download/id_92881
+NaN
+URI: http://gis.stackexchange.com/questions/76358/how-to-make-two-raster-correlation-coefficient-map
+0.0
+URI: http://stackoverflow.com/questions/tagged/c
+0.0
+URI: http://gis.stackexchange.com/questions/76328/high-resolution-and-high-detail-vector-gis-coastline-product-needed
+0.0
+URI: https://www.phpbb.com/kb/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.009123300802754563
+URI: http://stackoverflow.com/questions/tagged/ruby-on-rails
+0.0
+URI: http://gis.stackexchange.com/questions/76257/python-indentation-error
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@id,'footer') and contains(@class,'categories')]/div[contains(@class,'footerwrap')]/div[contains(@id,'footer')]/div[contains(@class,'top')]/b/a
+URI: http://www.phpbb.com/community/viewtopic.php?f=185&t=1038985
+0.9453432382202794
+URI: http://gis.stackexchange.com/contact
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a
+URI: http://www.topix.com/entertainment
+0.0
+URI: https://www.phpbb.com/support/irc/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.031516327159027725
+URI: http://gis.stackexchange.com/questions?page=2&sort=newest
+0.8646342477417802
+URI: http://stackoverflow.com/questions/tagged/javascript
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@id,'questions')]/div[contains(@id,'question') and contains(@class,'question')]/div[contains(@class,'summary')]/h3/a
+URI: https://www.phpbb.com/customise/db/mod/mchat_new_version/
+0.6875869016703299
+URI: https://www.phpbb.com/downloads/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.028059338974501514
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/p[contains(@class,'author')]/a
+URI: http://stackoverflow.com/questions/19766809/xslt-stylesheet-not-included-in-runnable-jar-with-eclipse
+0.0
+URI: http://gis.stackexchange.com/questions?page=3&sort=newest
+0.8970224752876372
+URI: http://stackoverflow.com/questions/19766821/jquery-fires-click-events-on-wrong-elements-in-ie8
+0.0
+URI: https://www.phpbb.com/customise/db/official_tools-23/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.5595001679083648
+URI: http://gis.stackexchange.com/questions?page=4&sort=newest
+0.9096726204090669
+URI: http://stackoverflow.com/questions/19766862/custom-cllocationcoordinate2d-in-ios-programming
+0.0
+URI: https://www.phpbb.com/support/tutorials/3.0/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.029825542926459107
+URI: https://www.phpbb.com/community/viewtopic.php?p=11311045&sid=3273876e814b26eeb6f3abdffb442f8e
+1.0
+URI: http://www.topix.com/arts
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'twocol')]/div[contains(@id,'col')]/div[contains(@id,'local') and contains(@class,'widget')]/div[contains(@id,'gallery')]/ul[contains(@class,'gallery')]/li/a
+URI: http://gis.stackexchange.com/questions?page=5&sort=newest
+0.8929112658134817
+URI: http://stackoverflow.com/questions/19766826/oracle-sql-select-query
+0.0
+URI: http://stackoverflow.com/questions/19766828/ios-5-and-dispatch-release
+0.0
+URI: http://gis.stackexchange.com/questions?page=513&sort=newest
+0.9009188660642297
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@id,'questions')]/div[contains(@id,'question') and contains(@class,'question')]/div[contains(@class,'summary')]/div[contains(@class,'started')]/div[contains(@class,'user')]/div[contains(@class,'user')]/a
+URI: https://www.phpbb.com/bugs/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.029925864578479552
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'community')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'forumbg')]/div[contains(@class,'inner')]/ul[contains(@class,'topics')]/li[contains(@class,'row')]/dl[contains(@class,'icon')]/dd[contains(@class,'lastpost')]/span/a
+URI: http://www.topix.com/album/detail/carrizo-springs-tx/HODFOEEHMMGS6Q20
+0.13202694366966833
+URI: http://gis.stackexchange.com/users/23557/user23557
+0.0
+URI: http://stackoverflow.com/questions/19766845/overlapping-table-with-z-index
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?p=11311115&sid=3273876e814b26eeb6f3abdffb442f8e
+1.0
+URI: http://www.topix.com/album/upload/carrizo-springs-tx
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2121336&p=13439676&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6510001377247656
+URI: http://gis.stackexchange.com/users/23598/ghouse-katiri
+0.0
+URI: http://stackoverflow.com/questions/19766800/most-elegant-way-to-copy-pod-struct-vector-of-structs-to-vectorunsigned-char
+0.0
+URI: http://stackoverflow.com/questions/19766802/what-is-the-order-for-linking-the-opencv-libraries
+0.0
+URI: http://www.topix.com/album/detail/carrizo-springs-tx/T4HSJF2CDIB5BLMB
+0.13202694366966833
+URI: http://gis.stackexchange.com/users/23585/yoav-abadi
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&p=13439626&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6597844412030692
+URI: http://stackoverflow.com/questions/19766833/jquery-append-prepend-html-event
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?p=11307575&sid=3273876e814b26eeb6f3abdffb442f8e
+1.0
+URI: http://gis.stackexchange.com/users/23582/vievk
+0.0
+URI: http://stackoverflow.com/questions/19766816/postgresql-jdbc-getgeneratedkeys-returns-all-columns
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2199811&p=13395721&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6531256653245551
+URI: http://gis.stackexchange.com/users/18881/ionden
+0.0
+URI: http://www.topix.com/album/detail/carrizo-springs-tx/8Q3SD2VSBGSGU5V1
+0.13202694366966833
+URI: http://stackoverflow.com/questions/19766877/intellij-idea-java-certificate
+0.0
+URI: http://gis.stackexchange.com/users/17366/venkat
+0.0
+URI: http://stackoverflow.com/questions/19766818/got-error-when-rup-grails-app
+0.0
+URI: http://www.topix.com/album/detail/carrizo-springs-tx/KK9MJ92PS9KIP6UO
+0.13202694366966833
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'twocol')]/div[contains(@id,'footer')]/div[contains(@id,'footer')]/table[contains(@id,'footer')]/tbody/tr/td[contains(@id,'footer') and contains(@class,'footer')]/div/p[contains(@class,'footer')]/a
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2103854&p=13439661&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6306128097518687
+URI: http://gis.stackexchange.com/users/23378/gispadawan
+0.0
+URI: https://boards.4chan.org/vg/res/52050652
+0.007626410536605084
+URI: https://www.phpbb.com/community/viewtopic.php?p=11312755&sid=3273876e814b26eeb6f3abdffb442f8e
+1.0
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'community')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'post')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/div[contains(@class,'content')]/ul/li/a
+URI: http://stackoverflow.com/questions/19766822/split-motion-events-in-android-2-3-and-below
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@id,'footer') and contains(@class,'categories')]/div[contains(@class,'footerwrap')]/div[contains(@id,'footer')]/div[contains(@class,'top')]/b/a
+URI: http://gis.stackexchange.com/users/23579/msd
+0.0
+URI: http://stackoverflow.com/contact
+0.0
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a
+URI: http://www.topix.com/merchants/landing/carrizo-springs-tx
+0.1308603913420526
+URI: http://gis.stackexchange.com/users/22295/igor-s
+0.0
+URI: http://www.phpbb.com/mods/umil/
+0.03829307571370374
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/div[contains(@class,'content')]/span/a
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2181622&p=13436571&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6519422512968785
+URI: http://gis.stackexchange.com/users/23560/help
+0.0
+URI: http://stackoverflow.com/questions?page=120170&sort=newest
+0.8534445699089214
+URI: http://www.topix.com/member/register
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'col')]/div[contains(@id,'local') and contains(@class,'widget')]/div[contains(@id,'mortgages') and contains(@class,'widget')]/h5/a
+URI: http://gis.stackexchange.com/users/21085/salliva2000
+0.0
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=1430525&p=13442241&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6205272587447934
+URI: https://www.phpbb.com/customise/db/mod/mchat_new_version/support/
+0.2937093611366888
+URI: http://stackoverflow.com/questions?page=2&sort=newest
+0.8740586248082682
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/div[contains(@id,'sig') and contains(@class,'signature')]/a
+URI: http://gis.stackexchange.com/users/20513/user20513
+0.0
+URI: http://www.topix.com/mortgages/carrizo-springs-tx
+0.12782183446570763
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'twocol')]/div[contains(@id,'col')]/div[contains(@id,'local') and contains(@class,'widget')]/div[contains(@id,'gallery')]/a
+URI: http://stackoverflow.com/questions?page=3&sort=newest
+0.8740586248082682
+URI: https://www.phpbb.com/community/viewtopic.php?f=69&t=2205191&p=13422951&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6531256653245551
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'community')]/div[contains(@id,'wrap')]/div[contains(@id,'navbar')]/ul/li[contains(@class,'but')]/div[contains(@class,'sub')]/div[contains(@class,'sub')]/a
+URI: http://www.phpbb.com/customise/db/author/rmcgirr83/contributions/
+0.5960800304608026
+URI: http://stackoverflow.com/questions?page=4&sort=newest
+0.8944954538170404
+URI: http://www.topix.com/album/detail/carrizo-springs-tx/CEVO13EOBAIEGE30
+0.13202694366966833
+URI: https://www.phpbb.com/support/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.030160500822620232
+URI: http://stackoverflow.com/questions?page=5&sort=newest
+0.8587899094011031
+Xpath: //html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@id,'questions')]/div[contains(@id,'question') and contains(@class,'question')]/div[contains(@class,'summary')]/div[contains(@class,'started')]/div[contains(@class,'user')]/div[contains(@class,'user')]/a
+URI: http://www.phpbb.com/customise/db/author/doyouspeakwak/contributions/
+0.7198427387626898
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/dl[contains(@id,'profile') and contains(@class,'postprofile')]/dt/a
+URI: https://www.phpbb.com/about/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.03056055286774972
+URI: http://stackoverflow.com/users/1223948/kiwanax
+0.0
+URI: http://www.topix.com/album/carrizo-springs-tx
+0.11570573438042325
+URI: https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=1153255&sid=3273876e814b26eeb6f3abdffb442f8e
+0.8330480436022681
+URI: http://stackoverflow.com/users/2791739/user2791739
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/table[contains(@class,'thread')]/tbody/tr[contains(@id,'threadrow')]/td/a
+URI: https://www.phpbb.com/community/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.3814463269963067
+URI: http://stackoverflow.com/users/1644770/neeko
+0.0
+URI: http://stackoverflow.com/users/1128527/sinisa-dragicevic-martincic
+0.0
+URI: https://www.phpbb.com/development/?from=submenu&sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6126105083526355
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'forabg')]/div[contains(@class,'inner')]/ul[contains(@class,'topiclist')]/li[contains(@class,'row')]/dl[contains(@class,'icon')]/dt/a
+URI: https://boards.4chan.org/vg/res/51913509
+0.007630230426920541
+URI: http://stackoverflow.com/users/2952212/user2952212
+0.0
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TGNBGLE53DC2FP1GU
+0.04147745275075083
+URI: https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=216463&sid=3273876e814b26eeb6f3abdffb442f8e
+0.8330480436022681
+URI: http://stackoverflow.com/users/470763/kmcgrady
+0.0
+URI: http://stackoverflow.com/users/2646427/marc-pursals
+0.0
+URI: https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=294346&sid=3273876e814b26eeb6f3abdffb442f8e
+0.8330480436022681
+URI: https://www.phpbb.com/customise/db/support/modifications-1
+0.21168159974511938
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'navbar')]/ul/li[contains(@class,'but')]/a
+URI: http://stackoverflow.com/users/2952317/user2952317
+0.0
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T56DF6NTI3R21MB8J
+0.0415659601124042
+URI: https://www.phpbb.com/development/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.6126105083526355
+URI: http://stackoverflow.com/users/2833536/abodvdv
+0.0
+URI: https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=77503&sid=3273876e814b26eeb6f3abdffb442f8e
+0.8356191856530583
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'navbar')]/ul/li[contains(@class,'but')]/a
+URI: http://stackoverflow.com/users/2952325/user2952325
+0.0
+URI: https://www.phpbb.com/development/?sid=3273876e814b26eeb6f3abdffb442f8e
+0.7785949349934818
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TM5VRSTASEM2M8E3E
+0.04283529938571572
+URI: https://www.phpbb.com/customise/db/?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.5061711666465234
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/h3/a
+URI: http://stackoverflow.com/users/683830/royal
+0.0
+URI: https://www.phpbb.com/support/?sid=3273876e814b26eeb6f3abdffb442f8e
+0.03833237082482675
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/div[contains(@id,'sig') and contains(@class,'signature')]/span/a
+URI: http://stackoverflow.com/users/2948033/user2948033
+0.0
+URI: https://www.phpbb.com/community/viewonline.php?sid=9d9f94974bf7b0ce9b11cf8c827a41c7
+0.5289720498813559
+URI: http://stackoverflow.com/users/2724940/baklap4
+0.0
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TLE2UFMDKDQGKLFHH
+0.042732019429801815
+URI: http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&start=60
+0.9530477956568237
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TJJQ6G3JAMGQTA1FE
+0.04141876098121909
+URI: http://www.phpbb.com/mods/junior-validators/
+0.77104291426564
+Xpath: //html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/h3/a
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TT27EPLODQ9F7CTU9
+0.04277066180643653
+URI: https://www.phpbb.com/community/viewonline.php?sid=3273876e814b26eeb6f3abdffb442f8e
+0.6733205841885348
+URI: https://boards.4chan.org/vg/res/52075212
+0.00762164373162871
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TG4IG0IDOCQ0I16QV/p2
+0.04209994251628905
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T979DGBP2NIALNPE5
+0.0412326083043037
+URI: https://boards.4chan.org/vg/res/52017541
+0.007630230426920541
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TBKJ1BPRLL4V8NRF8
+0.04283529938571572
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TD1PPJOKBS83P586G
+0.042883970347201095
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T5NSNV6NDNSCFMUH8/p16
+0.04105749774825837
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TUTBFB87R5RSF0D50/p26
+0.042703106283246924
+URI: https://boards.4chan.org/vg/res/52022950
+0.007626410536605084
+Xpath: //html/body[contains(@class,'board')]/form[contains(@id,'delform')]/div[contains(@class,'navLinks')]/span[contains(@class,'mobileib')]/a
+Xpath: //html/body[contains(@class,'is')]/div[contains(@class,'pagelist')]/div[contains(@class,'pages')]/strong/a
+Xpath: //html/body[contains(@class,'board')]/div[contains(@class,'navLinks')]/span[contains(@class,'mobileib')]/a
+Xpath: //html/body[contains(@class,'is')]/div[contains(@id,'boardNavDesktopFoot') and contains(@class,'desktop')]/span[contains(@class,'boardList')]/a
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T7ODIP2HJ12CKT4QS
+0.04283529938571572
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TKSS4MHL0OP5MHO5N
+0.04132246190335418
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TFTO4O7HFUD9T5TV0
+0.042883970347201095
+URI: https://boards.4chan.org/lit/
+0.8673188057987886
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TK0U7H1AU2NORI9U1
+0.04207536219452277
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TSOV1SNSR6TISMJNU/p2
+0.042874222882511664
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T3NN9KTM62O5RTQAG
+0.0420355108352821
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TG4IG0IDOCQ0I16QV
+0.04145101059649566
+URI: https://boards.4chan.org/tv/
+0.8672261565183115
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TFCCU9T8P7BNOO4HB
+0.04255941575860551
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T979DGBP2NIALNPE5/p2
+0.04282558506437849
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TOTR4OTSGP7UO6MB7
+0.042883970347201095
+URI: https://boards.4chan.org/wsg/
+0.9646946821528057
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TVIPO3324OICC9BTK
+0.042883970347201095
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TF8FS6REL0F69722A
+0.04141876098121909
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TOEVLG648FIIN51BA/p2
+0.042066155667547483
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TUU65M67BAV4ELEGR
+0.0426870687620131
+URI: https://boards.4chan.org/g/
+0.8673188057987886
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TBMQQFLLUQFAGV5LD
+0.04264225964996519
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TGNBGLE53DC2FP1GU/p2
+0.04283529938571572
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T6LBN6V5EL092J48E
+0.042883970347201095
+URI: https://boards.4chan.org/y/
+0.8673188057987886
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TDD52BCFUD6T13IES
+0.042883970347201095
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T3HO45EUQ2PLL0MD4
+0.04279002234841928
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TJB3HVB4QA1VHU9AO
+0.04281911252069089
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'top')]/div[contains(@id,'flip')]/div[contains(@id,'ribbon') and contains(@class,'face')]/div[contains(@class,'top')]/div[contains(@class,'weather')]/div[contains(@class,'weather')]/a
+URI: https://boards.4chan.org/mu/
+0.8660707502673595
+URI: http://www.topix.com/weather/carrizo-springs-tx
+0.1261062983109016
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'fix')]/div[contains(@class,'main')]/div[contains(@class,'main')]/div[contains(@class,'forum')]/a
+URI: http://www.topix.com/alerts/subscribe-forum/city/carrizo-springs-tx
+0.1301509576820153
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'col')]/div[contains(@id,'node') and contains(@class,'widget')]/div/div[contains(@id,'LocalNews') and contains(@class,'widget')]/a
+URI: http://www.topix.com/webslice/localnews?node=city/carrizo-springs-tx
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'top')]/div[contains(@id,'flip')]/div[contains(@id,'ribbon') and contains(@class,'back')]/div[contains(@class,'top')]/div[contains(@class,'ribbon')]/div[contains(@class,'ribbon')]/p/a
+URI: https://boards.4chan.org/co/
+0.8672261565183115
+URI: http://www.topix.com/wire/city/carrizo-springs-tx
+0.11890058855920546
+URI: https://boards.4chan.org/s/
+0.9338196974238656
+URI: http://www.topix.com/topstories
+0.0
+URI: https://boards.4chan.org/an/
+0.8672261565183115
+URI: http://www.topix.com/tech
+0.0
+URI: http://www.topix.com/forum/recent
+0.0
+URI: http://www.topix.com/coupons/carrizo-springs-tx
+0.13014131936914375
+URI: http://www.topix.com/
+0.0
+URI: https://boards.4chan.org/hc/
+0.8656666449201622
+URI: http://www.topix.com/classifieds/carrizo-springs-tx/jobs
+0.12656473994531534
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'footer')]/div[contains(@id,'footer')]/table[contains(@id,'footer')]/tbody/tr/td[contains(@class,'footer')]/ul/li/a
+URI: http://www.topix.com/world/list
+0.0
+URI: http://www.topix.com/ext/law-enforcement
+0.0
+URI: https://boards.4chan.org/hr/
+0.8672261565183115
+URI: http://www.topix.com/shopping/carrizo-springs-tx
+0.1267299757022961
+URI: http://www.topix.com/issue
+0.0
+URI: https://boards.4chan.org/out/
+0.8673188057987886
+URI: http://www.topix.com/home
+0.0
+URI: http://www.topix.com/dir
+0.0
+URI: https://boards.4chan.org/t/
+0.8673188057987886
+URI: http://www.topix.com/movies
+0.0
+URI: http://www.topix.com/food
+0.0
+URI: https://boards.4chan.org/s4s/
+0.8479461746250695
+URI: http://www.topix.com/ce
+0.0
+URI: http://www.topix.com/entertainment/celebrities
+0.0
+URI: https://boards.4chan.org/vr/
+0.8672261565183115
+URI: https://boards.4chan.org/i/
+0.913355833331363
+Xpath: //html/body[contains(@class,'is')]/div[contains(@class,'desktop')]/a
+Xpath: //html/body[contains(@class,'is')]/form[contains(@id,'delform')]/div[contains(@class,'board')]/div[contains(@id,'t') and contains(@class,'thread')]/div[contains(@id,'pc') and contains(@class,'postContainer')]/div[contains(@id,'p') and contains(@class,'post')]/blockquote[contains(@id,'m') and contains(@class,'postMessage')]/a
+URI: http://www.topix.com/real-estate/city/carrizo-springs-tx
+0.1281175180799169
+URI: http://www.topix.com/city
+0.0
+URI: http://www.topix.com/dating/carrizo-springs-tx
+0.12817981524237948
+URI: http://www.topix.com/topix/terms
+0.0
+URI: http://www.topix.com/travel
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/table[contains(@class,'thread')]/tbody/tr[contains(@id,'threadrow')]/td[contains(@class,'numposts')]/a
+URI: https://boards.4chan.org/vg/res/52059123
+0.007826126366941775
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TCI3AOAENGQ7U0QA9
+0.0420355108352821
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T3OSPH6AJR5A1RG2M
+0.042883970347201095
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TNA5O0OJA5EB29BTM
+0.042883970347201095
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TD1TR70TSEN70NMEO/p19
+0.04144807570000058
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TAAFIC1A48FPAOHIG
+0.04280617623262506
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T2VS2J8VHT04MLGU6
+0.042887220979788455
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T0A56PRRGCP1E4R1M
+0.04279002234841928
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TNECCGU6NNDVD799H
+0.04283529938571572
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TQGEQU2K6NB27AVPF/p948
+0.04273523562816033
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T3D6MCKGGMR7F4VEL
+0.04280617623262506
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TNSQLO2PH8H1GUC6E
+0.04158076649627152
+URI: https://boards.4chan.org/vg/res/52011804
+0.008768265624873175
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TDUSL93IB6HCD9KNF
+0.04266464655798725
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TONJ4PJTBUFEVH1PM
+0.04266464655798725
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TSFTOVT7OHNJFH8JG
+0.04177470073273355
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TA6V5U86J4T6G4HUJ
+0.04283529938571572
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TTFI0B09836TFJE2S
+0.04261033939723239
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TQEBHJSDKFUVH780Q
+0.042887220979788455
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TI96ABFLSBFD6KAOC/p6
+0.04240144841166545
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TJ9NFEUSUPJVIULU9
+0.042063088167950485
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TM916K7K5GDB9FKDK
+0.042867728264147885
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T63HNASUJGIHL08LM
+0.042883970347201095
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/T2II5GMDDTSDL45JF
+0.042883970347201095
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TPM91KIOCOD57HGJB
+0.04287097520437327
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TTC29296M463M4KJO
+0.04283529938571572
+URI: https://boards.4chan.org/vg/res/52065806
+0.007805648024733159
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/TK5HO100B6RFOTCFK
+0.042164671389512735
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/div/div/a
+URI: http://www.topix.com/forum/city/carrizo-springs-tx/p2
+0.9990207571652229
+URI: http://www.topix.com/sms/city/carrizo-springs-tx
+0.12919759766188602
+URI: http://www.topix.com/rss/forum/city/carrizo-springs-tx
+NaN
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'footer')]/div[contains(@class,'footer')]/a
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/div[contains(@class,'paging')]/div/a
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'footer')]/div[contains(@id,'footer')]/table[contains(@id,'footer')]/tbody/tr/td[contains(@id,'footer') and contains(@class,'footer')]/ul/li/a
+URI: http://www.topix.com/politics/carrizo-springs-tx
+0.1301509576820153
+URI: https://boards.4chan.org/vg/res/52036087
+0.007626410536605084
+URI: http://www.topix.com/events/carrizo-springs-tx
+0.13010278751948526
+URI: http://www.topix.com/crime/carrizo-springs-tx
+0.1301509576820153
+URI: http://www.topix.com/city/carrizo-springs-tx
+0.12771486202721297
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'top')]/div[contains(@id,'flip')]/div[contains(@id,'ribbon') and contains(@class,'front')]/div[contains(@class,'top')]/div[contains(@class,'media')]/a
+URI: http://www.topix.com/member/login
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'fix')]/div[contains(@class,'main')]/div[contains(@class,'main')]/div[contains(@class,'sty')]/div[contains(@class,'forum')]/a
+URI: http://www.topix.com/forum/post/newthread?forum=city/carrizo-springs-tx
+0.0
+Xpath: //html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'col')]/div[contains(@id,'node') and contains(@class,'widget')]/div/div[contains(@id,'LocalNews') and contains(@class,'widget')]/ul/li/a
+URI: https://boards.4chan.org/vg/res/51962747
+0.007826126366941775
+URI: http://www.topix.com/city/carrizo-springs-tx/2013/10/cold-front-much-rain-expected-on-tuesday
+0.042754548080284845
+URI: http://www.topix.com/city/carrizo-springs-tx/2013/10/floods-catch-zavala-county-off-guard
+0.04288072045364581
+URI: https://boards.4chan.org/vg/res/52024162
+0.007826126366941775
+URI: https://boards.4chan.org/vg/res/51789486
+0.007630230426920541
+URI: https://boards.4chan.org/vg/res/52053445
+0.007821235954437143
+URI: https://boards.4chan.org/vg/res/52073725
+0.007626410536605084
+Xpath: //html/body[contains(@class,'board')]/form[contains(@id,'delform')]/div[contains(@class,'board')]/div[contains(@id,'t') and contains(@class,'thread')]/div[contains(@id,'pc') and contains(@class,'postContainer')]/div[contains(@id,'p') and contains(@class,'post')]/div[contains(@id,'pi') and contains(@class,'desktop')]/span[contains(@class,'nameBlock')]/a
+URI: https://boards.4chan.org/vg/nokap@live.com.au
+NaN
+:df 15,
+   :hrefs #{"http://www.fmylife.com/"},
+   :avg-novelty 12})
+ ({:xpath
+   "//html/body[contains(@class,'is')]/div[contains(@id,'boardNavDesktopFoot') and contains(@class,'desktop')]/span[contains(@class,'boardList')]/a",
+   :df 18,
+   :hrefs
+   #{"https://boards.4chan.org/diy/" "https://boards.4chan.org/t/"
+     "https://boards.4chan.org/hr/" "https://boards.4chan.org/cm/"
+     "https://boards.4chan.org/s/" "https://boards.4chan.org/3/"
+     "https://boards.4chan.org/adv/" "https://boards.4chan.org/mu/"
+     "https://boards.4chan.org/r/" "https://boards.4chan.org/s4s/"
+     "https://boards.4chan.org/ck/" "https://boards.4chan.org/fit/"
+     "https://boards.4chan.org/mlp/" "https://boards.4chan.org/p/"
+     "https://boards.4chan.org/jp/" "https://boards.4chan.org/int/"
+     "https://boards.4chan.org/o/" "https://boards.4chan.org/hm/"
+     "https://boards.4chan.org/out/" "https://boards.4chan.org/n/"
+     "https://boards.4chan.org/m/" "https://boards.4chan.org/pol/"
+     "https://boards.4chan.org/tv/" "https://boards.4chan.org/k/"
+     "https://boards.4chan.org/wsg/" "https://boards.4chan.org/i/"
+     "https://boards.4chan.org/po/" "https://boards.4chan.org/h/"
+     "https://boards.4chan.org/cgl/" "https://boards.4chan.org/gd/"
+     "https://boards.4chan.org/soc/" "https://boards.4chan.org/sp/"
+     "https://boards.4chan.org/g/" "https://boards.4chan.org/vr/"
+     "https://boards.4chan.org/f/" "https://boards.4chan.org/fa/"
+     "https://boards.4chan.org/e/" "https://boards.4chan.org/hc/"
+     "https://boards.4chan.org/vp/" "https://boards.4chan.org/gif/"
+     "https://boards.4chan.org/r9k/" "https://boards.4chan.org/d/"
+     "https://boards.4chan.org/ic/" "https://rs.4chan.org/"
+     "https://boards.4chan.org/c/" "https://boards.4chan.org/b/"
+     "https://boards.4chan.org/a/" "https://boards.4chan.org/toy/"
+     "https://boards.4chan.org/asp/" "https://boards.4chan.org/tg/"
+     "https://boards.4chan.org/vg/" "https://boards.4chan.org/wg/"
+     "https://boards.4chan.org/sci/" "https://boards.4chan.org/y/"
+     "https://boards.4chan.org/x/" "https://boards.4chan.org/trv/"
+     "https://boards.4chan.org/lgbt/" "https://boards.4chan.org/w/"
+     "https://boards.4chan.org/lit/" "https://boards.4chan.org/an/"
+     "https://boards.4chan.org/v/" "https://boards.4chan.org/co/"
+     "https://boards.4chan.org/u/"},
+   :avg-novelty 291/8})
+ ({:xpath
+   "//html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'pagination')]/span/a",
+   :df 16,
+   :hrefs
+   #{"https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=75"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=45"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1430525&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1659365&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=630"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=25"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=15"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1659365&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=60"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=150"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1521565&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1659365&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=30"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=175"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=550"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=100"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1659365&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=45"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=575"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=90"
+     "https://www.phpbb.com/community/viewforum.php?f=6&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=50"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=125"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=500"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1659365&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=15"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=600"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=60"
+     "https://www.phpbb.com/community/viewforum.php?f=6&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=75"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1521565&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=30"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=525"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=30"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=75"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1521565&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=45"
+     "https://www.phpbb.com/community/viewforum.php?f=6&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=1850"
+     "https://www.phpbb.com/community/viewforum.php?f=6&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=25"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=45"
+     "https://www.phpbb.com/community/viewforum.php?f=6&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=100"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1521565&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=15"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=60"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=2003455&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=105"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=50"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=1185"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=9d9f94974bf7b0ce9b11cf8c827a41c7&start=30"},
+   :avg-novelty 347/5}
+  {:xpath
+   "//html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'navbar')]/div[contains(@class,'inner')]/ul[contains(@class,'linklist')]/li[contains(@class,'icon')]/a",
+   :df 34,
+   :hrefs
+   #{"https://www.phpbb.com/community/viewforum.php?f=52&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/ucp.php?mode=register&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/memberlist.php?sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewforum.php?f=81&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/faq.php?sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewforum.php?f=6&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/index.php?sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/ucp.php?mode=login&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/search.php?sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewforum.php?f=49&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"
+     "https://www.phpbb.com/community/viewforum.php?f=69&sid=9d9f94974bf7b0ce9b11cf8c827a41c7"},
+   :avg-novelty 158/3})
+ ({:xpath
+   "//html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/div[contains(@id,'sig') and contains(@class,'signature')]/span/a",
+   :df 10,
+   :hrefs
+   #{"http://phpbb.davidiq.com"
+     "http://www.rmcgirr83.org/phpbb_services.php"
+     "http://secure.hostgator.com/cgi-bin/affiliates/clickthru.cgi?id=ameisez"
+     "http://www.davidiq.com/services.php" "http://www.schoollife.nl"
+     "https://www.forumatic.com/"
+     "http://support.forumatic.com/viewtopic.php?p=3077"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&start=60"
+     "http://www.phpbb.com/mods/junior-validators/"
+     "http://www.phpbb.com/customise/db/author/jeroen+b/contributions/"},
+   :avg-novelty 73}
+  {:xpath
+   "//html/body[contains(@id,'phpbb') and contains(@class,'section')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@class,'topic')]/div[contains(@class,'pagination')]/span/a",
+   :df 13,
+   :hrefs
+   #{"http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367&start=45"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=1038985&sid=d35f8be98372fdd7465d5eb7b08e9c07&start=45"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367&start=15"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=1038985&sid=d35f8be98372fdd7465d5eb7b08e9c07&start=15"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=1038985&sid=d35f8be98372fdd7465d5eb7b08e9c07&start=180"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=90"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=1170"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=60"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=1140"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367&start=90"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=30"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367&start=720"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=1185"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=75"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367&start=105"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=1155"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=45"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=1038985&sid=d35f8be98372fdd7465d5eb7b08e9c07&start=60"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367&start=30"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=1125"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&sid=ac314449dfe2ebd1535cd323ec219367&start=75"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=105"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e&start=15"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=1038985&sid=d35f8be98372fdd7465d5eb7b08e9c07&start=30"},
+   :avg-novelty 24}
+  {:xpath
+   "//html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div[contains(@id,'p') and contains(@class,'bg')]/div[contains(@class,'inner')]/div[contains(@class,'postbody')]/p[contains(@class,'author')]/a",
+   :df 13,
+   :hrefs
+   #{"https://www.phpbb.com/community/viewtopic.php?p=11324315&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11311115&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11314965&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805701&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11333225&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11333885&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=12911406&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805679&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11326405&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805514&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11333455&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11314205&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11312115&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=12784058&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11324545&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11334335&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11316305&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11318945&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805699&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11316965&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11321475&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11308505&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11327205&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11318735&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=12784034&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11314455&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11313355&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11311045&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11324685&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12804630&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11333595&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11308735&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=12784054&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=13432691&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11317105&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11318425&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11317325&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805289&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11315565&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11318105&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11329765&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11313265&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6095655&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11309425&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11328125&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11327025&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11308985&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11319985&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11328025&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11317575&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11317685&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805264&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11315485&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11334075&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=12784040&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11307575&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11328585&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6042215&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=12784061&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6006905&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11317035&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805042&sid=ac314449dfe2ebd1535cd323ec219367"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805273&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11309565&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6005925&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11307585&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11328155&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11328375&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11315175&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6001635&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11337175&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6096795&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "http://www.phpbb.com/community/viewtopic.php?p=6093495&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "http://www.phpbb.com/community/viewtopic.php?p=6006705&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11317055&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11319695&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11307595&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11337075&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805283&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11318275&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805073&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11337195&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805293&sid=ac314449dfe2ebd1535cd323ec219367"
+     "http://www.phpbb.com/community/viewtopic.php?p=6006945&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11318175&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11309385&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805070&sid=ac314449dfe2ebd1535cd323ec219367"
+     "http://www.phpbb.com/community/viewtopic.php?p=6042065&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=12960928&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6106025&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "http://www.phpbb.com/community/viewtopic.php?p=6005595&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11311805&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=6003095&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11313905&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11333705&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11331625&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11333945&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=5999165&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?p=11330655&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=5998295&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "http://www.phpbb.com/community/viewtopic.php?p=12804616&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11321305&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11335935&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?p=12805308&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?p=11314935&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=12784106&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11334735&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11317915&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11314835&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11321875&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11314735&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11312755&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11320455&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?p=11333765&sid=3273876e814b26eeb6f3abdffb442f8e"},
+   :avg-novelty 0}
+  {:xpath
+   "//html/body[contains(@id,'phpbb') and contains(@class,'ltr')]/div[contains(@id,'wrap')]/div[contains(@id,'page')]/div/h2/a",
+   :df 13,
+   :hrefs
+   #{"http://www.phpbb.com/community/viewtopic.php?f=185&t=1038985&sid=d35f8be98372fdd7465d5eb7b08e9c07"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&start=15&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&start=45&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&start=30&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&start=1185&sid=3273876e814b26eeb6f3abdffb442f8e"
+     "http://www.phpbb.com/community/viewtopic.php?f=185&t=2093333&start=60&sid=ac314449dfe2ebd1535cd323ec219367"
+     "https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815&start=60&sid=3273876e814b26eeb6f3abdffb442f8e"},
+   :avg-novelty 0})
+ ({:xpath
+   "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'fr')]/a",
+   :df 11,
+   :hrefs
+   #{"http://stackoverflow.com/questions?pagesize=50&sort=unanswered"
+     "http://stackoverflow.com/questions?pagesize=30&sort=unanswered"
+     "http://stackoverflow.com/questions?pagesize=15&sort=unanswered"
+     "http://stackoverflow.com/questions?pagesize=50&sort=newest"
+     "http://stackoverflow.com/questions?pagesize=30&sort=newest"
+     "http://stackoverflow.com/questions?pagesize=15&sort=newest"},
+   :avg-novelty 70}
+  {:xpath
+   "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'subheader')]/div[contains(@id,'tabs')]/a",
+   :df 11,
+   :hrefs
+   #{"http://stackoverflow.com/questions?sort=votes"
+     "http://stackoverflow.com/questions?sort=newest"
+     "http://stackoverflow.com/questions?sort=active"
+     "http://stackoverflow.com/questions?sort=frequent"
+     "http://stackoverflow.com/questions?sort=featured"
+     "http://stackoverflow.com/questions?sort=unanswered"},
+   :avg-novelty 87/2}
+  {:xpath
+   "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a",
+   :df 11,
+   :hrefs
+   #{"http://stackoverflow.com/questions?page=2&sort=unanswered"
+     "http://stackoverflow.com/questions?page=3&sort=unanswered"
+     "http://stackoverflow.com/questions?page=4&sort=unanswered"
+     "http://stackoverflow.com/questions?page=5&sort=unanswered"
+     "http://stackoverflow.com/questions?page=120170&sort=newest"
+     "http://stackoverflow.com/questions?page=120171&sort=newest"
+     "http://stackoverflow.com/questions?page=200284&sort=newest"
+     "http://stackoverflow.com/questions?page=120172&sort=newest"
+     "http://stackoverflow.com/questions?page=91896&sort=unanswered"
+     "http://stackoverflow.com/questions?page=400565&sort=newest"
+     "http://stackoverflow.com/questions?page=400566&sort=newest"
+     "http://stackoverflow.com/questions?page=1&sort=newest"
+     "http://stackoverflow.com/questions?page=400567&sort=newest"
+     "http://stackoverflow.com/questions?page=2&sort=newest"
+     "http://stackoverflow.com/questions?page=3&sort=newest"
+     "http://stackoverflow.com/questions?page=120168&sort=newest"
+     "http://stackoverflow.com/questions?page=4&sort=newest"
+     "http://stackoverflow.com/questions?page=120169&sort=newest"
+     "http://stackoverflow.com/questions?page=5&sort=newest"
+     "http://stackoverflow.com/questions?page=6&sort=newest"
+     "http://stackoverflow.com/questions?page=7&sort=newest"},
+   :avg-novelty 26})
+ ({:xpath
+   "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'pager')]/a",
+   :df 10,
+   :hrefs
+   #{"http://gis.stackexchange.com/questions?page=1710&sort=newest"
+     "http://gis.stackexchange.com/questions?page=1&sort=newest"
+     "http://gis.stackexchange.com/questions?page=2&sort=newest"
+     "http://gis.stackexchange.com/questions?page=3&sort=newest"
+     "http://gis.stackexchange.com/questions?page=4&sort=newest"
+     "http://gis.stackexchange.com/questions?page=511&sort=newest"
+     "http://gis.stackexchange.com/questions?page=5&sort=newest"
+     "http://gis.stackexchange.com/questions?page=512&sort=newest"
+     "http://gis.stackexchange.com/questions?page=6&sort=newest"
+     "http://gis.stackexchange.com/questions?page=7&sort=newest"
+     "http://gis.stackexchange.com/questions?page=513&sort=newest"
+     "http://gis.stackexchange.com/questions?page=855&sort=newest"
+     "http://gis.stackexchange.com/questions?page=514&sort=newest"
+     "http://gis.stackexchange.com/questions?page=515&sort=newest"},
+   :avg-novelty 141/5}
+  {:xpath
+   "//html/body[contains(@class,'questions')]/div[contains(@class,'container')]/div[contains(@id,'content')]/div[contains(@id,'mainbar')]/div[contains(@class,'fr')]/a",
+   :df 10,
+   :hrefs
+   #{"http://gis.stackexchange.com/questions?pagesize=50&sort=newest"
+     "http://gis.stackexchange.com/questions?pagesize=30&sort=newest"
+     "http://gis.stackexchange.com/questions?pagesize=15&sort=newest"},
+   :avg-novelty 2})
+ ({:xpath
+   "//html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@id,'navigation')]/a",
+   :df 6,
+   :hrefs
+   #{"http://carsandetc.tumblr.com/tagged/chevy/page/2"
+     "http://carsandetc.tumblr.com/tagged/classic+car/page/2"
+     "http://carsandetc.tumblr.com/tagged/exotic+cars/page/2"
+     "http://carsandetc.tumblr.com/tagged/car/page/2"
+     "http://carsandetc.tumblr.com/page/1"
+     "http://carsandetc.tumblr.com/page/2"
+     "http://carsandetc.tumblr.com/page/3"},
+   :avg-novelty 41}
+  {:xpath
+   "//html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@class,'post')]/div[contains(@class,'footer')]/div[contains(@class,'tags')]/a",
+   :df 13,
+   :hrefs
+   #{"http://carsandetc.tumblr.com/tagged/chevy"
+     "http://carsandetc.tumblr.com/tagged/army"
+     "http://carsandetc.tumblr.com/tagged/bmw-3.0-csl"
+     "http://carsandetc.tumblr.com/tagged/mach-1"
+     "http://carsandetc.tumblr.com/tagged/z8"
+     "http://carsandetc.tumblr.com/tagged/3.0-csl"
+     "http://carsandetc.tumblr.com/tagged/cars"
+     "http://carsandetc.tumblr.com/tagged/granturismo"
+     "http://carsandetc.tumblr.com/tagged/2002"
+     "http://carsandetc.tumblr.com/tagged/vintage"
+     "http://carsandetc.tumblr.com/tagged/world-war-II"
+     "http://carsandetc.tumblr.com/tagged/II"
+     "http://carsandetc.tumblr.com/tagged/ss"
+     "http://carsandetc.tumblr.com/tagged/cabriolet"
+     "http://carsandetc.tumblr.com/tagged/rolls-royce"
+     "http://carsandetc.tumblr.com/tagged/bmw-2002"
+     "http://carsandetc.tumblr.com/tagged/hot-rod"
+     "http://carsandetc.tumblr.com/tagged/mgb"
+     "http://carsandetc.tumblr.com/tagged/chevrolet"
+     "http://carsandetc.tumblr.com/tagged/morgan"
+     "http://carsandetc.tumblr.com/tagged/touring"
+     "http://carsandetc.tumblr.com/tagged/m1"
+     "http://carsandetc.tumblr.com/tagged/dino"
+     "http://carsandetc.tumblr.com/tagged/us-army"
+     "http://carsandetc.tumblr.com/tagged/m3"
+     "http://carsandetc.tumblr.com/tagged/bmw"
+     "http://carsandetc.tumblr.com/tagged/bmw-m3"
+     "http://carsandetc.tumblr.com/tagged/nissan"
+     "http://carsandetc.tumblr.com/tagged/concours"
+     "http://carsandetc.tumblr.com/tagged/lime-rock-edition"
+     "http://carsandetc.tumblr.com/tagged/stingray"
+     "http://carsandetc.tumblr.com/tagged/m6"
+     "http://carsandetc.tumblr.com/tagged/azure"
+     "http://carsandetc.tumblr.com/tagged/fleetmaster"
+     "http://carsandetc.tumblr.com/tagged/maserati"
+     "http://carsandetc.tumblr.com/tagged/plymouth"
+     "http://carsandetc.tumblr.com/tagged/275"
+     "http://carsandetc.tumblr.com/tagged/bmw-m6"
+     "http://carsandetc.tumblr.com/tagged/lime-rock-park-edition"
+     "http://carsandetc.tumblr.com/tagged/mustang"
+     "http://carsandetc.tumblr.com/tagged/touring-car"
+     "http://carsandetc.tumblr.com/tagged/callaway"
+     "http://carsandetc.tumblr.com/tagged/classic"
+     "http://carsandetc.tumblr.com/tagged/hot-rods"
+     "http://carsandetc.tumblr.com/tagged/288"
+     "http://carsandetc.tumblr.com/tagged/nova"
+     "http://carsandetc.tumblr.com/tagged/8-series"
+     "http://carsandetc.tumblr.com/tagged/world-war-2"
+     "http://carsandetc.tumblr.com/tagged/575"
+     "http://carsandetc.tumblr.com/tagged/military"
+     "http://carsandetc.tumblr.com/tagged/car"
+     "http://carsandetc.tumblr.com/tagged/superbird"
+     "http://carsandetc.tumblr.com/tagged/apc"
+     "http://carsandetc.tumblr.com/tagged/246"
+     "http://carsandetc.tumblr.com/tagged/bmw-3.0"
+     "http://carsandetc.tumblr.com/tagged/auto"
+     "http://carsandetc.tumblr.com/tagged/gtb"
+     "http://carsandetc.tumblr.com/tagged/3.0"
+     "http://carsandetc.tumblr.com/tagged/u.s.-army"
+     "http://carsandetc.tumblr.com/tagged/cs"
+     "http://carsandetc.tumblr.com/tagged/deuce"
+     "http://carsandetc.tumblr.com/tagged/rolls"
+     "http://carsandetc.tumblr.com/tagged/corvette"
+     "http://carsandetc.tumblr.com/tagged/half-track"
+     "http://carsandetc.tumblr.com/tagged/silver-wraith"
+     "http://carsandetc.tumblr.com/tagged/bentley"
+     "http://carsandetc.tumblr.com/tagged/3-series"
+     "http://carsandetc.tumblr.com/tagged/batmobile"
+     "http://carsandetc.tumblr.com/tagged/m3-half-track"
+     "http://carsandetc.tumblr.com/tagged/327"
+     "http://carsandetc.tumblr.com/tagged/gt-r"
+     "http://carsandetc.tumblr.com/tagged/xj"
+     "http://carsandetc.tumblr.com/tagged/911"
+     "http://carsandetc.tumblr.com/tagged/ferrari"
+     "http://carsandetc.tumblr.com/tagged/944"
+     "http://carsandetc.tumblr.com/tagged/superamerica"
+     "http://carsandetc.tumblr.com/tagged/classic-car"
+     "http://carsandetc.tumblr.com/tagged/c7"
+     "http://carsandetc.tumblr.com/tagged/318"
+     "http://carsandetc.tumblr.com/tagged/luxury-car"
+     "http://carsandetc.tumblr.com/tagged/exotic-cars"
+     "http://carsandetc.tumblr.com/tagged/trucks"
+     "http://carsandetc.tumblr.com/tagged/greenwich"
+     "http://carsandetc.tumblr.com/tagged/vintage-military"
+     "http://carsandetc.tumblr.com/tagged/supercars"
+     "http://carsandetc.tumblr.com/tagged/muscle-cars"
+     "http://carsandetc.tumblr.com/tagged/ti"
+     "http://carsandetc.tumblr.com/tagged/saratoga-auto-museum"
+     "http://carsandetc.tumblr.com/tagged/race-cars"
+     "http://carsandetc.tumblr.com/tagged/jaguar"
+     "http://carsandetc.tumblr.com/tagged/csl"
+     "http://carsandetc.tumblr.com/tagged/car-show"
+     "http://carsandetc.tumblr.com/tagged/lime-rock"
+     "http://carsandetc.tumblr.com/tagged/road-runner"
+     "http://carsandetc.tumblr.com/tagged/dtm"
+     "http://carsandetc.tumblr.com/tagged/thunderbird"
+     "http://carsandetc.tumblr.com/tagged/z1"
+     "http://carsandetc.tumblr.com/tagged/royce"
+     "http://carsandetc.tumblr.com/tagged/race-car"
+     "http://carsandetc.tumblr.com/tagged/sting-ray"
+     "http://carsandetc.tumblr.com/tagged/coupe"
+     "http://carsandetc.tumblr.com/tagged/muscle-car"
+     "http://carsandetc.tumblr.com/tagged/turbo"
+     "http://carsandetc.tumblr.com/tagged/supercar"
+     "http://carsandetc.tumblr.com/tagged/luxury-cars"
+     "http://carsandetc.tumblr.com/tagged/exotic-car"
+     "http://carsandetc.tumblr.com/tagged/truck"
+     "http://carsandetc.tumblr.com/tagged/mg"
+     "http://carsandetc.tumblr.com/tagged/porsche"
+     "http://carsandetc.tumblr.com/tagged/classic-cars"
+     "http://carsandetc.tumblr.com/tagged/greenwich-concours"
+     "http://carsandetc.tumblr.com/tagged/ford"
+     "http://carsandetc.tumblr.com/tagged/pickup"
+     "http://carsandetc.tumblr.com/tagged/gto"
+     "http://carsandetc.tumblr.com/tagged/e30"
+     "http://carsandetc.tumblr.com/tagged/c10"
+     "http://carsandetc.tumblr.com/tagged/bora"},
+   :avg-novelty 78/7}
+  {:xpath
+   "//html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@class,'post')]/div[contains(@class,'for')]/a",
+   :df 13,
+   :hrefs
+   #{"http://carsandetc.tumblr.com/post/65558638697/a-pair-of-very-different-porsche-911s-at-the-2013"
+     "http://carsandetc.tumblr.com/post/65556774448/a-baby-blue-porsche-911"
+     "http://carsandetc.tumblr.com/post/63519037183/on-a-day-when-i-saw-my-first-ferrari-f40-f50-and"
+     "http://carsandetc.tumblr.com/post/6703481450/a-world-war-2-era-m3-halftrack-around-43-000-of"
+     "http://carsandetc.tumblr.com/post/65952088101/this-pair-of-bmw-m3s-is-matched-up-with-the-lime"
+     "http://carsandetc.tumblr.com/post/63775476713/chevy-deuce-with-some-subtly-color-matched-wheels"
+     "http://carsandetc.tumblr.com/post/63520013673/the-ferrari-246-dino-has-a-very-respectable-top"
+     "http://carsandetc.tumblr.com/post/9351707874/a-pair-of-classic-bimmers-a-2002-and-a-6-series"
+     "http://carsandetc.tumblr.com/post/27001146609/one-of-my-personal-favorite-cars-out-there-a-bmw"
+     "http://carsandetc.tumblr.com/post/57424179745/gotta-love-a-3-0-csl-with-the-full-batmobile"
+     "http://carsandetc.tumblr.com/post/65951570627/there-are-few-bimmers-out-there-with-the-rarity"
+     "http://carsandetc.tumblr.com/post/55183138255/one-of-200-bmw-m3-lime-rock-park-editions-which"
+     "http://carsandetc.tumblr.com/post/4090998743/this-bmw-m3-touring-car-was-run-in-the-british"
+     "http://carsandetc.tumblr.com/post/65557441635/porsche-944-cabriolet"
+     "http://carsandetc.tumblr.com/post/57423967102/two-very-different-yet-equally-amazing-cars-at"
+     "http://carsandetc.tumblr.com/post/65952222147/the-new-class-bmws-of-the-60s-have-such"
+     "http://carsandetc.tumblr.com/post/65654972178/a-great-example-of-the-first-generation-bmw-m6"
+     "http://carsandetc.tumblr.com/post/65557123907/the-mg-mgb-is-a-great-starting-point-for-those"
+     "http://carsandetc.tumblr.com/post/63777171382/nissans-gt-r-is-unbelievably-quick-around-a"
+     "http://carsandetc.tumblr.com/post/63520934656/ferrari-275-gtb-coupe"
+     "http://carsandetc.tumblr.com/post/65480926497/this-custom-chevy-pickup-is-a-great-example-of"
+     "http://carsandetc.tumblr.com/post/65479937107/the-maserati-bora-is-a-very-rare-car-with-about"
+     "http://carsandetc.tumblr.com/post/24081053467/mildly-tuned-bmw-e36-m3-the-m3-continues-to-be"
+     "http://carsandetc.tumblr.com/post/62249116093/bmw-m3-race-car-at-the-saratoga-auto-museum"
+     "http://carsandetc.tumblr.com/post/55784362390/thanks-to-a-new-naming-system-bmw-is-about-to"
+     "http://carsandetc.tumblr.com/post/62247004932/a-badass-callaway-corvette"
+     "http://carsandetc.tumblr.com/post/65394574429/despite-the-constant-change-of-trends-in-styling"
+     "http://carsandetc.tumblr.com/post/65484940422/my-final-show-for-the-2013-season-was-the-way-we"
+     "http://carsandetc.tumblr.com/post/65951107105/a-pair-of-bmw-m6s-at-saratoga"
+     "http://carsandetc.tumblr.com/post/65481335013/early-70s-mustangs-ended-up-evolving-into"
+     "http://carsandetc.tumblr.com/post/65950956960/the-bmw-e30-was-the-beginning-of-a-long-lineage-of"
+     "http://carsandetc.tumblr.com/post/65557574758/a-pair-of-corvettes-at-the-2013-auto-haus-open"
+     "http://carsandetc.tumblr.com/post/63594423814/the-bentley-azure-convertible"
+     "http://carsandetc.tumblr.com/post/63519470838/ferrari-575-superamerica-a-car-which-can-both"
+     "http://carsandetc.tumblr.com/post/65559393362/shifting-focus-to-the-bmw-vintage-at-the-saratoga"
+     "http://carsandetc.tumblr.com/post/63519705255/chevy-corvette-sting-ray"
+     "http://carsandetc.tumblr.com/post/63844913161/chevy-corvette-with-a-396-turbo-jet-engine"
+     "http://carsandetc.tumblr.com/post/15101081158/flawless-bmw-3-0-with-recaro-buckets-and-alpina"
+     "http://carsandetc.tumblr.com/post/65951321490/an-m3-coupe-from-the-e36-era"
+     "http://carsandetc.tumblr.com/post/63518073907/a-nicely-restored-first-gen-corvette"
+     "http://carsandetc.tumblr.com/post/65950724884/this-bmw-318ti-is-a-real-throwback-to-the-early"
+     "http://carsandetc.tumblr.com/post/53397734096/the-2014-bmw-m6-sedan"
+     "http://carsandetc.tumblr.com/post/63779380695/the-chevy-nova-ss-is-by-the-1960s-american"
+     "http://carsandetc.tumblr.com/post/65482355370/a-few-weekends-ago-was-my-last-big-show-weekend-of"
+     "http://carsandetc.tumblr.com/post/65950403865/bmws-8-series-was-their-top-of-the-line-sports"
+     "http://carsandetc.tumblr.com/post/56794060935/there-arent-a-lot-of-bmws-with-the-presence-to"
+     "http://carsandetc.tumblr.com/post/63594522742/this-maserati-granturismo-looks-pretty-classy-in"
+     "http://carsandetc.tumblr.com/post/65394775818/chevy-fleetmaster-custom-with-modern-corvette-v-8"
+     "http://carsandetc.tumblr.com/post/65393919122/chevy-corvette-with-a-custom-body-kit-a-great"
+     "http://carsandetc.tumblr.com/post/56793906593/73-bmw-3-0-cs"
+     "http://carsandetc.tumblr.com/post/63844534923/in-factory-form-the-porsche-911-turbo-is-a-pretty"
+     "http://carsandetc.tumblr.com/post/63521130509/bmws-z8-is-essentially-a-modern-take-on-the"
+     "http://carsandetc.tumblr.com/post/65654248591/an-average-lawn-show-at-the-saratoga-auto-museum"
+     "http://carsandetc.tumblr.com/post/52952521214/33-ford-cabriolet"
+     "http://carsandetc.tumblr.com/post/65560427733/this-corvette-coupe-is-the-first-c7-stingray-ive"
+     "http://carsandetc.tumblr.com/post/65557800719/plymouths-wing-tastic-road-runner-superbird"
+     "http://carsandetc.tumblr.com/post/7776129592/some-of-the-bmw-2002s-and-3-0-csls-on-show-at"
+     "http://carsandetc.tumblr.com/post/65559495123/the-first-of-countless-bmw-3-0s-at-saratoga-auto"
+     "http://carsandetc.tumblr.com/post/65558353469/57-ford-thunderbird-with-a-porthole-window"},
+   :avg-novelty 0})
+ ()
+ ({:xpath
+   "//HTML/body/div[contains(@id,'nabble') and contains(@class,'macro')]/table[contains(@class,'main')]/tbody/tr[contains(@class,'main')]/td[contains(@class,'adbayes')]/a",
+   :df 5,
+   :hrefs
+   #{"http://grails.1312388.n4.nabble.com/Grails-dev-f1393096.html"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389.html"},
+   :avg-novelty 141/2}
+  {:xpath
+   "//HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/span[contains(@class,'pages')]/span[contains(@class,'page')]/a",
+   :df 16,
+   :hrefs
+   #{"http://grails.1312388.n4.nabble.com/Grails-f1312388i140.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369263&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=44383&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369263&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=44383&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i35.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369263&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=44383&i=20"
+     "http://grails.1312388.n4.nabble.com/Grails-dev-f1393096i70.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=319023&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=60"
+     "http://grails.1312388.n4.nabble.com/"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i105.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369263&i=100"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=44383&i=200"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i70.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=60"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i35.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=1600"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42735.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=160"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=233622&i=80"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=20"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i38430.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42700.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=233622&i=60"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42665.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=20"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i105.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=233622&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i70.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=233622&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=660"
+     "http://grails.1312388.n4.nabble.com/Grails-dev-f1393096i4305.html"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42770.html"
+     "http://grails.1312388.n4.nabble.com/Grails-dev-f1393096i35.html"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i210.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=880"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i175.html"
+     "http://grails.1312388.n4.nabble.com/Grails-dev-f1393096i105.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369125&i=20"},
+   :avg-novelty 179/2}))
+1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=60"
+     "http://grails.1312388.n4.nabble.com/"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i105.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=20"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i70.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=364938&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=354391&i=200"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=364938&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94859&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=364938&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=239248&i=100"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94859&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i35.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=129071&i=1600"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42735.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94859&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=60"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=267899&i=80"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=160"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=20"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i38430.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=267899&i=60"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42700.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=111830&i=60"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42665.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=61305&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94859&i=4600"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=267899&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i105.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=111830&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=267899&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=218634&i=80"
+     "http://grails.1312388.n4.nabble.com/Grails-user-f1312389i70.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=111830&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=94857&i=660"
+     "http://grails.1312388.n4.nabble.com/Grails-dev-f1393096i4305.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=218634&i=60"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i42770.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=239248&i=60"
+     "http://grails.1312388.n4.nabble.com/Grails-dev-f1393096i35.html"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i210.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=364938&i=340"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=239248&i=40"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=60958&i=880"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=218634&i=40"
+     "http://grails.1312388.n4.nabble.com/Grails-f1312388i175.html"
+     "http://grails.1312388.n4.nabble.com/Grails-dev-f1393096i105.html"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=335421&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=239248&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=218634&i=20"
+     "http://grails.1312388.n4.nabble.com/template/NamlServlet.jtp?macro=user_nodes&user=369125&i=20"},
+   :avg-novelty 90}))

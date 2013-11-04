@@ -1,0 +1,16 @@
+URL: https://boards.4chan.org/vg/
+Rank: -1
+URL: https://www.phpbb.com/community/viewforum.php?f=69
+Rank: 0
+URL: https://www.phpbb.com/community/viewtopic.php?f=69&t=1870815
+Rank: 1
+URL: http://stackoverflow.com/questions?pagesize=50&sort=newest
+Rank: 1
+URL: http://gis.stackexchange.com/questions?pagesize=50&sort=newest
+Rank: 1
+URL: http://carsandetc.tumblr.com/
+Rank: 0
+URL: http://www.topix.com/forum/city/carrizo-springs-tx/
+Rank: -1
+URL: http://grails.1312388.n4.nabble.com/
+Rank: 1

@@ -45,12 +45,7 @@
      (if verbose
        (pmap
         (fn [{url :url xpath :xpath}]
-          (let [ranked-enums (extractor/process-link url)
-                xpaths       (map #(-> % :xpath) ranked-enums)
-                ranks        (.indexOf xpaths xpath)
-                infos        (map
-                              vector ranks (map #(nth ranked-enums %) ranks))]
-            infos))
+          (extractor/process-link url))
         *enumerate-positives*)
        (pmap
         (fn [{url :url xpath :xpath}]
@@ -64,12 +59,7 @@
   (let [[optional _ _] (cli/cli args ["-v" "--verbose" "Print out info as well" :default false :flag true])]
     (println optional)
     (if (:verbose optional)
-      (doseq [[info url] (map
-                          vector
-                          (test-enumeration optional)
-                          (map #(-> % :url) *enumerate-positives*))]
-        (println "URL:" url)
-        (println "Rank:" info))
+      (clojure.pprint/pprint (test-enumeration optional))
       (doseq [[rank url] (map
                           vector
                           (test-enumeration optional)

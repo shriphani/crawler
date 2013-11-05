@@ -39,12 +39,20 @@
     :xpath "//HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/span[contains(@class,'pages')]/span[contains(@class,'page')]/a"}])
 
 (def blogs-test-case
-  ["http://www.bbcamerica.com/anglophenia/"
-   "http://www.charitywater.org/blog/"
-   "http://magazine.enterprise.co.uk/"
+  ["http://www.charitywater.org/blog/"
    "http://www.hermanmiller.com/discover/"
-   "http://www.thesartorialist.com/"
-   "http://blogs.hbr.org/"])
+   "http://www.thesartorialist.com/"])
+
+(def tumblr-test-case
+  ["http://oldpeoplefacebook.tumblr.com/"
+   "http://anthonybourdain.tumblr.com/"
+   "http://1796foods.com/"
+   "http://efccooking.tumblr.com/"
+   "http://scandybars.tumblr.com/"
+   "http://gastrogirl.tumblr.com/"
+   "http://foodculturalist.tumblr.com/"
+   "http://sexiestfoods.tumblr.com/"
+   "http://artinmycoffee.com/"])
 
 (defn test-enumeration
   ([]
@@ -66,16 +74,20 @@
   [& args]
   (let [[optional _ _] (cli/cli args
                                 ["-v" "--verbose" "Print out info as well" :default false :flag true]
-                                ["-b" "--blogs" "Verbose test of the blogs framework" :default false :flag true])]
+                                ["-b" "--blogs" "Verbose test of the blogs framework" :default false :flag true]
+                                ["-t" "--tumblr" "Verbose test of tumblr dataset" :default false :flag true])]
     (println optional)
-    (if (:blogs optional)
+    (if (:tumblr optional)
       (clojure.pprint/pprint
-       (pmap #(extractor/process-link %) blogs-test-case))
-      (if (:verbose optional)
-        (clojure.pprint/pprint (test-enumeration optional))
-        (doseq [[rank url] (map
-                            vector
-                            (test-enumeration optional)
-                            (map #(-> % :url) *enumerate-positives*))]
-          (println "URL:" url)
-          (println "Rank:" rank))))))
+       (pmap #(extractor/process-link %) tumblr-test-case))
+     (if (:blogs optional)
+       (clojure.pprint/pprint
+        (pmap #(extractor/process-link %) blogs-test-case))
+       (if (:verbose optional)
+         (clojure.pprint/pprint (test-enumeration optional))
+         (doseq [[rank url] (map
+                             vector
+                             (test-enumeration optional)
+                             (map #(-> % :url) *enumerate-positives*))]
+           (println "URL:" url)
+           (println "Rank:" rank)))))))

@@ -18,7 +18,7 @@
 
 (utils/global-logger-config)
 
-(def *page-sim-thresh* 0.85)
+(def *page-sim-thresh* 0.70)
 (def *sample-fraction* (/ 1 4))   ; fraction of links to look at
                                   ; before sampling
 
@@ -147,7 +147,8 @@ needs to be above the threshold."
                                 :similarity))
                           (filter
                            (fn [an-exploration]
-                             (try (< *page-sim-thresh* (-> an-exploration :similarity))
+                             (try (< *page-sim-thresh*
+                                     (-> an-exploration :similarity))
                                   (catch Exception e nil)))
                            explorations))]
     (< 0 (count similarities))))
@@ -285,6 +286,22 @@ needs to be above the threshold."
 
          enum-candidates-info  (map (fn [x]
                                       (enum-candidate-info x dfs hrefs novelties))
-                                    enum-candidates)]
-     (rank/rank-enum-candidates enum-candidates-info))))
+                                    enum-candidates)
+
+         extraction-candidates (reverse
+                                (sort-by
+                                 second
+                                 (map
+                                  vector
+                                  in-host-xpaths
+                                  (map (fn [xpath]
+                                         (let [href-score  (count (hrefs xpath))
+                                               df-score    (dfs xpath)]
+                                           (/ href-score
+                                              df-score)))
+                                       in-host-xpaths))))]
+     
+     (list
+      {:rank-candidates    (rank/rank-enum-candidates enum-candidates-info)
+       :content-candidates extraction-candidates}))))
 

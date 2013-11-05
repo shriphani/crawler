@@ -50,7 +50,7 @@
                           (= host (uri/host url))
                           (not (some #{url} @*visited*))))
                        (into [] urls))]
-       (if (<= (count candidates) 5)
+       (if (<= (count candidates) 10)
          candidates
          (sample urls host n []))))
   
@@ -129,7 +129,6 @@ nonsense"
                                         (set (in-host-map xpath))
                                         (set (in-host-xpath-hrefs xpath)))))
                                     src-xpaths))]
-
          (when xpaths-hrefs'
            (do
              (swap! *visited* conj sampled)
@@ -140,15 +139,18 @@ nonsense"
      sampled-uris)))
 
 (defn is-enum-candidate?
-  "Average-similarity must be over threshold"
+  "Currently the feature used is that at most 1 guy
+needs to be above the threshold."
   [{xpath :xpath explorations :explorations}]
   (let [similarities (map (fn [an-exploration]
                             (-> an-exploration
                                 :similarity))
-                          explorations)]
-    (when (and (seq explorations) (< 0 (count explorations)))
-      (try (> (/ (apply + similarities) (count explorations)) *page-sim-thresh*)
-           (catch Exception e nil)))))
+                          (filter
+                           (fn [an-exploration]
+                             (try (< *page-sim-thresh* (-> an-exploration :similarity))
+                                  (catch Exception e nil)))
+                           explorations))]
+    (< 0 (count similarities))))
 
 (defn enum-candidate-info
   "Uses the information sent and the snapshot info"
@@ -211,7 +213,9 @@ nonsense"
                     (zero? (count xpath-explorations)))
               0
               (/ (apply
-                  + (map #(:novelty %) xpath-explorations))
+                  + (filter
+                     identity
+                     (map #(:novelty %) xpath-explorations)))
                  (count xpath-explorations)))})
          (catch Exception e nil)))
      explorations))))
@@ -282,6 +286,5 @@ nonsense"
          enum-candidates-info  (map (fn [x]
                                       (enum-candidate-info x dfs hrefs novelties))
                                     enum-candidates)]
-     
      (rank/rank-enum-candidates enum-candidates-info))))
 

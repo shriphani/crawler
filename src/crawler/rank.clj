@@ -7,9 +7,8 @@
 
 (defn enum-candidate-score
   [{xpath :xpath df :df hrefs :hrefs avg-novelty :avg-novelty}]
-  (* (/ (Math/log (+ (count hrefs)
-                     *href-prior*))
-        df)
+  (* (Math/log (+ (count hrefs)
+                  *href-prior*))
      avg-novelty))
 
 (defn enum-candidate-score-no-df

@@ -33,10 +33,18 @@
     :xpath "//html/body/div[contains(@id,'wrapper')]/div[contains(@id,'content')]/div[contains(@id,'navigation')]/a"}
 
    {:url   "http://www.topix.com/forum/city/carrizo-springs-tx/"
-    :xpath "//html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/div[contains(@class,'paging')]/div/a"}
+    :xpath "//html/body[contains(@id,'stream')]/div[contains(@id,'content')]/div[contains(@id,'content') and contains(@class,'xtra')]/div[contains(@id,'onetwocombo')]/div[contains(@class,'onetwosub')]/div/div/a"}
 
    {:url   "http://grails.1312388.n4.nabble.com/"
     :xpath "//HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/span[contains(@class,'pages')]/span[contains(@class,'page')]/a"}])
+
+(def blogs-test-case
+  ["http://www.bbcamerica.com/anglophenia/"
+   "http://www.charitywater.org/blog/"
+   "http://magazine.enterprise.co.uk/"
+   "http://www.hermanmiller.com/discover/"
+   "http://www.thesartorialist.com/"
+   "http://blogs.hbr.org/"])
 
 (defn test-enumeration
   ([]
@@ -56,13 +64,18 @@
 
 (defn -main
   [& args]
-  (let [[optional _ _] (cli/cli args ["-v" "--verbose" "Print out info as well" :default false :flag true])]
+  (let [[optional _ _] (cli/cli args
+                                ["-v" "--verbose" "Print out info as well" :default false :flag true]
+                                ["-b" "--blogs" "Verbose test of the blogs framework" :default false :flag true])]
     (println optional)
-    (if (:verbose optional)
-      (clojure.pprint/pprint (test-enumeration optional))
-      (doseq [[rank url] (map
-                          vector
-                          (test-enumeration optional)
-                          (map #(-> % :url) *enumerate-positives*))]
-        (println "URL:" url)
-        (println "Rank:" rank)))))
+    (if (:blogs optional)
+      (clojure.pprint/pprint
+       (pmap #(extractor/process-link %) blogs-test-case))
+      (if (:verbose optional)
+        (clojure.pprint/pprint (test-enumeration optional))
+        (doseq [[rank url] (map
+                            vector
+                            (test-enumeration optional)
+                            (map #(-> % :url) *enumerate-positives*))]
+          (println "URL:" url)
+          (println "Rank:" rank))))))

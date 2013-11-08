@@ -115,7 +115,7 @@ nonsense"
 
              pg-signature     (page/page-signature in-host-xpath-hs in-host-map)
 
-             similarity       (page/signature-similarity2 signature pg-signature)
+             similarity       (page/signature-similarity-cosine signature pg-signature)
 
              src-xpaths       (filter
                                #(not= % xpath) (map first in-host-xpath-hrefs))

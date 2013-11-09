@@ -62,11 +62,11 @@
      (if verbose
        (pmap
         (fn [{url :url xpath :xpath}]
-          (extractor/process-link url))
+          (extractor/process-link url {}))
         *enumerate-positives*)
        (pmap
         (fn [{url :url xpath :xpath}]
-          (let [ranked-enums (extractor/process-link url)
+          (let [ranked-enums (extractor/process-link url {})
                 xpaths       (map #(-> % :xpath) ranked-enums)]
             (.indexOf xpaths xpath)))
         *enumerate-positives*))))
@@ -89,7 +89,9 @@
                               :cosine-sim          (page/signature-similarity-cosine
                                                     signature expl-sign)
                               :cosine-weighted-sim (page/signature-similarity-weighted-cosine
-                                                    signature expl-sign weights-table)})
+                                                    signature expl-sign weights-table)
+                              :cardinality-sim     (page/signature-similarity-cardinality
+                                                    signature expl-sign)})
                           xpath-explorations))
                        explorations))})
    *enumerate-positives*))
@@ -109,6 +111,21 @@
                                 ["--similarity-test"
                                  "Test similarity routines"
                                  :flag true
+                                 :default false]
+                                
+                                ["--enumeration-test"
+                                 "Test enumeration routine"
+                                 :flag true
+                                 :default false]
+
+                                ["-v" "--verbose"
+                                 "Verbose version"
+                                 :flag true
                                  :default false])]
+    
     (when (:similarity-test optional)
-      (clojure.pprint/pprint (test-similarity)))))
+      (clojure.pprint/pprint (test-similarity)))
+
+    (when (:enumeration-test optional)
+      (clojure.pprint/pprint (test-enumeration
+                              {:verbose (optional :verbose)})))))

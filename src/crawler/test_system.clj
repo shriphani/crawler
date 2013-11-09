@@ -6,6 +6,7 @@
   (:require [clojure.tools.cli :as cli]
             [crawler.dom :as dom]
             [crawler.extractor :as extractor]
+            [crawler.page :as page]
             [crawler.records :as records])
   (:use     [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]]))
 
@@ -70,24 +71,44 @@
             (.indexOf xpaths xpath)))
         *enumerate-positives*))))
 
+(defn test-similarity
+  []
+  (pmap
+   (fn [{url :url xpath :xpath}]
+     {:url url
+      :similarities (let [[signature explorations dfs hrefs novelties] (extractor/process-link url {})
+                          
+                          weights-table                      (page/weights-table dfs hrefs)]
+                      (pmap
+                       (fn [{xpath :xpath xpath-explorations :explorations}]
+                         (map
+                          #(let [xpaths      (extractor/exploration-xpaths %)
+                                 xpath-hrefs (-> % :hrefs-table)
+                                 expl-sign   (page/page-signature xpaths xpath-hrefs)]
+                             {:url                 (-> % :url)
+                              :cosine-sim          (page/signature-similarity-cosine
+                                                    signature expl-sign)
+                              :cosine-weighted-sim (page/signature-similarity-weighted-cosine
+                                                    signature expl-sign weights-table)})
+                          xpath-explorations))
+                       explorations))})
+   *enumerate-positives*))
+
+(defn dump-explorations
+  []
+  (pmap
+   (fn [{url :url xpath :xpath}]
+     (let [[explorations dfs hrefs novelties]
+           (extractor/process-link url {})]
+       explorations))
+   *enumerate-positives*))
+
 (defn -main
   [& args]
   (let [[optional _ _] (cli/cli args
-                                ["-v" "--verbose" "Print out info as well" :default false :flag true]
-                                ["-b" "--blogs" "Verbose test of the blogs framework" :default false :flag true]
-                                ["-t" "--tumblr" "Verbose test of tumblr dataset" :default false :flag true])]
-    (println optional)
-    (if (:tumblr optional)
-      (clojure.pprint/pprint
-       (pmap #(extractor/process-link %) tumblr-test-case))
-     (if (:blogs optional)
-       (clojure.pprint/pprint
-        (pmap #(extractor/process-link %) blogs-test-case))
-       (if (:verbose optional)
-         (clojure.pprint/pprint (test-enumeration optional))
-         (doseq [[rank url] (map
-                             vector
-                             (test-enumeration optional)
-                             (map #(-> % :url) *enumerate-positives*))]
-           (println "URL:" url)
-           (println "Rank:" rank)))))))
+                                ["--similarity-test"
+                                 "Test similarity routines"
+                                 :flag true
+                                 :default false])]
+    (when (:similarity-test optional)
+      (clojure.pprint/pprint (test-similarity)))))

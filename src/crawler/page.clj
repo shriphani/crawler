@@ -64,9 +64,10 @@
    weights-table:
    [Xpath -> #of items globally, df globally]"
   [sign1 sign2 weights-table]
-  (let [weighted-sign  (fn [sgn]
+  (let [weights-map    weights-table
+        weighted-sign  (fn [sgn]
                          (map
-                          (fn [[xpath count] sign1]
+                          (fn [[xpath count]]
                             [xpath (* count (weights-table xpath))])
                           sgn))
 
@@ -81,3 +82,15 @@
    (fn [an-xpath]
      [an-xpath (count (xpath-hrefs an-xpath))])
    xpaths))
+
+(defn weights-table
+  [dfs-table hrefs-table]
+  (let [dfs-map   (into {} dfs-table)
+        hrefs-map (into {} hrefs-table)
+        xpaths    (map first dfs-table)]
+    (into
+     {} (map
+         (fn [an-xpath]
+           [an-xpath (/ (Math/log (count (hrefs-map an-xpath)))
+                        (dfs-map an-xpath))])
+         xpaths))))

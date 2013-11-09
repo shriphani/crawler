@@ -115,8 +115,6 @@ nonsense"
 
              pg-signature     (page/page-signature in-host-xpath-hs in-host-map)
 
-             similarity       (page/signature-similarity-cosine signature pg-signature)
-
              src-xpaths       (filter
                                #(not= % xpath) (map first in-host-xpath-hrefs))
 
@@ -133,7 +131,6 @@ nonsense"
            (do
              (swap! *visited* conj sampled)
              {:url         sampled
-              :similarity  similarity
               :novelty     (novelty diff)
               :hrefs-table in-host-map}))))
      sampled-uris)))
@@ -230,10 +227,10 @@ needs to be above the threshold."
 
 (defn process-link
 
-  ([url]
-     (process-link url {} {}))
+  ([url config]
+     (process-link url {} {} config))
   
-  ([url *xpath-df* *xpath-hrefs*]
+  ([url *xpath-df* *xpath-hrefs* config]
    (let [body                  (visit-and-record-page url)
         
          xpaths-hrefs          (dom/minimum-maximal-xpath-set
@@ -301,7 +298,8 @@ needs to be above the threshold."
                                               df-score)))
                                        in-host-xpaths))))]
      
-     (list
-      {:rank-candidates    (rank/rank-enum-candidates enum-candidates-info)
-       :content-candidates extraction-candidates}))))
+     (list signature explorations dfs hrefs novelties))))
 
+(defn exploration-xpaths
+  [{url :url novelty :novelty hrefs-table :hrefs-table}]
+  (map first hrefs-table))

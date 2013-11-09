@@ -12,7 +12,7 @@
       (count hrefs))
     xpath-hrefs)))
 
-(defn signature-similarity
+(defn signature-similarity-cardinality
   "Return cardinality of intersection"
   [sign1 sign2]
   (let [set-sign1 (set sign1)
@@ -94,3 +94,9 @@
            [an-xpath (/ (Math/log (count (hrefs-map an-xpath)))
                         (dfs-map an-xpath))])
          xpaths))))
+
+(defn signature-similarity
+  [sign1 sign2 dfs]
+  (let [cosine-sim      (signature-similarity-cosine sign1 sign2)
+        cardinality-sim (signature-similarity-cardinality sign1 sign2)]
+    (* cosine-sim cardinality-sim)))

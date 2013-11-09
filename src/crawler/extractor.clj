@@ -130,24 +130,26 @@ nonsense"
          (when xpaths-hrefs'
            (do
              (swap! *visited* conj sampled)
-             {:url         sampled
-              :novelty     (novelty diff)
-              :hrefs-table in-host-map}))))
+             {:url                 sampled
+              :novelty             (novelty diff)
+              :hrefs-table         xpaths-hrefs'
+              :in-host-hrefs-table in-host-map}))))
      sampled-uris)))
+
+(defn exploration-xpaths
+  [{url :url novelty :novelty hrefs-table :hrefs-table}]
+  (map first hrefs-table))
 
 (defn is-enum-candidate?
   "Currently the feature used is that at most 1 guy
 needs to be above the threshold."
-  [{xpath :xpath explorations :explorations}]
-  (let [similarities (map (fn [an-exploration]
-                            (-> an-exploration
-                                :similarity))
-                          (filter
-                           (fn [an-exploration]
-                             (try (< *page-sim-thresh*
-                                     (-> an-exploration :similarity))
-                                  (catch Exception e nil)))
-                           explorations))]
+  [{xpath :xpath xpath-explorations :explorations} signature]
+  (let [similarities (map
+                      #(let [xpaths      (exploration-xpaths %)
+                             xpath-hrefs (-> % :hrefs-table)
+                             expl-sign   (page/page-signature xpaths xpath-hrefs)]
+                         (page/signature-similarity signature expl-sign))
+                      xpath-explorations)]
     (< 0 (count similarities))))
 
 (defn enum-candidate-info
@@ -252,8 +254,8 @@ needs to be above the threshold."
          
          signature             (into
                                 {} (map (fn [an-xpath]
-                                          [an-xpath (count (ih-xp-map an-xpath))])
-                                        in-host-xpaths))
+                                          [an-xpath (count (xpaths-hrefs an-xpath))])
+                                        xpaths))
         
          explorations          (map
                                 (fn [[xpath hrefs]]
@@ -278,12 +280,15 @@ needs to be above the threshold."
 
          novelties             (novelty-table explorations)
 
-         enum-candidates       (map #(-> % :xpath)
-                                    (filter is-enum-candidate? explorations))
+         enum-candidates       (filter
+                                #(is-enum-candidate? % signature)
+                                explorations)
 
+         enum-candidates-xs    (map #(-> % :xpath) enum-candidates)
+         
          enum-candidates-info  (map (fn [x]
                                       (enum-candidate-info x dfs hrefs novelties))
-                                    enum-candidates)
+                                    enum-candidates-xs)
 
          extraction-candidates (reverse
                                 (sort-by
@@ -298,8 +303,5 @@ needs to be above the threshold."
                                               df-score)))
                                        in-host-xpaths))))]
      
-     (list signature explorations dfs hrefs novelties))))
+     (rank/rank-enum-candidates enum-candidates-info))))
 
-(defn exploration-xpaths
-  [{url :url novelty :novelty hrefs-table :hrefs-table}]
-  (map first hrefs-table))

@@ -269,7 +269,10 @@ array"
                                                   (into {} in-host-xpath-hrefs))})
                                 in-host-xpath-hrefs)]
      
-     explorations)))
+     {:src-link             url
+      :explorations         explorations
+      :xpaths-hrefs         xpaths-hrefs
+      :in-host-xpaths-hrefs in-host-xpath-hrefs})))
 
 (defn enum-candidates
   "Enumeration info"

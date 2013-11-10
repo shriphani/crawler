@@ -18,7 +18,7 @@
 
 (utils/global-logger-config)
 
-(def *page-sim-thresh* 0.70)
+(def *page-sim-thresh* 0.85)
 (def *sample-fraction* (/ 1 4))   ; fraction of links to look at
                                   ; before sampling
 
@@ -37,7 +37,7 @@
   
   ([a-link info]
      (let [body (utils/get-and-log a-link info)]
-       (swap! *visited* conj a-link)
+;       (swap! *visited* conj a-link)
        (swap!
         *url-documents* utils/atom-merge-with set/union {a-link (set [body])})
        body)))
@@ -132,7 +132,7 @@ nonsense"
              (swap! *visited* conj sampled)
              {:url                 sampled
               :novelty             (novelty diff)
-              :hrefs-table         xpaths-hrefs'
+              :hrefs-table         in-host-map
               :in-host-hrefs-table in-host-map}))))
      sampled-uris)))
 
@@ -228,7 +228,8 @@ needs to be above the threshold."
    :avg-novelty (novelties enum-candidate)})
 
 (defn process-link
-
+  "Process a link and provide all explorations in an
+array"
   ([url config]
      (process-link url {} {} config))
   
@@ -266,42 +267,47 @@ needs to be above the threshold."
                                                   (uri/host url)
                                                   signature
                                                   (into {} in-host-xpath-hrefs))})
-                                in-host-xpath-hrefs)
-
-         dfs                   (merge-with
-                                +
-                                (reduce
-                                 (fn [acc v] (merge-with + acc v))
-                                 {}
-                                 (map (fn [x] {x 1}) in-host-xpaths))
-                                (df-table explorations))
-
-         hrefs                 (merge-with set/union ih-xp-map (href-table explorations))
-
-         novelties             (novelty-table explorations)
-
-         enum-candidates       (filter
-                                #(is-enum-candidate? % signature)
-                                explorations)
-
-         enum-candidates-xs    (map #(-> % :xpath) enum-candidates)
-         
-         enum-candidates-info  (map (fn [x]
-                                      (enum-candidate-info x dfs hrefs novelties))
-                                    enum-candidates-xs)
-
-         extraction-candidates (reverse
-                                (sort-by
-                                 second
-                                 (map
-                                  vector
-                                  in-host-xpaths
-                                  (map (fn [xpath]
-                                         (let [href-score  (count (hrefs xpath))
-                                               df-score    (dfs xpath)]
-                                           (/ href-score
-                                              df-score)))
-                                       in-host-xpaths))))]
+                                in-host-xpath-hrefs)]
      
-     (rank/rank-enum-candidates enum-candidates-info))))
+     explorations)))
 
+(defn enum-candidates
+  "Enumeration info"
+  [explorations in-host-xpaths]
+  (let [dfs                   (merge-with
+                               +
+                               (reduce
+                                (fn [acc v] (merge-with + acc v))
+                                {}
+                                (map (fn [x] {x 1}) in-host-xpaths))
+                               (df-table explorations))
+        
+        hrefs                 (merge-with set/union ih-xp-map (href-table explorations))
+        
+        novelties             (novelty-table explorations)
+        
+        enum-candidates       (filter
+                               #(is-enum-candidate? % signature)
+                               explorations)
+        
+        enum-candidates-xs    (map #(-> % :xpath) enum-candidates)
+        
+        enum-candidates-info  (map
+                               (fn [x]
+                                 (enum-candidate-info x dfs hrefs novelties))
+                               enum-candidates-xs)
+        
+        extraction-candidates (reverse
+                               (sort-by
+                                second
+                                (map
+                                 vector
+                                 in-host-xpaths
+                                 (map (fn [xpath]
+                                        (let [href-score  (count (hrefs xpath))
+                                              df-score    (dfs xpath)]
+                                          (/ href-score
+                                             df-score)))
+                                      in-host-xpaths))))]
+    
+    (rank/rank-enum-candidates enum-candidates-info)))

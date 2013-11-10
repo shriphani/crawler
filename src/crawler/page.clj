@@ -15,8 +15,8 @@
 (defn signature-similarity-cardinality
   "Return cardinality of intersection"
   [sign1 sign2]
-  (let [set-sign1 (set sign1)
-        set-sign2 (set sign2)]
+  (let [set-sign1 (set (map first sign1))
+        set-sign2 (set (map first sign2))]
     (/ (count
         (clojure.set/intersection set-sign1 set-sign2))
        (* (Math/sqrt (count set-sign1)) (Math/sqrt (count set-sign2))))))
@@ -96,7 +96,7 @@
          xpaths))))
 
 (defn signature-similarity
-  [sign1 sign2 dfs]
+  [sign1 sign2]
   (let [cosine-sim      (signature-similarity-cosine sign1 sign2)
         cardinality-sim (signature-similarity-cardinality sign1 sign2)]
     (* cosine-sim cardinality-sim)))

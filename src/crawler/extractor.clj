@@ -293,7 +293,7 @@ array"
       :in-host-xpaths-hrefs in-host-xpath-hrefs})))
 
 (defn enum-candidates
-  "Enumeration info"
+  "Returns enumeration info"
   [{url                  :src-link
     explorations         :explorations
     xpaths-hrefs         :xpaths-hrefs
@@ -318,3 +318,11 @@ array"
                                enum-candidates-xs)]
     
     enum-candidates-info))
+
+(defn estimate-similarity
+  "After 1 round of sampling, fetch some values and make
+an estimation of the situation"
+  [] '*)
+
+(defn classify-nn
+  [] '*)

@@ -142,13 +142,15 @@ nonsense"
 (defn is-enum-candidate?
   "Currently the feature used is that at most 1 guy
 needs to be above the threshold."
-  [{xpath :xpath xpath-explorations :explorations} signature]
-  (let [similarities (map
-                      #(let [xpaths      (exploration-xpaths %)
-                             xpath-hrefs (-> % :hrefs-table)
-                             expl-sign   (page/page-signature xpaths xpath-hrefs)]
-                         (page/signature-similarity signature expl-sign))
-                      xpath-explorations)]
+  [{xpath :xpath xpath-explorations :explorations} signature threshold]
+  (let [similarities (filter
+                      (fn [a-sim-score] (> a-sim-score threshold))
+                      (map
+                       #(let [xpaths      (exploration-xpaths %)
+                              xpath-hrefs (-> % :hrefs-table)
+                              expl-sign   (page/page-signature xpaths xpath-hrefs)]
+                          (page/signature-similarity signature expl-sign))
+                       xpath-explorations))]
     (< 0 (count similarities))))
 
 (defn enum-candidate-info
@@ -299,11 +301,13 @@ array"
     dfs                  :dfs
     hrefs                :hrefs
     novelties            :novelties
-    in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
+    in-host-xpaths-hrefs :in-host-xpaths-hrefs}
+
+   config]
   
   (let [in-host-xpaths        (map first in-host-xpaths-hrefs)
         enum-candidates       (filter
-                               #(is-enum-candidate? % signature)
+                               #(is-enum-candidate? % signature (-> config :sim-thresh))
                                explorations)
         
         enum-candidates-xs    (map #(-> % :xpath) enum-candidates)
@@ -311,19 +315,6 @@ array"
         enum-candidates-info  (map
                                (fn [x]
                                  (enum-candidate-info x dfs hrefs novelties))
-                               enum-candidates-xs)
-        
-        extraction-candidates (reverse
-                               (sort-by
-                                second
-                                (map
-                                 vector
-                                 in-host-xpaths
-                                 (map (fn [xpath]
-                                        (let [href-score  (count (hrefs xpath))
-                                              df-score    (dfs xpath)]
-                                          (/ href-score
-                                             df-score)))
-                                      in-host-xpaths))))]
+                               enum-candidates-xs)]
     
-    (rank/rank-enum-candidates enum-candidates-info)))
+    enum-candidates-info))

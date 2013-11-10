@@ -76,7 +76,7 @@
   (pmap
    (fn [{url :url xpath :xpath}]
      {:url url
-      :similarities (let [{src-link :src-link
+      :similarities (let [{src-link     :src-link
                            explorations :explorations
                            xpaths-hrefs :xpaths-hrefs
                            signature    :signature
@@ -96,12 +96,24 @@
                                   xpath-hrefs (-> % :hrefs-table)
                                   expl-sign   (page/page-signature xpaths xpath-hrefs)]
                               {:url                 (-> % :url)
-                               :similarity         (* (page/signature-similarity-cosine
-                                                       signature expl-sign)
-                                                      (page/signature-similarity-cardinality
-                                                       signature expl-sign))})
+                               :similarity          (* (page/signature-similarity-cosine
+                                                        signature expl-sign)
+                                                       (page/signature-similarity-cardinality
+                                                        signature expl-sign))})
                            xpath-explorations)})
                        explorations))})
+   *enumerate-positives*))
+
+(defn test-enumeration-candidates
+  [thresh]
+  (pmap
+   (fn [{url :url xpath :xpath}]
+     {:url
+      url
+
+      :enum-candidates
+      (let [info (extractor/process-link url {})]
+        (extractor/enum-candidates info {:sim-thresh thresh}))})
    *enumerate-positives*))
 
 (defn dump-explorations
@@ -126,6 +138,14 @@
                                  :flag true
                                  :default false]
 
+                                ["--enumeration-candidates-test"
+                                 "Test enumeration candidates"
+                                 :flag true
+                                 :default false]
+
+                                ["--sim-thresh"
+                                 "Similarity threshold"]
+
                                 ["-v" "--verbose"
                                  "Verbose version"
                                  :flag true
@@ -135,5 +155,13 @@
       (clojure.pprint/pprint (test-similarity)))
 
     (when (:enumeration-test optional)
-      (clojure.pprint/pprint (test-enumeration
-                              {:verbose (optional :verbose)})))))
+      (clojure.pprint/pprint
+       (test-enumeration
+        {:verbose (optional :verbose)})))
+
+    (when (:enumeration-candidates-test optional)
+      (clojure.pprint/pprint
+       (-> optional
+           :sim-thresh
+           Double/parseDouble
+           test-enumeration-candidates)))))

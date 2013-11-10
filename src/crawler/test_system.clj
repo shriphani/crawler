@@ -76,23 +76,31 @@
   (pmap
    (fn [{url :url xpath :xpath}]
      {:url url
-      :similarities (let [[signature explorations dfs hrefs novelties] (extractor/process-link url {})
-                          
-                          weights-table                      (page/weights-table dfs hrefs)]
+      :similarities (let [{src-link :src-link
+                           explorations :explorations
+                           xpaths-hrefs :xpaths-hrefs
+                           signature    :signature
+                           dfs          :dfs
+                           hrefs        :hrefs
+                           novelties    :novelties
+                           _            :in-host-xpaths-hrefs}
+                          (extractor/process-link url {})]
                       (pmap
                        (fn [{xpath :xpath xpath-explorations :explorations}]
-                         (map
-                          #(let [xpaths      (extractor/exploration-xpaths %)
-                                 xpath-hrefs (-> % :hrefs-table)
-                                 expl-sign   (page/page-signature xpaths xpath-hrefs)]
-                             {:url                 (-> % :url)
-                              :cosine-sim          (page/signature-similarity-cosine
-                                                    signature expl-sign)
-                              :cosine-weighted-sim (page/signature-similarity-weighted-cosine
-                                                    signature expl-sign weights-table)
-                              :cardinality-sim     (page/signature-similarity-cardinality
-                                                    signature expl-sign)})
-                          xpath-explorations))
+                         {:xpath
+                          xpath
+
+                          :similarities
+                          (map
+                           #(let [xpaths      (extractor/exploration-xpaths %)
+                                  xpath-hrefs (-> % :hrefs-table)
+                                  expl-sign   (page/page-signature xpaths xpath-hrefs)]
+                              {:url                 (-> % :url)
+                               :similarity         (* (page/signature-similarity-cosine
+                                                       signature expl-sign)
+                                                      (page/signature-similarity-cardinality
+                                                       signature expl-sign))})
+                           xpath-explorations)})
                        explorations))})
    *enumerate-positives*))
 

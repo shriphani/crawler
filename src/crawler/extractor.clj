@@ -18,7 +18,6 @@
 
 (utils/global-logger-config)
 
-(def *page-sim-thresh* 0.85)
 (def *sample-fraction* (/ 1 4))   ; fraction of links to look at
                                   ; before sampling
 
@@ -267,28 +266,42 @@ array"
                                                   (uri/host url)
                                                   signature
                                                   (into {} in-host-xpath-hrefs))})
-                                in-host-xpath-hrefs)]
+                                in-host-xpath-hrefs)
+         
+         dfs                   (merge-with
+                                +
+                                (reduce
+                                 (fn [acc v] (merge-with + acc v))
+                                 {}
+                                 (map (fn [x] {x 1}) in-host-xpaths))
+                                (df-table explorations))
+
+         hrefs                 (merge-with
+                                set/union ih-xp-map (href-table explorations))
+
+         novelties             (novelty-table explorations)]
      
      {:src-link             url
       :explorations         explorations
       :xpaths-hrefs         xpaths-hrefs
+      :signature            signature
+      :dfs                  dfs
+      :hrefs                hrefs
+      :novelties            novelties
       :in-host-xpaths-hrefs in-host-xpath-hrefs})))
 
 (defn enum-candidates
   "Enumeration info"
-  [explorations in-host-xpaths]
-  (let [dfs                   (merge-with
-                               +
-                               (reduce
-                                (fn [acc v] (merge-with + acc v))
-                                {}
-                                (map (fn [x] {x 1}) in-host-xpaths))
-                               (df-table explorations))
-        
-        hrefs                 (merge-with set/union ih-xp-map (href-table explorations))
-        
-        novelties             (novelty-table explorations)
-        
+  [{url                  :src-link
+    explorations         :explorations
+    xpaths-hrefs         :xpaths-hrefs
+    signature            :signature
+    dfs                  :dfs
+    hrefs                :hrefs
+    novelties            :novelties
+    in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
+  
+  (let [in-host-xpaths        (map first in-host-xpaths-hrefs)
         enum-candidates       (filter
                                #(is-enum-candidate? % signature)
                                explorations)

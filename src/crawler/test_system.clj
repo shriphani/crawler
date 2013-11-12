@@ -7,6 +7,7 @@
             [crawler.dom :as dom]
             [crawler.extractor :as extractor]
             [crawler.page :as page]
+            [crawler.rank :as rank]
             [crawler.records :as records])
   (:use     [clj-xpath.core :only [$x $x:node $x:node+ $x:text+]]))
 
@@ -74,6 +75,16 @@
                         (extractor/process-link a-url {})
                         {:sim-thresh thresh})]
        enumerators))
+   nabble-test-case))
+
+(defn test-nabble-enumeration-rank
+  [thresh]
+  (map
+   (fn [a-url]
+     (let [enumerators (extractor/enum-candidates
+                        (extractor/process-link a-url {})
+                        {:sim-thresh thresh})]
+       (rank/rank-enum-candidates enumerators)))
    nabble-test-case))
 
 (defn test-enumeration
@@ -216,6 +227,11 @@ enumerate-positives dataset"
                                 ["--nabble-enumeration"
                                  "Nabble index pages consistent"
                                  :flag true
+                                 :default false]
+
+                                ["--nabble-enumeration-rank"
+                                 "Nabble index pages rank enumeration"
+                                 :flag true
                                  :default false])]
 
     (when (:similarity-test optional)
@@ -239,4 +255,8 @@ enumerate-positives dataset"
 
     (when (:nabble-enumeration optional)
       (clojure.pprint/pprint
-       (test-nabble-enumeration 0.85)))))
+       (test-nabble-enumeration 0.85)))
+
+    (when (:nabble-enumeration-rank optional)
+      (clojure.pprint/pprint
+       (test-nabble-enumeration-rank 0.85)))))

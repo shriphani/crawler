@@ -204,7 +204,27 @@ needs to be above the threshold."
 
 (defn update-table
   [explorations]
-  '*)
+  (reduce
+   merge
+   {}
+   (filter
+    identity
+    (map
+     (fn [explorations]
+       (try
+         (let [xpath              (:xpath explorations)
+               xpath-explorations (:explorations explorations)]
+           {xpath
+            (if (or (not xpath-explorations)
+                    (zero? (count xpath-explorations)))
+              0
+              (/ (apply
+                  + (filter
+                     identity
+                     (map #(:update %) xpath-explorations)))
+                 (count xpath-explorations)))})
+         (catch Exception e nil)))
+     explorations))))
 
 (defn novelty-table
   [explorations]
@@ -332,11 +352,6 @@ array"
                                enum-candidates-xs)]
     
     enum-candidates-info))
-
-(defn estimate-similarity
-  "After 1 round of sampling, fetch some values and make
-an estimation of the situation"
-  [] '*)
 
 (defn classify-nn
   [] '*)

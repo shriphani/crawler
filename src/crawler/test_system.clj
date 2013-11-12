@@ -39,6 +39,17 @@
    {:url   "http://grails.1312388.n4.nabble.com/"
     :xpath "//HTML/body/div[contains(@id,'nabble') and contains(@class,'nabble')]/span[contains(@class,'pages')]/span[contains(@class,'page')]/a"}])
 
+(def nabble-test-case
+  ["http://grails.1312388.n4.nabble.com/"
+   "http://postgresql.1045698.n5.nabble.com/"
+   "http://jenkins-ci.361315.n4.nabble.com/"
+   "http://lucene.472066.n3.nabble.com/"
+   "http://elasticsearch-users.115913.n3.nabble.com/"
+   "http://windows-installer-xml-wix-toolset.687559.n2.nabble.com/"
+   "http://dojo-toolkit.33424.n3.nabble.com/"
+   "http://jmeter.512774.n5.nabble.com/"
+   "http://abaqus-users.1086179.n5.nabble.com/"])
+
 (def blogs-test-case
   ["http://www.charitywater.org/blog/"
    "http://www.hermanmiller.com/discover/"
@@ -54,6 +65,16 @@
    "http://foodculturalist.tumblr.com/"
    "http://sexiestfoods.tumblr.com/"
    "http://artinmycoffee.com/"])
+
+(defn test-nabble-enumeration
+  [thresh]
+  (map
+   (fn [a-url]
+     (let [enumerators (extractor/enum-candidates
+                        (extractor/process-link a-url {})
+                        {:sim-thresh thresh})]
+       enumerators))
+   nabble-test-case))
 
 (defn test-enumeration
   ([]
@@ -190,6 +211,11 @@ enumerate-positives dataset"
                                 ["-v" "--verbose"
                                  "Verbose version"
                                  :flag true
+                                 :default false]
+
+                                ["--nabble-enumeration"
+                                 "Nabble index pages consistent"
+                                 :flag true
                                  :default false])]
 
     (when (:similarity-test optional)
@@ -209,4 +235,8 @@ enumerate-positives dataset"
 
     (when (:sim-histogram optional)
       (clojure.pprint/pprint
-       (similarity-histogram)))))
+       (similarity-histogram)))
+
+    (when (:nabble-enumeration optional)
+      (clojure.pprint/pprint
+       (test-nabble-enumeration 0.85)))))

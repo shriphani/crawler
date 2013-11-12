@@ -88,6 +88,13 @@
                hrefs))
             xpaths-hrefs)))
 
+(defn update
+  [original-hrefs current-pg-hrefs]
+  (let [orig-set (set original-hrefs)
+        curr-set (set current-pg-hrefs)]
+    (try (count (set/difference curr-set orig-set))
+         (catch Exception e nil))))
+
 (defn explore-xpath
   "Explore an xpath. This version holds
 values and doesn't do any of that ugly global
@@ -125,14 +132,19 @@ nonsense"
                                        (set/difference
                                         (set (in-host-map xpath))
                                         (set (in-host-xpath-hrefs xpath)))))
-                                    src-xpaths))]
+                                    src-xpaths))
+
+             original-hrefs   (in-host-xpath-hrefs xpath)
+
+             current-hrefs    (in-host-map xpath)]
          (when xpaths-hrefs'
            (do
              (swap! *visited* conj sampled)
              {:url                 sampled
               :novelty             (novelty diff)
               :hrefs-table         in-host-map
-              :in-host-hrefs-table in-host-map}))))
+              :in-host-hrefs-table in-host-map
+              :update              (update original-hrefs current-hrefs)}))))
      sampled-uris)))
 
 (defn exploration-xpaths
@@ -152,13 +164,6 @@ needs to be above the threshold."
                           (page/signature-similarity signature expl-sign))
                        xpath-explorations))]
     (< 0 (count similarities))))
-
-(defn enum-candidate-info
-  "Uses the information sent and the snapshot info"
-  [dfs hrefs xpath]
-  {:xpath xpath
-   :df    (dfs xpath)
-   :hrefs (hrefs xpath)})
 
 (defn df-table
   [explorations]
@@ -197,6 +202,10 @@ needs to be above the threshold."
        (map #(-> % :hrefs-table) xpath-explorations)))
     explorations)))
 
+(defn update-table
+  [explorations]
+  '*)
+
 (defn novelty-table
   [explorations]
   (reduce
@@ -222,11 +231,12 @@ needs to be above the threshold."
      explorations))))
 
 (defn enum-candidate-info
-  [enum-candidate dfs hrefs novelties]
+  [enum-candidate dfs hrefs novelties updates]
   {:xpath       enum-candidate
    :df          (dfs enum-candidate)
    :hrefs       (hrefs enum-candidate)
-   :avg-novelty (novelties enum-candidate)})
+   :avg-novelty (novelties enum-candidate)
+   :avg-update  (updates enum-candidate)})
 
 (defn process-link
   "Process a link and provide all explorations in an
@@ -281,7 +291,9 @@ array"
          hrefs                 (merge-with
                                 set/union ih-xp-map (href-table explorations))
 
-         novelties             (novelty-table explorations)]
+         novelties             (novelty-table explorations)
+
+         updates               (update-table explorations)]
      
      {:src-link             url
       :explorations         explorations
@@ -290,6 +302,7 @@ array"
       :dfs                  dfs
       :hrefs                hrefs
       :novelties            novelties
+      :updates              updates
       :in-host-xpaths-hrefs in-host-xpath-hrefs})))
 
 (defn enum-candidates
@@ -301,6 +314,7 @@ array"
     dfs                  :dfs
     hrefs                :hrefs
     novelties            :novelties
+    updates              :updates
     in-host-xpaths-hrefs :in-host-xpaths-hrefs}
 
    config]
@@ -314,7 +328,7 @@ array"
         
         enum-candidates-info  (map
                                (fn [x]
-                                 (enum-candidate-info x dfs hrefs novelties))
+                                 (enum-candidate-info x dfs hrefs novelties updates))
                                enum-candidates-xs)]
     
     enum-candidates-info))

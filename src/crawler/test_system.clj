@@ -104,6 +104,42 @@
                        explorations))})
    *enumerate-positives*))
 
+(defn similarity-histogram
+  "Produces a histogram of similarity scores for the
+enumerate-positives dataset"
+  []
+  (pmap
+   (fn [{url :url xpath :xpath}]
+     {:url url
+      :similarities (let [{src-link     :src-link
+                           explorations :explorations
+                           xpaths-hrefs :xpaths-hrefs
+                           signature    :signature
+                           dfs          :dfs
+                           hrefs        :hrefs
+                           novelties    :novelties
+                           _            :in-host-xpaths-hrefs}
+                          (extractor/process-link url {})]
+                      
+                      (reverse
+                       (sort-by
+                        #(-> % :similarity)
+                        (flatten
+                         (pmap
+                          (fn [{xpath :xpath xpath-explorations :explorations}]
+                            (map
+                             #(let [xpaths      (extractor/exploration-xpaths %)
+                                    xpath-hrefs (-> % :hrefs-table)
+                                    expl-sign   (page/page-signature xpaths xpath-hrefs)]
+                                {:url                 (-> % :url)
+                                 :similarity          (* (page/signature-similarity-cosine
+                                                          signature expl-sign)
+                                                         (page/signature-similarity-cardinality
+                                                          signature expl-sign))})
+                             xpath-explorations))
+                          explorations)))))})
+   *enumerate-positives*))
+
 (defn test-enumeration-candidates
   [thresh]
   (pmap
@@ -132,7 +168,7 @@
                                  "Test similarity routines"
                                  :flag true
                                  :default false]
-                                
+
                                 ["--enumeration-test"
                                  "Test enumeration routine"
                                  :flag true
@@ -146,11 +182,16 @@
                                 ["--sim-thresh"
                                  "Similarity threshold"]
 
+                                ["--sim-histogram"
+                                 "Similarity Histogram for each test case"
+                                 :flag true
+                                 :default false]
+
                                 ["-v" "--verbose"
                                  "Verbose version"
                                  :flag true
                                  :default false])]
-    
+
     (when (:similarity-test optional)
       (clojure.pprint/pprint (test-similarity)))
 
@@ -164,4 +205,8 @@
        (-> optional
            :sim-thresh
            Double/parseDouble
-           test-enumeration-candidates)))))
+           test-enumeration-candidates)))
+
+    (when (:sim-histogram optional)
+      (clojure.pprint/pprint
+       (similarity-histogram)))))

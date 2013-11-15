@@ -100,3 +100,55 @@
   (let [cosine-sim      (signature-similarity-cosine sign1 sign2)
         cardinality-sim (signature-similarity-cardinality sign1 sign2)]
     (* cosine-sim cardinality-sim)))
+
+(defn signature-edit-distance
+  "Args:
+    sign1: Signature of page1. Xpath: number of hrefs
+    sign2: Signature of page2
+
+    ins-cost: cost of inserting an XPath
+    del-cost: cost of deleting an XPath
+
+   Edit distance = XPath deletions and XPath additions from sign1 -> sign2"
+  [sign1 sign2 ins-cost del-cost]
+  (let [sign1-map     (into {} sign1)
+        
+        sign2-map     (into {} sign2)
+        
+        deletion-cost (apply
+                       + (for [[x1 h1] sign1-map]
+                           (cond (not (sign2-map x1))
+                                 (* del-cost h1)
+                                 
+                                 (and (sign2-map x1)
+                                      (< (sign2-map x1) h1))
+                                 (* del-cost
+                                    (- h1 (sign2-map x1)))
+
+                                 :else 0)))
+
+        insert-cost   (apply
+                       + (for [[x2 h2] sign2-map]
+                           (cond (not (sign1-map x2))
+                                 (* ins-cost h2)
+
+                                 (and (sign1-map x2) (< (sign1-map x2) h2))
+                                 (* ins-cost (- h2 (sign1-map x2)))
+
+                                 :else 0)))]
+    (+ deletion-cost insert-cost)))
+
+(defn signature-edit-distance-similarity
+  [sign1 sign2 ins-cost del-cost]
+  (let [best  (signature-edit-distance sign1 sign2 ins-cost del-cost)
+
+        items (fn [sign]
+                (reduce
+                 (fn [acc [x h]]
+                   (+ acc h))
+                 0
+                 sign))
+
+        worst (+ (* del-cost (items sign1))
+                 (* ins-cost (items sign2)))]
+    (- 1 (/ best worst))))

@@ -193,6 +193,38 @@ enumerate-positives dataset"
        explorations))
    *enumerate-positives*))
 
+(defn similarity-edit-dist-histogram
+  [ins-cost del-cost]
+  (pmap
+   (fn [{url :url xpath :xpath}]
+     {:url url
+      :similarities (let [{src-link     :src-link
+                           explorations :explorations
+                           xpaths-hrefs :xpaths-hrefs
+                           signature    :signature
+                           dfs          :dfs
+                           hrefs        :hrefs
+                           novelties    :novelties
+                           _            :in-host-xpaths-hrefs}
+                          (extractor/process-link url {})]
+                      
+                      (reverse
+                       (sort-by
+                        #(-> % :similarity)
+                        (flatten
+                         (pmap
+                          (fn [{xpath :xpath xpath-explorations :explorations}]
+                            (map
+                             #(let [xpaths      (extractor/exploration-xpaths %)
+                                    xpath-hrefs (-> % :hrefs-table)
+                                    expl-sign   (page/page-signature xpaths xpath-hrefs)]
+                                {:url                 (-> % :url)
+                                 :similarity          (page/signature-edit-distance-similarity
+                                                       signature expl-sign ins-cost del-cost)})
+                             xpath-explorations))
+                          explorations)))))})
+   *enumerate-positives*))
+
 (defn -main
   [& args]
   (let [[optional _ _] (cli/cli args
@@ -219,6 +251,17 @@ enumerate-positives dataset"
                                  :flag true
                                  :default false]
 
+                                ["--edit-distance-sim-histogram"
+                                 "Similarity histogram using the XPath edit dist"
+                                 :flag true
+                                 :default false]
+
+                                ["--ins-cost"
+                                 "Insertion cost"]
+
+                                ["--del-cost"
+                                 "Insertion cost"]
+                                
                                 ["-v" "--verbose"
                                  "Verbose version"
                                  :flag true
@@ -259,4 +302,14 @@ enumerate-positives dataset"
 
     (when (:nabble-enumeration-rank optional)
       (clojure.pprint/pprint
-       (test-nabble-enumeration-rank 0.85)))))
+       (test-nabble-enumeration-rank 0.85)))
+
+    (when (:edit-distance-sim-histogram optional)
+      (clojure.pprint/pprint
+       (similarity-edit-dist-histogram
+        (-> optional
+            :ins-cost
+            Double/parseDouble)
+        (-> optional
+            :del-cost
+            Double/parseDouble))))))

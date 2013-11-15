@@ -353,5 +353,45 @@ array"
     
     enum-candidates-info))
 
-(defn classify-nn
-  [] '*)
+(defn xpath-uniqueness-rank
+  [{url                  :src-link
+    explorations         :explorations
+    xpaths-hrefs         :xpaths-hrefs
+    signature            :signature
+    dfs                  :dfs
+    hrefs                :hrefs
+    novelties            :novelties
+    updates              :updates
+    in-host-xpaths-hrefs :in-host-xpaths-hrefs}
+   
+   enum-candidates]
+
+  (let
+      [xpaths                 (map first in-host-xpaths-hrefs)
+       enum-exploration-hrefs (reduce
+                               (fn [acc v]
+                                 (merge-with clojure.set/union acc v))
+                               {}
+                               (flatten
+                                (map
+                                 (fn [{xpath :xpath xpath-expl :explorations}]
+                                   (map
+                                    #(-> % :in-host-hrefs-table)
+                                    xpath-expl))
+                                 (filter
+                                  (fn [{xpath :xpath xpath-expl :explorations}]
+                                    (<= 0 (.indexOf enum-candidates xpath)))
+                                  explorations))))]
+    (reverse
+     (sort-by
+      second
+      (map
+       vector
+       xpaths
+       (map
+        (fn [xpath]
+          (count
+           (clojure.set/difference
+            (enum-exploration-hrefs xpath)
+            (xpaths-hrefs xpath))))
+        xpaths))))))

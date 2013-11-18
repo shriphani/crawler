@@ -5,6 +5,7 @@
   "Code to operate on a webpage and lookup URLs"
   (:require [clj-http.client :as client]
             [clojure.set :as set]
+            [crawler.cluster :as cluster]
             [crawler.dom :as dom]
             [crawler.page :as page]
             [crawler.rank :as rank]
@@ -19,7 +20,9 @@
 (utils/global-logger-config)
 
 (def *sample-fraction* (/ 1 4))   ; fraction of links to look at
-                                  ; before sampling
+                                        ; before sampling
+
+(def *page-sim-thresh* 0.85)
 
 (def *visited*       (atom
                       (set [])))  ; set of visited documents
@@ -36,7 +39,7 @@
   
   ([a-link info]
      (let [body (utils/get-and-log a-link info)]
-;       (swap! *visited* conj a-link)
+       (swap! *visited* conj a-link)
        (swap!
         *url-documents* utils/atom-merge-with set/union {a-link (set [body])})
        body)))
@@ -410,17 +413,32 @@ clusters based on their similarities."
     updates              :updates
     in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
   
-  (let [explorations-ds
-        (map
-         (fn [{xpath :xpath xpath-expls :explorations}]
-           (flatten
-            (map
-             (fn [x]
-               (let [hrefs-table (-> x :hrefs-table)
-                     xpaths      (map first hrefs-table)]
-                {:r1             (into {} (page/page-signature xpaths hrefs-table))
-                 :incoming-xpath xpath
-                 :url            (-> x :url)}))
-             xpath-expls)))
-         explorations)]
-    explorations-ds))
+  (let [explorations-ds (flatten
+                         (map
+                          (fn [{xpath :xpath xpath-expls :explorations}]
+                            (flatten
+                             (map
+                              (fn [x]
+                                (let [hrefs-table (-> x :hrefs-table)
+                                      xpaths      (map first hrefs-table)]
+                                  {:r1             (into {} (page/page-signature xpaths hrefs-table))
+                                   :incoming-xpath xpath
+                                   :url            (-> x :url)}))
+                              xpath-expls)))
+                          explorations))
+
+        cluster-member? (fn [a-cluster x]
+                          (some
+                           (fn [a-member]
+                             (>= (page/signature-edit-distance-similarity
+                                  (-> a-member :r1)
+                                  (-> x :r1)
+                                  0.25
+                                  0.75)
+                                 *page-sim-thresh*))
+                           a-cluster))]
+    (reduce
+     (fn [clusters x]
+       (cluster/assign (into [] clusters) x cluster-member?))
+     []
+     explorations-ds)))

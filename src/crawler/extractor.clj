@@ -354,6 +354,7 @@ array"
     enum-candidates-info))
 
 (defn xpath-uniqueness-rank
+  "FIX: Get rid of this routine"
   [{url                  :src-link
     explorations         :explorations
     xpaths-hrefs         :xpaths-hrefs
@@ -395,3 +396,31 @@ array"
             (enum-exploration-hrefs xpath)
             (xpaths-hrefs xpath))))
         xpaths))))))
+
+(defn cluster-explorations
+  "Explorations are grouped into
+clusters based on their similarities."
+  [{url                  :src-link
+    explorations         :explorations
+    xpaths-hrefs         :xpaths-hrefs
+    signature            :signature
+    dfs                  :dfs
+    hrefs                :hrefs
+    novelties            :novelties
+    updates              :updates
+    in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
+  
+  (let [explorations-ds
+        (map
+         (fn [{xpath :xpath xpath-expls :explorations}]
+           (flatten
+            (map
+             (fn [x]
+               (let [hrefs-table (-> x :hrefs-table)
+                     xpaths      (map first hrefs-table)]
+                {:r1             (into {} (page/page-signature xpaths hrefs-table))
+                 :incoming-xpath xpath
+                 :url            (-> x :url)}))
+             xpath-expls)))
+         explorations)]
+    explorations-ds))

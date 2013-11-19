@@ -22,7 +22,7 @@
 (def *sample-fraction* (/ 1 4))   ; fraction of links to look at
                                         ; before sampling
 
-(def *page-sim-thresh* 0.85)
+(def *page-sim-thresh* 0.9)
 
 (def *visited*       (atom
                       (set [])))  ; set of visited documents
@@ -421,7 +421,10 @@ clusters based on their similarities."
                               (fn [x]
                                 (let [hrefs-table (-> x :hrefs-table)
                                       xpaths      (map first hrefs-table)]
-                                  {:r1             (into {} (page/page-signature xpaths hrefs-table))
+                                  {:r1             (into
+                                                    {}
+                                                    (page/page-signature
+                                                     xpaths hrefs-table))
                                    :incoming-xpath xpath
                                    :url            (-> x :url)}))
                               xpath-expls)))
@@ -436,9 +439,120 @@ clusters based on their similarities."
                                   0.25
                                   0.75)
                                  *page-sim-thresh*))
-                           a-cluster))]
-    (reduce
-     (fn [clusters x]
-       (cluster/assign (into [] clusters) x cluster-member?))
-     []
-     explorations-ds)))
+                           a-cluster))
+        
+        clusters        (reduce
+                         (fn [clusters x]
+                           (cluster/assign
+                            (into [] clusters) x cluster-member?))
+                         []
+                         explorations-ds)
+
+        self-cluster    (cluster/assign-where?
+                         clusters
+                         {:r1 signature
+                          :incoming-xpath nil
+                          :url url}
+                         cluster-member?)
+
+        content-candids (map
+                         #(nth clusters %)
+                         (filter
+                          #(not= % self-cluster)
+                          (range (count clusters))))
+
+        content-xpaths  (map
+                         (fn [a-cluster]
+                           (map
+                            (fn [x]
+                              (-> x :incoming-xpath))
+                            a-cluster))
+                         content-candids)
+
+        all-inc-xp      (-> content-xpaths flatten set)
+
+        total-expl      (count explorations-ds)
+
+        cluster-scores  (map count content-candids)
+        
+        incom-xp-df     (into {}
+                         (map vector all-inc-xp
+                              (map #(dfs %) all-inc-xp)))
+
+        cluster-inc-scr (map
+                         (fn [i]
+                           (let [inc-xps (nth content-xpaths i)]
+                             (apply +
+                              (map
+                               (fn [an-xp]
+                                 (/ (incom-xp-df an-xp)
+                                    total-expl))
+                               inc-xps))))
+                         (range (count content-candids)))
+        
+        enums-ranked    (when (<= 0 self-cluster)
+                          (let [enum-candidate-xpaths
+                                (set
+                                 (map
+                                  (fn [an-exploration]
+                                    (-> an-exploration
+                                        :incoming-xpath))
+                                  (nth clusters self-cluster)))
+
+                                enum-candidate-objs
+                                (filter
+                                 (fn [{xpath :xpath xpath-expls :explorations}]
+                                   (some #{xpath} enum-candidate-xpaths))
+                                 explorations)
+                                
+                                enum-candidates-info
+                                (map
+                                 (fn [x]
+                                   (enum-candidate-info
+                                    x dfs hrefs novelties updates))
+                                 enum-candidate-xpaths)]
+                            
+                            (rank/rank-enum-candidates enum-candidates-info)))
+        content-rank
+        (reverse
+         (sort-by identity cluster-inc-scr))
+
+        content-to-follow   (.indexOf (into [] cluster-inc-scr)
+                                      (first content-rank))
+
+        enum-updates        (reduce
+                             (fn [acc v]
+                               (merge-with clojure.set/union acc v))
+                             {}
+                             (flatten
+                              (map
+                               (fn [{xpath :xpath xpath-expl :explorations}]
+                                 (map
+                                  #(-> % :in-host-hrefs-table)
+                                  xpath-expl))
+                               (filter
+                                (fn [{xpath :xpath _ :explorations}]
+                                  (some #{xpath} (set (map #(-> % :xpath) enums-ranked))))
+                                explorations))))]
+
+
+    {:enum-xpath (-> (first enums-ranked) :xpath)
+     :content-xpath (let [xs (set (nth content-xpaths content-to-follow))]
+                     (first
+                      (first
+                       (reverse
+                        (sort-by
+                         second
+                         (map
+                          vector
+                          xs
+                          (map (fn [x]
+                                 (count (enum-updates x)))
+                               xs)))))))
+     :urls-clustered (map
+                      (fn [a-cluster]
+                        (map
+                         (fn [x]
+                           (-> x :url))
+                         a-cluster))
+                      clusters)}))

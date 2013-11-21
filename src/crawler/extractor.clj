@@ -356,49 +356,26 @@ array"
     
     enum-candidates-info))
 
-(defn xpath-uniqueness-rank
-  "FIX: Get rid of this routine"
-  [{url                  :src-link
-    explorations         :explorations
-    xpaths-hrefs         :xpaths-hrefs
-    signature            :signature
-    dfs                  :dfs
-    hrefs                :hrefs
-    novelties            :novelties
-    updates              :updates
-    in-host-xpaths-hrefs :in-host-xpaths-hrefs}
-   
-   enum-candidates]
-
-  (let
-      [xpaths                 (map first in-host-xpaths-hrefs)
-       enum-exploration-hrefs (reduce
-                               (fn [acc v]
-                                 (merge-with clojure.set/union acc v))
-                               {}
-                               (flatten
-                                (map
-                                 (fn [{xpath :xpath xpath-expl :explorations}]
-                                   (map
-                                    #(-> % :in-host-hrefs-table)
-                                    xpath-expl))
-                                 (filter
-                                  (fn [{xpath :xpath xpath-expl :explorations}]
-                                    (<= 0 (.indexOf enum-candidates xpath)))
-                                  explorations))))]
-    (reverse
-     (sort-by
-      second
-      (map
-       vector
-       xpaths
+(defn exploration->exploration-ds
+  "An exploration is the value of :explorations in the output of process-link.
+   An exploration-ds contains a flat structure for clustering and so on"
+  [explorations]
+  (flatten
+   (map
+    (fn [{xpath :xpath xpath-expls :explorations}]
+      (flatten
        (map
-        (fn [xpath]
-          (count
-           (clojure.set/difference
-            (enum-exploration-hrefs xpath)
-            (xpaths-hrefs xpath))))
-        xpaths))))))
+        (fn [x]
+          (let [hrefs-table (-> x :hrefs-table)
+                xpaths      (map first hrefs-table)]
+            {:r1             (into
+                              {}
+                              (page/page-signature
+                               xpaths hrefs-table))
+             :incoming-xpath xpath
+             :url            (-> x :url)}))
+        xpath-expls)))
+    explorations)))
 
 (defn cluster-explorations
   "Explorations are grouped into
@@ -413,22 +390,7 @@ clusters based on their similarities."
     updates              :updates
     in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
   
-  (let [explorations-ds (flatten
-                         (map
-                          (fn [{xpath :xpath xpath-expls :explorations}]
-                            (flatten
-                             (map
-                              (fn [x]
-                                (let [hrefs-table (-> x :hrefs-table)
-                                      xpaths      (map first hrefs-table)]
-                                  {:r1             (into
-                                                    {}
-                                                    (page/page-signature
-                                                     xpaths hrefs-table))
-                                   :incoming-xpath xpath
-                                   :url            (-> x :url)}))
-                              xpath-expls)))
-                          explorations))
+  (let [explorations-ds (exploration->exploration-ds explorations)
 
         cluster-member? (fn [a-cluster x]
                           (some

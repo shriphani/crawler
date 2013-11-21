@@ -14,3 +14,7 @@ pom.xml.asc
 *.txt
 *.gz
 *.com.sample
+resources/*.edn
+*.html
+logs/
+.DS_Store

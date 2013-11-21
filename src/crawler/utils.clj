@@ -131,3 +131,9 @@ escape characters. then call re-pattern on it"
   [an-atom value]
   (swap! an-atom (fn [an-obj] value)))
 
+
+;; This set of routines has their arguments reversed
+;; so I can use them with swap! and atoms
+(defn cons-aux
+  [coll x]
+  (cons x coll))

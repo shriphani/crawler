@@ -39,7 +39,7 @@
   
   ([a-link info]
      (let [body (utils/get-and-log a-link info)]
-       (swap! *visited* conj a-link)
+       (swap! *visited* utils/cons-aux a-link)
        (swap!
         *url-documents* utils/atom-merge-with set/union {a-link (set [body])})
        body)))
@@ -73,7 +73,7 @@
                   (= (uri/host sampled) host)
                   (not (some #{sampled} @*visited*))
                   (not (some #{sampled} sampled-list)))
-           (recur urls host (dec n) (conj sampled-list sampled))
+           (recur urls host (dec n) (utils/cons-aux sampled-list sampled))
            (recur urls host 0 sampled-list))))))
 
 (defn novelty
@@ -142,7 +142,7 @@ nonsense"
              current-hrefs    (in-host-map xpath)]
          (when xpaths-hrefs'
            (do
-             (swap! *visited* conj sampled)
+             (swap! *visited* utils/cons-aux sampled)
              {:url                 sampled
               :novelty             (novelty diff)
               :hrefs-table         in-host-map

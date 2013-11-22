@@ -24,8 +24,8 @@
 
 (def *page-sim-thresh* 0.9)
 
-(def *visited*       (atom
-                      (set [])))  ; set of visited documents
+(def *visited* (atom (set [])))  ; set of visited documents
+
 (def *url-documents* (atom {}))   ; url -> body map
 
 (defn add-xpath

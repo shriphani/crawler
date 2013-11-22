@@ -10,7 +10,6 @@
                  [com.rubiconproject.oss/jchronic "0.2.6"]
                  [com.github.kyleburton/clj-xpath "1.4.2"]
                  [enlive "1.1.4"]
-                 [itsy "0.1.2-SNAPSHOT"]
                  [log4j/log4j "1.2.16"
                   :exclusions
                   [javax.mail/mail

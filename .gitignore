@@ -18,3 +18,4 @@ resources/*.edn
 *.html
 logs/
 .DS_Store
+.nrepl-port

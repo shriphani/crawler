@@ -376,7 +376,8 @@ array"
         xpath-expls)))
     explorations)))
 
-(defn cluster-member?
+(defn cluster-member-single?
+  "Single linkage clustering of explorations"
   [a-cluster x]
   (some
    (fn [a-member]
@@ -387,6 +388,37 @@ array"
           0.75)
          *page-sim-thresh*))
    a-cluster))
+
+(defn cluster-member-maximum?
+  "Cluster explorations using maximum linkage"
+  [a-cluster x]
+  (every?
+   (fn [a-member]
+     (>= (page/signature-edit-distance-similarity
+          (-> a-member :r1)
+          (-> x :r1)
+          0.25
+          0.75)
+         *page-sim-thresh*))
+   a-cluster))
+
+(defn cluster-member-average?
+  "CLuster explorations using average linkage"
+  [a-cluster x]
+  (let [sim-scores (map
+                    (fn [a-member]
+                      (page/signature-edit-distance-similarity
+                       (-> a-member :r1)
+                       (-> x :r1)
+                       0.25
+                       0.75)
+                      *page-sim-thresh*)
+                    a-cluster)]
+    
+    (/ (apply + sim-scores)
+       (count sim-scores))))
+
+(def cluster-member? cluster-member-single?)
 
 (defn cluster-explorations
   "Explorations are converted to an exploration-ds and
@@ -473,7 +505,6 @@ array"
   [explorations clusters]
   
   (let [total-expl   (-> clusters flatten count)
-        
         enums-ranked (fetch-enum-xpaths explorations clusters)]
 
     {:enum-candidates-ranked enums-ranked}))

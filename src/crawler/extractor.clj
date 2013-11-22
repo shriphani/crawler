@@ -450,7 +450,7 @@ array"
       []
       explorations-ds)))
 
-(defn fetch-enum-xpaths
+(defn get-enum-xpaths
   "Process the explorations and clusters to fetch the enumeration XPath"
   [{url                  :src-link
     explorations         :explorations
@@ -505,6 +505,6 @@ array"
   [explorations clusters]
   
   (let [total-expl   (-> clusters flatten count)
-        enums-ranked (fetch-enum-xpaths explorations clusters)]
+        enums-ranked (get-enum-xpaths explorations clusters)]
 
     {:enum-candidates-ranked enums-ranked}))

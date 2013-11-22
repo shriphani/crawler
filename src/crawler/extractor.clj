@@ -392,6 +392,34 @@ array"
   "Explorations are converted to an exploration-ds and
    these are clustered together. We don't assign the
    source URL into the clusters (is this a good idea?)"
+  ([an-exploration]
+
+     (cluster-explorations
+      an-exploration
+      (exploration->exploration-ds (-> an-exploration
+                                       :explorations))))
+  
+  ([{url                  :src-link
+     explorations         :explorations
+     xpaths-hrefs         :xpaths-hrefs
+     signature            :signature
+     dfs                  :dfs
+     hrefs                :hrefs
+     novelties            :novelties
+     updates              :updates
+     in-host-xpaths-hrefs :in-host-xpaths-hrefs}
+
+    explorations-ds]
+     
+     (reduce
+      (fn [clusters x]
+        (cluster/assign
+         (into [] clusters) x cluster-member?))
+      []
+      explorations-ds)))
+
+(defn fetch-enum-xpaths
+  "Process the explorations and clusters to fetch the enumeration XPath"
   [{url                  :src-link
     explorations         :explorations
     xpaths-hrefs         :xpaths-hrefs
@@ -400,142 +428,52 @@ array"
     hrefs                :hrefs
     novelties            :novelties
     updates              :updates
-    in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
+    in-host-xpaths-hrefs :in-host-xpaths-hrefs}
 
-  (let [explorations-ds (exploration->exploration-ds explorations)]
-    
-    (reduce
-     (fn [clusters x]
-       (cluster/assign
-        (into [] clusters) x cluster-member?))
-     []
-     explorations-ds)))
+   clusters]
 
-(defn process-page-cluster
-  "Page clusters are explored"
-  [explorations-ds-clustered]
-  
-  '*)
-
-(defn cluster-explorations-titanic
-  "Explorations are grouped into
-clusters based on their similarities.
-
-titanic because this guy is going down"
-  [{url                  :src-link
-    explorations         :explorations
-    xpaths-hrefs         :xpaths-hrefs
-    signature            :signature
-    dfs                  :dfs
-    hrefs                :hrefs
-    novelties            :novelties
-    updates              :updates
-    in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
-  
-  (let [clusters        '*
-
-        self-cluster    '*
-
-        explorations-ds '*
-
-        content-candids (map
-                         #(nth clusters %)
-                         (filter
-                          #(not= % self-cluster)
-                          (range (count clusters))))
-
-        content-xpaths  (map
-                         (fn [a-cluster]
-                           (map
-                            (fn [x]
-                              (-> x :incoming-xpath))
-                            a-cluster))
-                         content-candids)
-
-        all-inc-xp      (-> content-xpaths flatten set)
-
-        total-expl      (count explorations-ds)
-
-        cluster-scores  (map count content-candids)
+  (let [self-cluster          (cluster/assign-where?
+                               clusters
+                               {:r1 signature
+                                :incoming-xpath nil
+                                :url url}
+                               cluster-member?)
         
-        incom-xp-df     (into {}
-                         (map vector all-inc-xp
-                              (map #(dfs %) all-inc-xp)))
+        enum-candidate-xpaths (set
+                               (map
+                                (fn [an-exploration]
+                                  (-> an-exploration
+                                      :incoming-xpath))
+                                (nth clusters self-cluster)))
 
-        cluster-inc-scr (map
-                         (fn [i]
-                           (let [inc-xps (nth content-xpaths i)]
-                             (apply +
-                              (map
-                               (fn [an-xp]
-                                 (/ (incom-xp-df an-xp)
-                                    total-expl))
-                               inc-xps))))
-                         (range (count content-candids)))
+        enum-candidate-objs   (filter
+                               (fn [{xpath :xpath
+                                    xpath-expls :explorations}]
+                                 (some #{xpath} enum-candidate-xpaths))
+                               explorations)
+
+        enum-candidates-info  (map
+                               (fn [x]
+                                 (enum-candidate-info
+                                  x dfs hrefs novelties updates))
+                               enum-candidate-xpaths)]
+
+    (rank/rank-enum-candidates enum-candidates-info)))
+
+(defn process-explorations-cluster
+  "An explorations cluster is a
+   set of exploration-ds pages clustered.
+   From this enumeration and content XPaths are selected
+   Args:
+    an-exploration, the-explorations-ds, clusters, xpaths-hrefs
+
+   Returns:
+    enum-xpath + content-xpaths if any"
+
+  [explorations clusters]
+  
+  (let [total-expl   (-> clusters flatten count)
         
-        enums-ranked    (when (<= 0 self-cluster)
-                          (let [enum-candidate-xpaths
-                                (set
-                                 (map
-                                  (fn [an-exploration]
-                                    (-> an-exploration
-                                        :incoming-xpath))
-                                  (nth clusters self-cluster)))
+        enums-ranked (fetch-enum-xpaths explorations clusters)]
 
-                                enum-candidate-objs
-                                (filter
-                                 (fn [{xpath :xpath xpath-expls :explorations}]
-                                   (some #{xpath} enum-candidate-xpaths))
-                                 explorations)
-                                
-                                enum-candidates-info
-                                (map
-                                 (fn [x]
-                                   (enum-candidate-info
-                                    x dfs hrefs novelties updates))
-                                 enum-candidate-xpaths)]
-                            
-                            (rank/rank-enum-candidates enum-candidates-info)))
-        content-rank
-        (reverse
-         (sort-by identity cluster-inc-scr))
-
-        content-to-follow   (.indexOf (into [] cluster-inc-scr)
-                                      (first content-rank))
-
-        enum-updates        (reduce
-                             (fn [acc v]
-                               (merge-with clojure.set/union acc v))
-                             {}
-                             (flatten
-                              (map
-                               (fn [{xpath :xpath xpath-expl :explorations}]
-                                 (map
-                                  #(-> % :in-host-hrefs-table)
-                                  xpath-expl))
-                               (filter
-                                (fn [{xpath :xpath _ :explorations}]
-                                  (some #{xpath} (set (map #(-> % :xpath) enums-ranked))))
-                                explorations))))]
-
-
-    {:enum-xpath (-> (first enums-ranked) :xpath)
-     :content-xpath (let [xs (set (nth content-xpaths content-to-follow))]
-                     (first
-                      (first
-                       (reverse
-                        (sort-by
-                         second
-                         (map
-                          vector
-                          xs
-                          (map (fn [x]
-                                 (count (enum-updates x)))
-                               xs)))))))
-     :urls-clustered (map
-                      (fn [a-cluster]
-                        (map
-                         (fn [x]
-                           (-> x :url))
-                         a-cluster))
-                      clusters)}))
+    {:enum-candidates-ranked enums-ranked}))

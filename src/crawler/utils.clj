@@ -131,6 +131,27 @@ escape characters. then call re-pattern on it"
   [an-atom value]
   (swap! an-atom (fn [an-obj] value)))
 
+(defn find-in
+  "Args:
+    m: map
+    key: duh
+
+   Returns:
+    key that is somewhere in the nested map"
+  [m key]
+  (cond (not (keys m))         ; leaf
+        nil
+        
+        (some #{key} (keys m)) ; found it
+        (m key)
+
+        :else                  ; search
+        (first
+         (map
+          #(when (map? (m %))
+             (find-in
+              (m %) key))
+          (keys m)))))
 
 ;; This set of routines has their arguments reversed
 ;; so I can use them with swap! and atoms

@@ -11,7 +11,6 @@
             [crawler.rank :as rank]
             [crawler.records :as records]
             [crawler.utils :as utils]
-            [itsy.core :as itsy]
             [org.bovinegenius [exploding-fish :as uri]])
   (:use [clojure.tools.logging :only (info error)]
         [clj-logging-config.log4j])
@@ -377,9 +376,52 @@ array"
         xpath-expls)))
     explorations)))
 
+(defn cluster-member?
+  [a-cluster x]
+  (some
+   (fn [a-member]
+     (>= (page/signature-edit-distance-similarity
+          (-> a-member :r1)
+          (-> x :r1)
+          0.25
+          0.75)
+         *page-sim-thresh*))
+   a-cluster))
+
 (defn cluster-explorations
+  "Explorations are converted to an exploration-ds and
+   these are clustered together. We don't assign the
+   source URL into the clusters (is this a good idea?)"
+  [{url                  :src-link
+    explorations         :explorations
+    xpaths-hrefs         :xpaths-hrefs
+    signature            :signature
+    dfs                  :dfs
+    hrefs                :hrefs
+    novelties            :novelties
+    updates              :updates
+    in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
+
+  (let [explorations-ds (exploration->exploration-ds explorations)]
+    
+    (reduce
+     (fn [clusters x]
+       (cluster/assign
+        (into [] clusters) x cluster-member?))
+     []
+     explorations-ds)))
+
+(defn process-page-cluster
+  "Page clusters are explored"
+  [explorations-ds-clustered]
+  
+  '*)
+
+(defn cluster-explorations-titanic
   "Explorations are grouped into
-clusters based on their similarities."
+clusters based on their similarities.
+
+titanic because this guy is going down"
   [{url                  :src-link
     explorations         :explorations
     xpaths-hrefs         :xpaths-hrefs
@@ -390,32 +432,11 @@ clusters based on their similarities."
     updates              :updates
     in-host-xpaths-hrefs :in-host-xpaths-hrefs}]
   
-  (let [explorations-ds (exploration->exploration-ds explorations)
+  (let [clusters        '*
 
-        cluster-member? (fn [a-cluster x]
-                          (some
-                           (fn [a-member]
-                             (>= (page/signature-edit-distance-similarity
-                                  (-> a-member :r1)
-                                  (-> x :r1)
-                                  0.25
-                                  0.75)
-                                 *page-sim-thresh*))
-                           a-cluster))
-        
-        clusters        (reduce
-                         (fn [clusters x]
-                           (cluster/assign
-                            (into [] clusters) x cluster-member?))
-                         []
-                         explorations-ds)
+        self-cluster    '*
 
-        self-cluster    (cluster/assign-where?
-                         clusters
-                         {:r1 signature
-                          :incoming-xpath nil
-                          :url url}
-                         cluster-member?)
+        explorations-ds '*
 
         content-candids (map
                          #(nth clusters %)

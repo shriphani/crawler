@@ -158,3 +158,24 @@ escape characters. then call re-pattern on it"
 (defn cons-aux
   [coll x]
   (cons x coll))
+
+;; Reading explorations from a file
+(defn read-data-file
+  [a-file]
+  (-> a-file
+      clojure.java.io/reader
+      java.io.PushbackReader.
+      read))
+
+(defn cluster-urls
+  [clusters]
+  (reverse
+   (sort-by
+    count
+    (map
+     (fn [a-cluster]
+       (map
+        (fn [x]
+          (-> x :url))
+        a-cluster))
+     clusters))))

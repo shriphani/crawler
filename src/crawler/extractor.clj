@@ -492,6 +492,20 @@ array"
 
     (rank/rank-enum-candidates enum-candidates-info)))
 
+(defn cluster-info
+  "Collects features about clusters"
+  [a-cluster]
+  {:size (count a-cluster)
+   :incoming-xpaths (distinct
+                     (map
+                      (fn [x]
+                        (-> x :incoming-xpath))
+                      a-cluster))
+   :urls (map
+          (fn [x]
+            (-> x :url))
+          a-cluster)})
+
 (defn process-explorations-cluster
   "An explorations cluster is a
    set of exploration-ds pages clustered.
@@ -507,4 +521,5 @@ array"
   (let [total-expl   (-> clusters flatten count)
         enums-ranked (get-enum-xpaths explorations clusters)]
 
-    {:enum-candidates-ranked enums-ranked}))
+    {:enum-candidates-ranked enums-ranked}
+    {:content-candidates-ranked nil}))

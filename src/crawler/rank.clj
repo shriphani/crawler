@@ -40,3 +40,12 @@ info:
   (->> enum-candidates-info
        (sort-by enum-candidate-score-no-df)
        reverse))
+
+(defn rank-cluster-url-entry-point
+  "Counts the number of unique URLs that lead
+   to this cluster and how unique the URLs are"
+  [a-cluster]
+  (let [entry-urls (distinct
+                    (map #(-> % :url) a-cluster))]
+    (count entry-urls)))
+

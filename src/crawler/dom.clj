@@ -337,7 +337,9 @@ of the xpath set."
                               :attrs
                               :href
                               StringEscapeUtils/unescapeHtml)
-                     text (-> res :text)]
+                     text (->> res
+                               :text
+                               utils/tokenize)]
                  [(try
                     (uri/resolve-uri
                      src-link

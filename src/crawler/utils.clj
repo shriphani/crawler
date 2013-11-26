@@ -183,7 +183,7 @@ escape characters. then call re-pattern on it"
 (defn tokenize
   "Simplistic english tokenizer"
   [a-string]
-  (let [string-split (clojure.string/split a-string #"\s+|\d+")]
+  (let [string-split (clojure.string/split a-string #"\s+|\d+|\p{P}")]
     (filter
      #(not= % "")
      (map

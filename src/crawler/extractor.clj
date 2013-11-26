@@ -108,13 +108,20 @@ nonsense"
     (map
      (fn [sampled]
        (let [body             (visit-and-record-page sampled {:xpath xpath})
-            
-             xpaths-hrefs'    (when body
+
+             xpaths-hrefs-tks (when body
                                 (try
                                   (dom/minimum-maximal-xpath-set body sampled)
                                   (catch Exception e
                                     (do (error "Failed to parse: " sampled)
                                         (error "Error caused by: " xpath)))))
+             
+             xpaths-hrefs'    (into
+                               {}
+                               (map
+                                (fn [[xpath links-text]]
+                                  [xpath (set (map first links-text))])
+                                xpaths-hrefs-tks))
              
              in-host-map      (in-host-xpaths-hrefs
                                xpaths-hrefs' (uri/host sampled))
@@ -269,11 +276,19 @@ array"
   ([url *xpath-df* *xpath-hrefs* config]
    (let [body                  (visit-and-record-page url)
         
-         xpaths-hrefs          (dom/minimum-maximal-xpath-set
+         xpaths-hrefs-text     (dom/minimum-maximal-xpath-set
                                 body url)
 
+         xpaths-hrefs          (into
+                                {}
+                                (map
+                                 (fn [[xpath links-text]]
+                                   [xpath (set (map first links-text))])
+                                 xpaths-hrefs-text))
+
          xpaths                (map first xpaths-hrefs)
-        
+
+         ;; WTF?
          in-host-xpath-hrefs   (filter
                                 (fn [[xpath hrefs]]
                                   (some (fn [a-href]
@@ -301,7 +316,7 @@ array"
                                                   signature
                                                   (into {} in-host-xpath-hrefs))})
                                 in-host-xpath-hrefs)
-         
+
          dfs                   (merge-with
                                 +
                                 (reduce

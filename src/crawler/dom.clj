@@ -328,24 +328,25 @@ of the xpath set."
        (fn [xpath]
          (set
           (filter
-           #(not (re-find file-format-ignore-regex %))
+           #(not (re-find file-format-ignore-regex (first %)))
            (filter
-            identity
+            #(-> % first identity)
             (map
              (fn [res]
-               (try
-                 (uri/resolve-uri
-                  src-link
-                  (uri/fragment
-                   (let [a-href (-> res
-                                    :attrs
-                                    :href
-                                    StringEscapeUtils/unescapeHtml)]
-                     (if (= "javascript" (uri/scheme a-href))
-                       nil
-                       a-href))
-                   nil))
-                 (catch Exception e nil)))
+               (let [link (-> res
+                              :attrs
+                              :href
+                              StringEscapeUtils/unescapeHtml)
+                     text (-> res :text)]
+                 [(try
+                    (uri/resolve-uri
+                     src-link
+                     (uri/fragment
+                      (if (= "javascript" (uri/scheme link))
+                        nil link)
+                      nil))
+                    (catch Exception e nil))
+                  text]))
              (filter
               identity ($x xpath processed))))))) xpaths)))))
 

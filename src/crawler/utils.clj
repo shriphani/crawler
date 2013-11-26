@@ -179,3 +179,15 @@ escape characters. then call re-pattern on it"
           (-> x :url))
         a-cluster))
      clusters))))
+
+(defn tokenize
+  "Simplistic english tokenizer"
+  [a-string]
+  (let [string-split (clojure.string/split a-string #"\s+|\d+")]
+    (filter
+     #(not= % "")
+     (map
+      (fn [a-token]
+        (-> a-token
+            (.toLowerCase)))
+      string-split))))

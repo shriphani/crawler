@@ -49,3 +49,21 @@ info:
                     (map #(-> % :url) a-cluster))]
     (count entry-urls)))
 
+
+(defn rank-content-xpaths
+  [{means :means
+    variances :variances}]
+  (let [xpath-means (into {} means)
+        xpath-vars  (into {} variances)
+        xpaths      (map first means)]
+
+    (reverse
+     (sort-by
+      second
+      (map
+       vector
+       xpaths
+       (map
+        #(* (xpath-means %)
+            (xpath-vars %))
+        xpaths))))))

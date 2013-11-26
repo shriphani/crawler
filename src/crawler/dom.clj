@@ -18,7 +18,9 @@
 
 (defn process-page
   [page-src]
-  (let [cleaner (new HtmlCleaner)]
+  (let [cleaner (new HtmlCleaner)
+        props   (.getProperties cleaner)
+        _       (.setPruneTags props "script")]
     (.clean cleaner page-src)))
 
 (defn anchor-tags

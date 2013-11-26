@@ -558,6 +558,41 @@ array"
             (-> x :url))
           a-cluster)})
 
+(defn content-candidates-info
+  "Social media content is served using good reliable links"
+  [explorations]
+  (let [xpaths-texts  (-> explorations :xpaths-text)
+
+        xpaths        (map first xpaths-texts)
+        
+        xpaths-t-cnts (map
+                       (fn [[xpath texts]]
+                         (map count texts))
+                       xpaths-texts)
+
+        means         (map
+                       (fn [x]
+                         (/ (apply + x)
+                            (count x)))
+                       xpaths-t-cnts)
+
+        dists         (map
+                       (fn [[mean counts]]
+                         (map #(max (- % mean)
+                                    (- mean %)) counts))
+                       (map
+                        vector
+                        means
+                        xpaths-t-cnts))
+
+        variances     (map
+                       (fn [ds]
+                         (/ (apply + ds)
+                            (count ds)))
+                       dists)]
+    {:means (map vector xpaths means)
+     :variances (map vector xpaths variances)}))
+
 (defn process-explorations-cluster
   "An explorations cluster is a
    set of exploration-ds pages clustered.
@@ -570,8 +605,10 @@ array"
 
   [explorations clusters]
   
-  (let [total-expl   (-> clusters flatten count)
-        enums-ranked (get-enum-xpaths explorations clusters)]
+  (let [total-expl    (-> clusters flatten count)
+        enums-ranked  (get-enum-xpaths explorations clusters)
+        contents-rked (rank/rank-content-xpaths
+                       (content-candidates-info explorations))]
 
-    {:enum-candidates-ranked enums-ranked}
-    {:content-candidates-ranked nil}))
+    {:enum-candidates-ranked enums-ranked
+     :content-candidates-ranked contents-rked}))

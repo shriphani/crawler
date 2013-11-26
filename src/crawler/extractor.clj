@@ -122,6 +122,13 @@ nonsense"
                                 (fn [[xpath links-text]]
                                   [xpath (set (map first links-text))])
                                 xpaths-hrefs-tks))
+
+             xpaths-text'     (into
+                               {}
+                               (map
+                                (fn [[xpath links-text]]
+                                  [xpath (set (map second links-text))])
+                                xpaths-hrefs-tks))
              
              in-host-map      (in-host-xpaths-hrefs
                                xpaths-hrefs' (uri/host sampled))
@@ -152,6 +159,7 @@ nonsense"
              {:url                 sampled
               :novelty             (novelty diff)
               :hrefs-table         in-host-map
+              :text-table          xpaths-text'
               :in-host-hrefs-table in-host-map
               :update              (update original-hrefs current-hrefs)}))))
      sampled-uris)))
@@ -209,6 +217,21 @@ needs to be above the threshold."
          (merge-with set/union acc v))
        {}
        (map #(-> % :hrefs-table) xpath-explorations)))
+    explorations)))
+
+(defn text-table
+  [explorations]
+  (reduce
+   (fn [acc v]
+     (merge-with set/union acc v))
+   {}
+   (map
+    (fn [{xpath :xpath xpath-explorations :explorations}]
+      (reduce
+       (fn [acc v]
+         (merge-with set/union acc v))
+       {}
+       (map #(-> % :text-table) xpath-explorations)))
     explorations)))
 
 (defn update-table
@@ -286,6 +309,13 @@ array"
                                    [xpath (set (map first links-text))])
                                  xpaths-hrefs-text))
 
+         xpaths-text           (into
+                                {}
+                                (map
+                                 (fn [[xpath links-text]]
+                                   [xpath (set (map second links-text))])
+                                 xpaths-hrefs-text))
+
          xpaths                (map first xpaths-hrefs)
 
          ;; WTF?
@@ -302,9 +332,11 @@ array"
          in-host-xpaths        (map first in-host-xpath-hrefs)
          
          signature             (into
-                                {} (map (fn [an-xpath]
-                                          [an-xpath (count (xpaths-hrefs an-xpath))])
-                                        xpaths))
+                                {}
+                                (map
+                                 (fn [an-xpath]
+                                   [an-xpath (count (xpaths-hrefs an-xpath))])
+                                 xpaths))
         
          explorations          (map
                                 (fn [[xpath hrefs]]
@@ -328,6 +360,9 @@ array"
          hrefs                 (merge-with
                                 set/union ih-xp-map (href-table explorations))
 
+         tokens                (merge-with
+                                set/union ih-xp-map (text-table explorations))
+
          novelties             (novelty-table explorations)
 
          updates               (update-table explorations)]
@@ -335,9 +370,11 @@ array"
      {:src-link             url
       :explorations         explorations
       :xpaths-hrefs         xpaths-hrefs
+      :xpaths-text          xpaths-text
       :signature            signature
       :dfs                  dfs
       :hrefs                hrefs
+      :tokens               tokens
       :novelties            novelties
       :updates              updates
       :in-host-xpaths-hrefs in-host-xpath-hrefs})))

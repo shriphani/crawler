@@ -591,7 +591,10 @@ array"
                             (count ds)))
                        dists)]
     {:means (map vector xpaths means)
-     :variances (map vector xpaths variances)}))
+     :variances (map vector xpaths variances)
+     :counts (map (fn [[xpath texts]]
+                    [xpath (count texts)])
+                  xpaths-texts)}))
 
 (defn process-explorations-cluster
   "An explorations cluster is a

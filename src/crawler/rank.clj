@@ -52,9 +52,11 @@ info:
 
 (defn rank-content-xpaths
   [{means :means
-    variances :variances}]
+    variances :variances
+    counts :counts}]
   (let [xpath-means (into {} means)
         xpath-vars  (into {} variances)
+        xpath-counts (into {} counts)
         xpaths      (map first means)]
 
     (reverse
@@ -65,5 +67,6 @@ info:
        xpaths
        (map
         #(* (xpath-means %)
-            (xpath-vars %))
+            (xpath-vars %)
+            (xpath-counts %))
         xpaths))))))

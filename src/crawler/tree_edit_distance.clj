@@ -1,7 +1,8 @@
-(ns crawler.tree-edit-distance
-  (:use [clojure.pprint])
-  (:import (org.htmlcleaner HtmlCleaner DomSerializer CleanerProperties)
-           (org.w3c.dom Document)))
+(ns tree-edit-distance.enlive-core
+  "A version of RTDM that operates on a tree produced by
+   enlive."
+  (:require [clj-http.client :as client]
+            [net.cgrand.enlive-html :as html]))
 
 (defn init
   "Perform the correct initialization"
@@ -15,56 +16,57 @@
                         (* ins-cost c2)))))
       M)))
 
-(defn num-children
-  "Expects a html tree"
-  [a-tree]
-  (if(.hasChildNodes a-tree)
-    (.getLength (.getChildNodes a-tree)) 0))
+(defn load-tree
+  "Fetches a link's content and builds an enlive-tree with it"
+  [a-link]
+  (->> a-link
+       client/get
+       :body
+       java.io.StringReader.
+       html/html-resource
+       (filter (fn [x] (:tag x))) ; pick out the tree and not the docstring
+       first))
 
 (defn tree-children
-  "Return level 1 children"
   [a-tree]
-  (let [n  (num-children a-tree)
-        cs (.getChildNodes a-tree)]
-    (map
-     #(.item cs %)
-     (range n))))
+  (->> a-tree :content (filter map?)))
+
+(defn num-children
+  [a-tree]
+  (-> a-tree tree-children count))
 
 (defn tree-descendants
   [a-tree]
-  (if (.hasChildNodes a-tree)
-    (concat (tree-children a-tree)
-            (flatten (map tree-descendants (tree-children a-tree))))
-    []))
+  (if (-> a-tree tree-children seq)
+    (+ (num-children a-tree)
+       (apply + (map tree-descendants (tree-children a-tree))))
+    0))
 
-(declare rtdm-edit-distance)
+(declare tree-edit-distance)
 
 (defn invert-cost
-  [t1 t2 del-cost ins-cost sub-cost]
-  (let [t1-desc (tree-descendants t1)
-        t2-desc (tree-descendants t2)]
-    (- (+ (* del-cost (count t1-desc))
-          (* ins-cost (count t2-desc)))
-       (rtdm-edit-distance t1 t2 del-cost ins-cost sub-cost))))
+  [tree1 tree2 del-cost ins-cost sub-cost]
+  (let [t1-desc (tree-descendants tree1)
+        t2-desc (tree-descendants tree2)]
+    (- (+ (* del-cost t1-desc)
+          (* ins-cost t2-desc))
+       (tree-edit-distance tree1 tree2 del-cost ins-cost sub-cost))))
 
-(defn rtdm-edit-distance
-  "The RTDM algorithm for computing edit-distance.
-   The trees are assumed to be org.w3c.dom.Documents"
-  [tree-1 tree-2 del-cost ins-cost sub-cost]
+(defn tree-edit-distance
+  [tree1 tree2 del-cost ins-cost sub-cost]
+  (let [m (num-children tree1)
+        n (num-children tree2)
 
-  (let [m (num-children tree-1)
-        n (num-children tree-2)
+        t1-children (tree-children tree1)
+        t2-children (tree-children tree2)
 
-        t1-children (tree-children tree-1)
-        t2-children (tree-children tree-2)
-        
-        t1-desc (tree-descendants tree-1)
-        t2-desc (tree-descendants tree-2)
+        t1-desc (tree-descendants tree1)
+        t2-desc (tree-descendants tree2)
 
-        M (init m n (count t1-desc) (count t2-desc) del-cost ins-cost)]
+        M (init m n t1-desc t2-desc del-cost ins-cost)]
     
     (doseq [i (range m)
-            j (range n)]
+            j (range n)] 
       (let [c-i (nth t1-children i)
             c-j (nth t2-children j)
 
@@ -78,24 +80,16 @@
                      del-cost
                      ins-cost)
 
-            sub (if (.isEqualNode c-i c-j)
+            sub (if (= c-i c-j)
                   (- sub-i
-                     (* ins-cost (count c-j-desc))
-                     (* del-cost (count c-i-desc)))
+                     (* ins-cost c-j-desc)
+                     (* del-cost c-i-desc))
                   (cond
-                   (or (not (.hasChildNodes c-i))
-                       (not (.hasChildNodes c-j)))
+                   (or (not (-> c-i :content (filter map?)))
+                       (not (-> c-j :content (filter map?))))
                    (+ sub-i sub-cost)
 
-                   (and (= (.getNodeName c-i) (.getNodeName c-j))
-                        (try
-                          (= (.getNodeValue (.getNamedItem (.getAttributes c-i) "id"))
-                             (.getNodeValue (.getNamedItem (.getAttributes c-j) "id")))
-                          (catch Exception e true))
-                        (try
-                          (= (.getNodeValue (.getNamedItem (.getAttributes c-i) "class"))
-                             (.getNodeValue (.getNamedItem (.getAttributes c-j) "class")))
-                          (catch Exception e true)))
+                   (or (= (-> c-i :tag) (-> c-j :tag)))
                    (- sub-i (invert-cost c-i c-j del-cost ins-cost sub-cost))
 
                    :else
@@ -103,32 +97,12 @@
         (aset M (inc i) (inc j) (int (min del ins sub)))))
     (aget M m n)))
 
-(defn rtdm-edit-distance-sim
-  [tree-1 tree-2 del-cost ins-cost sub-cost]
-  (let [t1-desc (tree-descendants tree-1)
-        t2-desc (tree-descendants tree-2)]
+(defn tree-edit-distance-link
+  "load trees and return their edit distance"
+  [link1 link2]
+  (let [t1 (load-tree link1)
+        t2 (load-tree link2)]
     (- 1
-       (/ (rtdm-edit-distance tree-1 tree-2 del-cost ins-cost sub-cost)
-          (+ (* (+ (count t1-desc) 1) del-cost)
-             (* (+ (count t2-desc) 1) sub-cost))))))
-
-(defn get-xml-tree-body
-  "Downloads a webpage and converts it to an org.w3.dom.Document"
-  [page-src]
-  
-  (let [cleaner        (new HtmlCleaner)
-        props          (.getProperties cleaner)
-        cleaner-props  (new CleanerProperties)
-        dom-serializer (new DomSerializer cleaner-props)
-        tag-node       (.clean cleaner page-src)]
-    
-    (.createDOM dom-serializer tag-node)))
-
-(defn rtdm-edit-distance-html
-  [pg1 pg2 del-cost ins-cost sub-cost]
-  (rtdm-edit-distance-sim
-   (get-xml-tree-body pg1)
-   (get-xml-tree-body pg2)
-   del-cost
-   ins-cost
-   sub-cost))
+       (/ (tree-edit-distance t1 t2 1 1 1)
+          (+ (tree-descendants t1)
+             (tree-descendants t2))))))

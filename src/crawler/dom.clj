@@ -218,8 +218,7 @@ id and class tag constraints are also added"
       #(str/join "/" %) 
       (utils/cross-product acc x)))
    ["/"]
-   (concat (map w3c-node->xpath (drop-last nodes-seq))
-           (list (list (.getNodeName (last nodes-seq)))))))
+   (map w3c-node->xpath nodes-seq)))
 
 (defn xpath-to-custom-root
   [a-node the-root]
@@ -270,6 +269,41 @@ id and class tag constraints are also added"
         (.createDOM tag-node))))
 
 (def file-format-ignore-regex #".jpg$|.css$|.gif$|.png$|.xml$")
+
+(defn xpaths-hrefs-tokens
+  "Return xpaths, hrefs and tokens"
+  [a-processed-page url]
+  (let [a-tags         ($x:node+ ".//a" a-processed-page) ; anchor tags
+
+        a-tags-w-hrefs (filter
+                        ; the node must have a href
+                        (fn [a-tag]
+                          (-> a-tag
+                              (.getAttributes)
+                              (.getNamedItem "href")))
+                        a-tags)
+
+        xpaths-a-tags  (map #(-> % xpath-to-node first) a-tags-w-hrefs)
+
+        nodes-xpaths   (map vector
+                            xpaths-a-tags
+                            (map
+                             (fn [x]
+                               (let [link (-> x
+                                              (.getAttributes)
+                                              (.getNamedItem "href")
+                                              (.getValue))]
+                                 {:node x
+                                  :href (try (uri/fragment
+                                              (uri/resolve-uri url link) nil)
+                                             (catch Exception e nil))
+                                  :text (-> x
+                                            (.getTextContent))}))
+                                                  a-tags-w-hrefs))]
+
+    (reduce
+     (fn [acc [an-xpath node]]
+       (merge-with concat acc {an-xpath [node]})) {} nodes-xpaths)))
 
 (defn minimum-maximal-xpath-set-processed
   "This helper routine exists so we don't reparse
@@ -541,3 +575,5 @@ are sufficient to generate all the distinct records"
    str
    (.getTextContent a-node)
    (str/join " " (tooltips a-node))))
+
+  

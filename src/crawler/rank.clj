@@ -1,7 +1,9 @@
 ;;;; Soli Deo Gloria
 ;;;; spalakod
 
-(ns crawler.rank)
+(ns crawler.rank
+  "Ranking utils"
+  (:require [crawler.utils :as utils]))
 
 (def *href-prior* 10)
 
@@ -70,3 +72,60 @@ info:
             (xpath-vars %)
             (xpath-counts %))
         xpaths))))))
+
+(defn rank-by-uniqueness
+  "A simple ranker that ranks by exploration function"
+  [xpaths-hrefs-text]
+  (let [xpaths-tokens    (map
+                          (fn [[xpath nodes-and-info]]
+                            {:xpath  xpath
+                             :tokens (map
+                                      (fn [a-node]
+                                        {:path-tokens (-> a-node :href utils/tokenize-url)
+                                         :text-tokens  (-> a-node :text utils/tokenize)})
+                                      nodes-and-info)})
+                          xpaths-hrefs-text)
+        
+        xpath-mean       (into
+                          {}
+                          (map
+                           (fn [{xpath :xpath tokensets :tokens}]
+                             {xpath
+                              (/ (reduce
+                                  +
+                                  (concat
+                                   (map
+                                    #(-> % :text-tokens set count) tokensets)
+                                   (map
+                                    #(-> % :path-tokens set count) tokensets)))
+                                 (count tokensets))})
+                           xpaths-tokens))
+
+        xpath-vars       (into
+                          {}
+                          (map
+                           (fn [{xpath :xpath tokensets :tokens}]
+                             {xpath
+                              (/ 
+                               (reduce
+                                +
+                                (concat
+                                 (map
+                                  #(Math/pow
+                                    (- (-> % :text-tokens set count)
+                                       (xpath-mean xpath)) 2) tokensets)
+                                 (map
+                                  #(Math/pow
+                                    (- (-> % :path-tokens set count)
+                                       (xpath-mean xpath)) 2) tokensets)))
+                               (xpath-mean xpath)
+                                 (count tokensets))})
+                           xpaths-tokens))
+
+        xpath-score      (into
+                          {}
+                          (map
+                           (fn [[xpath mean]]
+                             [xpath (* mean (xpath-vars xpath))])
+                           xpath-mean))]
+    (reverse (sort-by second xpath-score))))

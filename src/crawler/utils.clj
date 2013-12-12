@@ -191,3 +191,9 @@ escape characters. then call re-pattern on it"
         (-> a-token
             (.toLowerCase)))
       string-split))))
+
+(defn tokenize-url
+  "Split on slugs. Slug urls typically contain - and _ elements"
+  [a-url]
+  (let [url-path (-> a-url uri/path)]
+    (if url-path (last (map tokenize (clojure.string/split url-path #"/"))) "")))

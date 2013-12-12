@@ -118,8 +118,7 @@ info:
                                   #(Math/pow
                                     (- (-> % :path-tokens set count)
                                        (xpath-mean xpath)) 2) tokensets)))
-                               (xpath-mean xpath)
-                                 (count tokensets))})
+                               (count tokensets))})
                            xpaths-tokens))
 
         xpath-score      (into

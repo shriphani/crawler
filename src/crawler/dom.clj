@@ -113,9 +113,7 @@
   (let [silent-fail-split (fn [s regex] (try (str/split s regex)
                                             (catch Exception e nil)))]
    (list (.getName a-tagnode)
-         (-> a-tagnode
-            (.getAttributeByName "id")
-            format-attr)
+         nil
          (map
           format-attr
           (-> a-tagnode
@@ -164,22 +162,11 @@
         formatted-classes (map
                            #(format "contains(@class,'%s')" %)
                            class-list)]
-    (cond (and id (not (empty? class-list))) 
-          (map
-           #(format "%s[%s and %s]"
-                    tag
-                    formatted-id
-                    %)
-           formatted-classes)
+    
 
-          (and id (empty? class-list)) 
-          (list 
-           (format "%s[%s]" tag formatted-id))
-
-          (and (not (empty? class-list)) (not id)) 
-          (map #(format "%s[%s]" tag %) formatted-classes)
-
-          :else (list tag))))
+    (if (not (empty? class-list)) 
+      (map #(format "%s[%s]" tag %) formatted-classes)
+      (list tag))))
 
 (defn tag-node->xpath
   [a-tagnode]

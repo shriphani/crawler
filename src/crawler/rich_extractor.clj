@@ -10,7 +10,7 @@
 ;;;; on how expressive a URL is. A decision to follow is based upon
 ;;;; some statistics.
 
-(defn featurize
+(defn tokenize-anchor-url
   [nodes]
   (map
    (fn [{_ :node href :href text :text}]
@@ -40,7 +40,7 @@
     (into
      {} (map
          (fn [[xpath nodes]]
-           [xpath (featurize nodes)])
+           [xpath (tokenize-anchor-url nodes)])
          in-host-xhrefs))))
 
 (defn follow-naive?

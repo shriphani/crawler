@@ -5,7 +5,8 @@
             [org.bovinegenius [exploding-fish :as uri]]))
 
 ;;;; A rich extractor performs an initial score assignment based
-;;;; on how expressive a URL is.
+;;;; on how expressive a URL is. A decision to follow is based upon
+;;;; some statistics.
 
 (defn extract
   [page-src url]
@@ -23,5 +24,27 @@
                                          (or (= host (uri/host (:href a-node)))
                                              (nil? (uri/host (:href a-node)))))
                                        nodes)])
-                             xpaths-hrefs-text)))]
-    (rank/rank-by-uniqueness in-host-xhrefs)))
+                             xpaths-hrefs-text)))
+
+        ranked-xpaths     (rank/rank-by-uniqueness in-host-xhrefs)]
+    (map
+     (fn [[xpath score]]
+       {:xpath xpath
+        :node (map (fn [a-node]
+                     {:href (-> a-node :href)
+                      :text (-> a-node :text)})
+                   (in-host-xhrefs xpath))
+        :score score})
+     ranked-xpaths)))
+
+(defn follow-naive?
+  "Decide if an Xpath's links are worth following based on a naive score of richness.
+   The score passed in currently is a trivial product of mean # of tokens and variance
+   of the # of tokens
+
+   Args:
+    state: A set of actions. {Xpath, url}
+    action: An xpath
+    details-map: {xpath -> information}"
+  [state action details-map]
+  (< 0 (details-map action)))

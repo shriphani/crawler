@@ -268,11 +268,12 @@ id and class tag constraints are also added"
                           (and (-> a-tag
                                    (.getAttributes)
                                    (.getNamedItem "href"))
-                               (try (not= (-> a-tag
-                                              (.getAttributes)
-                                              (.getNamedItem "rel")
-                                              (.getValue))
-                                          "nofollow")
+                               (try
+                                 (not= (-> a-tag
+                                           (.getAttributes)
+                                           (.getNamedItem "rel")
+                                           (.getValue))
+                                       "nofollow")
                                     (catch NullPointerException e true))))
                         a-tags)
 

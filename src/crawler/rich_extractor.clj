@@ -11,7 +11,7 @@
 ;;;; some statistics.
 
 (defn featurize
-  [xpath nodes]
+  [nodes]
   (map
    (fn [{_ :node href :href text :text}]
      (let [url-tokens  (set (utils/tokenize-url href))
@@ -37,10 +37,11 @@
                                              (nil? (uri/host (:href a-node)))))
                                        nodes)])
                              xpaths-hrefs-text)))]
-    (map
-     (fn [[xpath nodes]]
-       (featurize xpath nodes))
-     in-host-xhrefs)))
+    (into
+     {} (map
+         (fn [[xpath nodes]]
+           [xpath (featurize nodes)])
+         in-host-xhrefs))))
 
 (defn follow-naive?
   "Decide if an Xpath's links are worth following based on a naive score of richness.

@@ -265,9 +265,15 @@ id and class tag constraints are also added"
         a-tags-w-hrefs (filter
                         ; the node must have a href
                         (fn [a-tag]
-                          (-> a-tag
-                              (.getAttributes)
-                              (.getNamedItem "href")))
+                          (and (-> a-tag
+                                   (.getAttributes)
+                                   (.getNamedItem "href"))
+                               (try (not= (-> a-tag
+                                              (.getAttributes)
+                                              (.getNamedItem "rel")
+                                              (.getValue))
+                                          "nofollow")
+                                    (catch NullPointerException e true))))
                         a-tags)
 
         xpaths-a-tags  (map #(-> % xpath-to-node first) a-tags-w-hrefs)

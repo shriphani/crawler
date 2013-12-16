@@ -274,7 +274,12 @@ id and class tag constraints are also added"
                                            (.getNamedItem "rel")
                                            (.getValue))
                                        "nofollow")
-                                    (catch NullPointerException e true))))
+                                 (catch NullPointerException e true))
+                               (not= (uri/scheme (-> a-tag
+                                                     (.getAttributes)
+                                                     (.getNamedItem "href")
+                                                     (.getValue)))
+                                     "javascript")))
                         a-tags)
 
         xpaths-a-tags  (map #(-> % xpath-to-node first) a-tags-w-hrefs)

@@ -37,20 +37,26 @@
                                              (nil? (uri/host (:href a-node)))))
                                        nodes)])
                              xpaths-hrefs-text)))]
-    (into
-     {} (map
-         (fn [[xpath nodes]]
-           [xpath (tokenize-anchor-url nodes)])
-         in-host-xhrefs))))
+    in-host-xhrefs))
 
-(defn follow-naive?
-  "Decide if an Xpath's links are worth following based on a naive score of richness.
-   The score passed in currently is a trivial product of mean # of tokens and variance
-   of the # of tokens. NO LOOKAHEADS ARE SUPPLIED TO THIS CRAWLER.
+(defn tokenize-actions
+  [in-host-xhrefs]
+  (into
+   {} (map
+       (fn [[xpath nodes]]
+         [xpath (tokenize-anchor-url nodes)])
+       in-host-xhrefs)))
 
-   Args:
-    state: A set of actions. {Xpath, url}
-    action: An xpath
-    details-map: {xpath -> information}"
-  [state action details-map]
-  (< 0 (details-map action)))
+(defn score-actions
+  [xpaths-tokens]
+  (rank/score-xpaths-1 xpaths-tokens))
+
+(defn extract-richest
+  "Retrieve from possible actions, the xpath with the highest score"
+  [page-src url]
+  (let [in-host-xpaths-hrefs (state-action page-src url)
+        xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)
+        xpaths-scored        (score-actions xpaths-tokenized)
+        decision             (first (first (reverse (sort-by second xpaths-scored))))]
+    {:links (map #(-> % :href) (in-host-xpaths-hrefs decision))
+     :action-score (xpaths-scored decision)}))

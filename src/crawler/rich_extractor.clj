@@ -47,10 +47,6 @@
          [xpath (tokenize-anchor-url nodes)])
        in-host-xhrefs)))
 
-(defn score-actions
-  [xpaths-tokens]
-  (rank/score-xpaths-1 xpaths-tokens))
-
 (defn extract-richest
   "Retrieve from possible actions, the xpath with the highest score"
   [page-src url]

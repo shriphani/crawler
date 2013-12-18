@@ -6,7 +6,7 @@
 
 (defn write
   [content]
-  (println :received-content (content :url)))
+  (println :write (content :url)))
 
 (defn crawl-richest
   "Main crawl routine
@@ -18,26 +18,44 @@
    Representation for content XPath is important. What kind
    of representation to use? Target-cluster?"
   [queue visited num-decisions sum-score limit]
+  (Thread/sleep 2000)
   (if (and (not (zero? limit))
            (seq queue))
     (let [body       (-> queue first client/get :body)
-          decision   (extractor/extract-richest body (first queue))
+          decision   (extractor/extract-richest body (first queue) visited)
           links      (:links decision)
           score      (:action-score decision)]
-      (println queue)
       (do
-        (write {:content body
-                :url (first queue)})
-        (recur (if (< (/ sum-score num-decisions)
-                      score)
-                 (concat (rest queue)
-                         (filter
-                          (fn [a-link]
-                            (not (some #{a-link} visited)))
-                          links))
-                 (rest queue))
-               (conj visited (first queue))
-               (inc num-decisions)
-               (+ score sum-score)
-               (dec limit))))
+        (if (< (* 0.75 (/ sum-score num-decisions)) score)
+          (let [new-queue    (do
+                               (println :links links)
+                               (println)
+                               (concat (rest queue)
+                                       (filter
+                                        (fn [a-link]
+                                          (and (not (some #{a-link} visited))
+                                               (not (some #{a-link} (set queue)))))
+                                        links)))
+                new-visited  (conj visited (first queue))
+                new-num-dec  (inc num-decisions)
+                new-scr      (+ score sum-score)
+                new-lim      (dec limit)]
+            (recur new-queue
+                   new-visited
+                   new-num-dec
+                   new-scr
+                   new-lim))
+          (do
+            (println :no-links-chosen)
+            (println)
+            (let [new-queue   (rest queue)
+                  new-visited (conj visited (first queue))
+                  new-num-dec num-decisions
+                  new-scr     sum-score
+                  new-lim     (dec limit)]
+              (recur new-queue
+                     new-visited
+                     new-num-dec
+                     new-scr
+                     new-lim))))))
     {:visited visited}))

@@ -258,51 +258,62 @@ id and class tag constraints are also added"
 (def file-format-ignore-regex #".jpg$|.css$|.gif$|.png$|.xml$")
 
 (defn xpaths-hrefs-tokens
-  "Return xpaths, hrefs and tokens"
-  [a-processed-page url]
-  (let [a-tags         ($x:node+ ".//a" a-processed-page) ; anchor tags
+  "Args:
+    a-processed-page: a processed page
+    url: a url
+    "
+  ([a-processed-page url]
+     (xpaths-hrefs-tokens a-processed-page url (set [])))
+  
+  ([a-processed-page url blacklist]
+     (let [a-tags         ($x:node+ ".//a" a-processed-page) ; anchor tags
 
-        a-tags-w-hrefs (filter
-                        ; the node must have a href
-                        (fn [a-tag]
-                          (and (-> a-tag
-                                   (.getAttributes)
-                                   (.getNamedItem "href"))
-                               (try
-                                 (not= (-> a-tag
-                                           (.getAttributes)
-                                           (.getNamedItem "rel")
-                                           (.getValue))
-                                       "nofollow")
-                                 (catch NullPointerException e true))
-                               (not= (uri/scheme (-> a-tag
-                                                     (.getAttributes)
-                                                     (.getNamedItem "href")
-                                                     (.getValue)))
-                                     "javascript")))
-                        a-tags)
-
-        xpaths-a-tags  (map #(-> % xpath-to-node first) a-tags-w-hrefs)
-
-        nodes-xpaths   (map vector
-                            xpaths-a-tags
-                            (map
-                             (fn [x]
-                               (let [link (-> x
+           a-tags-w-hrefs (filter
+                                        ; the node must have a href
+                           (fn [a-tag]
+                             (and (-> a-tag
+                                      (.getAttributes)
+                                      (.getNamedItem "href"))
+                                  (try
+                                    (not= (-> a-tag
                                               (.getAttributes)
-                                              (.getNamedItem "href")
-                                              (.getValue))]
-                                 {:node x
-                                  :href (try (uri/fragment
-                                              (uri/resolve-uri url link) nil)
-                                             (catch Exception e nil))
-                                  :text (-> x
-                                            (.getTextContent))}))
-                                                  a-tags-w-hrefs))]
+                                              (.getNamedItem "rel")
+                                              (.getValue))
+                                          "nofollow")
+                                    (catch NullPointerException e true))
+                                  (not= (uri/scheme (-> a-tag
+                                                        (.getAttributes)
+                                                        (.getNamedItem "href")
+                                                        (.getValue)))
+                                        "javascript")
+                                  (not (some #{(-> a-tag
+                                                   (.getAttributes)
+                                                   (.getNamedItem "href")
+                                                   (.getValue))}
+                                             (set blacklist)))))
+                           a-tags)
 
-    (reduce
-     (fn [acc [an-xpath node]]
-       (merge-with concat acc {an-xpath [node]})) {} nodes-xpaths)))
+           xpaths-a-tags  (map #(-> % xpath-to-node first) a-tags-w-hrefs)
+
+           nodes-xpaths   (map vector
+                               xpaths-a-tags
+                               (map
+                                (fn [x]
+                                  (let [link (-> x
+                                                 (.getAttributes)
+                                                 (.getNamedItem "href")
+                                                 (.getValue))]
+                                    {:node x
+                                     :href (try (uri/fragment
+                                                 (uri/resolve-uri url link) nil)
+                                                (catch Exception e nil))
+                                     :text (-> x
+                                               (.getTextContent))}))
+                                a-tags-w-hrefs))]
+
+       (reduce
+        (fn [acc [an-xpath node]]
+          (merge-with concat acc {an-xpath [node]})) {} nodes-xpaths))))
 
 (defn minimum-maximal-xpath-set-processed
   "This helper routine exists so we don't reparse

@@ -3,7 +3,7 @@
   (:require [crawler.dom :as dom]
             [crawler.rank :as rank]
             [crawler.sample :as sample]
-            [crawler.similarity :as sim]
+            [crawler.similarity :as similarity]
             [crawler.utils :as utils]
             [clj-http.client :as client]
             [clojure.set :as clj-set]
@@ -161,7 +161,7 @@
                                    (count xpaths-scored))
            decision             (filter
                                  (fn [[xpath score]]
-                                   (> score mean-richness))
+                                   (>= score mean-richness))
                                  (reverse
                                   (sort-by second xpaths-scored)))
            decision-links       (flatten
@@ -182,6 +182,19 @@
         :action-score decision-scores
         :xpaths (map first decision)})))
 
+(defn pagination?
+  "Args:
+    {xpath -> [samples] ...}
+   Returns:
+    Xpaths which are samples"
+  [page-src [xpath samples]]
+  (let [similarities (pmap
+                      #(similarity/tree-edit-distance-html page-src %)
+                      samples)
+
+        thresh-sims  (filter #(> % 0.8) similarities)]
+    (> (count thresh-sims) (* 0.5 (count samples)))))
+
 (defn weak-pagination-detector
   ([page-src url]
      (weak-pagination-detector page-src url (set [])))
@@ -192,9 +205,23 @@
                                  {} (map
                                      (fn [[xpath nodes]]
                                        [xpath (map #(-> % :href) nodes)])
-                                     in-host-xpaths-hrefs))]
-       (into
-        {} (map
-            (fn [[xpath links]]
-              [xpath (sample/sample-some-links links blacklist)])
-            xpaths-hrefs)))))
+                                     in-host-xpaths-hrefs))
+           xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)
+           xpaths-scored        (sort-by second
+                                         (score-actions xpaths-tokenized))
+           mean-richness        (/ (apply + (map second xpaths-scored))
+                                   (count xpaths-scored))
+           xpaths-considered    (map
+                                 (fn [[xpath _]]
+                                   [xpath (xpaths-hrefs xpath)])
+                                 (filter
+                                  (fn [[xpath score]]
+                                    (< score mean-richness))
+                                  xpaths-scored))
+           xpaths-samples       (map
+                                 (fn [[xpath links]]
+                                   [xpath (sample/sample-some-links links blacklist)])
+                                 xpaths-considered)]
+       (println xpaths-considered)
+       (flush)
+       (map first (filter #(pagination? page-src %) xpaths-samples)))))

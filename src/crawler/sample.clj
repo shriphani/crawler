@@ -15,12 +15,15 @@
    (fn [a-link]
      (do
        (println :sampling a-link)
-       (-> a-link
-           client/get
-           :body)))
-   (take (int (/ (count links)
-                 10))
+       (flush)
+       (try (-> a-link
+                client/get
+                :body)
+            (catch Exception e (do (println a-link)
+                                   (flush))))))
+   (take (max 4 (int (/ (count links)
+                        10)))
          (filter
           (fn [a-link]
             (not (some #{a-link} blacklist)))
-          links))))
+          (distinct links)))))

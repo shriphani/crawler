@@ -104,12 +104,15 @@
 
 (defn tree-edit-distance-html
   [page-src1 page-src2]
-  (let [t1 (html->map page-src1)
-        t2 (html->map page-src2)]
-    (- 1
-       (/ (tree-edit-distance t1 t2 1 1 1)
-          (+ (tree-descendants t1)
-             (tree-descendants t2))))))
+  (if (or (nil? page-src1)
+          (nil? page-src2))
+    0.0
+    (let [t1 (html->map page-src1)
+          t2 (html->map page-src2)]
+      (- 1
+         (/ (tree-edit-distance t1 t2 1 1 1)
+            (+ (tree-descendants t1)
+               (tree-descendants t2)))))))
 
 (defn tree-edit-distance-link
   "load trees and return their edit distance"

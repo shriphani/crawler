@@ -175,6 +175,39 @@
         thresh-sims  (filter #(> % 0.8) similarities)]
     (> (count thresh-sims) (* 0.5 (count samples)))))
 
+(defn updated
+  [xpaths-hrefs1 xpaths-hrefs2]
+  (let [xpaths (set (map first xpaths-hrefs1))
+        upds   (map
+                (fn [xpath] (count
+                            (clojure.set/difference
+                             (set (xpaths-hrefs1 xpath))
+                             (set (xpaths-hrefs2 xpath)))))
+                xpaths)]
+    (apply + upds)))
+
+(defn pick-paginator
+  "Picks one XPath for pagination
+
+   Args:
+    {xpath: sample-bodies,...}
+   Returns:
+    picked xpath"
+  [src-xpaths-hrefs pagination-candidates blacklist]
+  (let [candidate-xpaths (map first pagination-candidates)]
+    (first ; don't return the score as well
+     (last
+      (sort-by
+       second
+       (map
+        (fn [[xpath sampled]]
+          (let [s (map
+                   (fn [a-sampled-page]
+                     (updated src-xpaths-hrefs a-sampled-page))
+                   sampled)]
+            [xpath (/ (apply + s) (count s))]))
+        pagination-candidates))))))
+
 (defn weak-pagination-detector
   ([page-src url]
      (weak-pagination-detector page-src url (set [])))
@@ -201,7 +234,23 @@
            xpaths-samples       (map
                                  (fn [[xpath links]]
                                    [xpath (sample/sample-some-links links blacklist)])
-                                 xpaths-considered)]
-       (println xpaths-considered)
-       (flush)
-       (map first (filter #(pagination? page-src %) xpaths-samples)))))
+                                 xpaths-considered)
+           xpaths-samples-map   (into {} xpaths-samples)
+           pagination-cands     (map
+                                 first
+                                 (filter
+                                  #(pagination? page-src %)
+                                  xpaths-samples))
+           pagination-ds        (map
+                                 (fn [an-xpath]
+                                   [an-xpath (map (fn [a-sample]
+                                                    (into
+                                                     {} (map
+                                                         (fn [[xpath nodes]]
+                                                           [xpath (map #(-> % :href) nodes)])
+                                                         (dom/xpaths-hrefs-tokens
+                                                          (dom/html->xml-doc a-sample)
+                                                          url))))
+                                                  (xpaths-samples-map an-xpath))])
+                                 pagination-cands)]
+       (pick-paginator xpaths-hrefs pagination-ds blacklist))))

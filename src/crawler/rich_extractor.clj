@@ -2,6 +2,7 @@
   "Implementation of the rich URL extractor"
   (:require [crawler.dom :as dom]
             [crawler.rank :as rank]
+            [crawler.sample :as sample]
             [crawler.similarity :as sim]
             [crawler.utils :as utils]
             [clj-http.client :as client]
@@ -148,6 +149,7 @@
         :action-score (xpaths-scored decision)})))
 
 (defn extract-above-average-richest
+  "Extract XPaths with above average # of tokens"
   ([page-src url]
      (extract-above-average-richest page-src url (set [])))
 
@@ -178,4 +180,21 @@
                                    (count decision))]
        {:links decision-links
         :action-score decision-scores
-        :xpaths (map first decisions)})))
+        :xpaths (map first decision)})))
+
+(defn weak-pagination-detector
+  ([page-src url]
+     (weak-pagination-detector page-src url (set [])))
+
+  ([page-src url blacklist]
+     (let [in-host-xpaths-hrefs (state-action page-src url blacklist)
+           xpaths-hrefs         (into
+                                 {} (map
+                                     (fn [[xpath nodes]]
+                                       [xpath (map #(-> % :href) nodes)])
+                                     in-host-xpaths-hrefs))]
+       (into
+        {} (map
+            (fn [[xpath links]]
+              [xpath (sample/sample-some-links links blacklist)])
+            xpaths-hrefs)))))

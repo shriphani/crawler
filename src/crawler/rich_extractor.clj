@@ -69,26 +69,6 @@
     (Thread/sleep 2000)
     (client/get a-link)))
 
-(defn sample-item
-  "Samples a set of links and decides if it is a
-   potential pagination clause"
-  [xpath links body]
-  (let [pages (map
-               #(fn [a-link]
-                  (let [body (-> % get-and-wait)]
-                   {:link a-link
-                    :body body
-                    :decisions (state-action body a-link)}))
-               links)
-        same  (reduce
-               (fn [acc page]
-                 (if (sim/tree-edit-distance-html body page)
-                   (inc acc) acc))
-               0
-               pages)]
-    {:same-signature-count same
-     :items pages}))
-
 (defn explore-pagination
   "Pagination is detected using:
     -> pages that have similar structure

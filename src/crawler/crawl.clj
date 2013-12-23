@@ -29,8 +29,9 @@
   (Thread/sleep 2000)
   (if (and (not (zero? limit))
            (seq queue))
-    (let [body       (-> queue first :url client/get :body)
-          decision   (extractor/extract-richest body (first queue) visited)
+    (let [url        (-> queue first :url)
+          body       (-> url client/get :body)
+          decision   (extractor/extract-richest body url visited)
           links      (:links decision)
           score      (:action-score decision)]
       (do
@@ -38,21 +39,24 @@
           (let [pagination-l (second
                               (extractor/weak-pagination-detector
                                body
-                               (first queue)
+                               url
                                (concat visited queue)))
 
                 new-queue    (do
                                (println :links links)
                                (println :pagination pagination-l)
                                (println)
-                               (concat pagination-l
+                               (concat (map #({:url %
+                                               :pagination? true}) pagination-l)
                                        (rest queue)
-                                       (filter
-                                        (fn [a-link]
-                                          (and (not (some #{a-link} visited))
-                                               (not (some #{a-link} (set queue)))))
-                                        links)))
-                new-visited  (conj visited (first queue))
+                                       (map
+                                        #({:url %})
+                                        (filter
+                                         (fn [a-link]
+                                           (and (not (some #{a-link} visited))
+                                                (not (some #{a-link} (set (map #(-> % :url) queue))))))
+                                         links))))
+                new-visited  (conj visited url)
                 new-num-dec  (inc num-decisions)
                 new-scr      (+ score sum-score)
                 new-lim      (dec limit)]
@@ -66,7 +70,7 @@
             (println)
             ; pagination must still be chosen though
             (let [new-queue   (rest queue)
-                  new-visited (conj visited (first queue))
+                  new-visited (conj visited url)
                   new-num-dec num-decisions
                   new-scr     sum-score
                   new-lim     (dec limit)]

@@ -16,21 +16,37 @@
    Next, we resolve pagination routines.
 
    Representation for content XPath is important. What kind
-   of representation to use? Target-cluster?"
+   of representation to use? Target-cluster?
+
+   Queue looks like: [{:url <url>
+                      :content-decision <content-xpath>
+                      :pag-decision <pag-xpath>
+                      :paginated?}
+                      .
+                      .
+                      .]"
   [queue visited num-decisions sum-score limit]
   (Thread/sleep 2000)
   (if (and (not (zero? limit))
            (seq queue))
-    (let [body       (-> queue first client/get :body)
+    (let [body       (-> queue first :url client/get :body)
           decision   (extractor/extract-richest body (first queue) visited)
           links      (:links decision)
           score      (:action-score decision)]
       (do
         (if (< (* 0.75 (/ sum-score num-decisions)) score)
-          (let [new-queue    (do
+          (let [pagination-l (second
+                              (extractor/weak-pagination-detector
+                               body
+                               (first queue)
+                               (concat visited queue)))
+
+                new-queue    (do
                                (println :links links)
+                               (println :pagination pagination-l)
                                (println)
-                               (concat (rest queue)
+                               (concat pagination-l
+                                       (rest queue)
                                        (filter
                                         (fn [a-link]
                                           (and (not (some #{a-link} visited))
@@ -48,6 +64,7 @@
           (do
             (println :no-links-chosen)
             (println)
+            ; pagination must still be chosen though
             (let [new-queue   (rest queue)
                   new-visited (conj visited (first queue))
                   new-num-dec num-decisions

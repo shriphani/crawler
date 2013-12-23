@@ -212,20 +212,28 @@
    avg. tokens and the least number of total chars
    is picked for this purpose"
   [pagination-candidates]
-  (first
-   (first
-    (sort-by
-     second
-     (map
-      (fn [[a-candidate tokens]]
-        [a-candidate
-         (if (empty? tokens)
-           0
-           (/ (apply + (map count tokens))
-              (count tokens)))])
-      pagination-candidates)))))
+  (sort-by
+   second
+   (map
+    (fn [[a-candidate tokens]]
+      [a-candidate
+       (if (empty? tokens)
+         0
+         (/ (apply + (map count tokens))
+            (count tokens)))])
+    pagination-candidates)))
 
 (defn weak-pagination-detector
+  "Detects a pagination based on how weak things are.
+   Weakness = smallest # of tokens.
+   Args:
+    page-src : body
+    url : url
+    blacklist : what not to get
+
+   Returns:
+    Pagination candidates
+    (one or more xpaths)."
   ([page-src url]
      (weak-pagination-detector page-src url (set [])))
 
@@ -294,6 +302,12 @@
                                                   xp-toks))))])
                                  pagination-cands)
 
-           picked-xpath         (pick-paginator-weakest pagination-token-ds)]
+           picked-xpath         (pick-paginator-weakest pagination-token-ds)
+
+           picked-links         (reduce
+                                 concat
+                                 (map
+                                  #(xpaths-hrefs %)
+                                  (map first picked-xpath)))]
        
-       [picked-xpath (xpaths-hrefs picked-xpath)])))
+       [picked-xpath picked-links])))

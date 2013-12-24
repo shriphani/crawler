@@ -228,86 +228,101 @@
    Weakness = smallest # of tokens.
    Args:
     page-src : body
-    url : url
+    url-ds : url datastructure (bubbled with some info like are we paginated etc)
     blacklist : what not to get
 
    Returns:
     Pagination candidates
     (one or more xpaths)."
-  ([page-src url]
-     (weak-pagination-detector page-src url (set [])))
+  ([page-src url-ds]
+     (weak-pagination-detector page-src url-ds (set [])))
 
-  ([page-src url blacklist]
-     (let [in-host-xpaths-hrefs (state-action page-src url blacklist)
+  ([page-src url-ds blacklist]
+     (let [url (-> url-ds :url)
+           
+           paginated? (-> url-ds :pagination?)
+
+           xpaths (-> url-ds :paging-xpaths)
+
+           in-host-xpaths-hrefs (state-action page-src url blacklist)
            
            xpaths-hrefs         (into
                                  {} (map
                                      (fn [[xpath nodes]]
                                        [xpath (map #(-> % :href) nodes)])
-                                     in-host-xpaths-hrefs))
-           
-           xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)
-           
-           xpaths-scored        (sort-by second
-                                         (score-actions xpaths-tokenized))
-           
-           mean-richness        (/ (apply + (map second xpaths-scored))
-                                   (count xpaths-scored))
-           
-           xpaths-considered    (map
-                                 (fn [[xpath _]]
-                                   [xpath (xpaths-hrefs xpath)])
-                                 (filter
-                                  (fn [[xpath score]]
-                                    (< score mean-richness))
-                                  xpaths-scored))
-           
-           xpaths-samples       (map
-                                 (fn [[xpath links]]
-                                   [xpath (sample/sample-some-links links blacklist)])
-                                 xpaths-considered)
-           
-           xpaths-samples-map   (into {} xpaths-samples)
-           
-           pagination-cands     (map
-                                 first
-                                 (filter
-                                  #(pagination? page-src %)
-                                  xpaths-samples))
-           
-           pagination-xhref-ds  (map
-                                 (fn [an-xpath]
-                                   [an-xpath
-                                    (map (fn [a-sample]
-                                           (into
-                                            {} (map
-                                                (fn [[xpath nodes]]
-                                                  [xpath (map #(-> % :href) nodes)])
-                                                (dom/xpaths-hrefs-tokens
-                                                 (dom/html->xml-doc a-sample)
-                                                 url))))
-                                         (xpaths-samples-map an-xpath))])
-                                 pagination-cands)
+                                     in-host-xpaths-hrefs))]
+       (if-not paginated?
+         (let [xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)
+               
+               xpaths-scored        (sort-by second
+                                             (score-actions xpaths-tokenized))
+               
+               mean-richness        (/ (apply + (map second xpaths-scored))
+                                       (count xpaths-scored))
+               
+               xpaths-considered    (map
+                                     (fn [[xpath _]]
+                                       [xpath (xpaths-hrefs xpath)])
+                                     (filter
+                                      (fn [[xpath score]]
+                                        (< score mean-richness))
+                                      xpaths-scored))
+               
+               xpaths-samples       (map
+                                     (fn [[xpath links]]
+                                       [xpath (sample/sample-some-links links blacklist)])
+                                     xpaths-considered)
+               
+               xpaths-samples-map   (into {} xpaths-samples)
+               
+               pagination-cands     (map
+                                     first
+                                     (filter
+                                      #(pagination? page-src %)
+                                      xpaths-samples))
+               
+               pagination-xhref-ds  (map
+                                     (fn [an-xpath]
+                                       [an-xpath
+                                        (map (fn [a-sample]
+                                               (into
+                                                {} (map
+                                                    (fn [[xpath nodes]]
+                                                      [xpath (map #(-> % :href) nodes)])
+                                                    (dom/xpaths-hrefs-tokens
+                                                     (dom/html->xml-doc a-sample)
+                                                     url))))
+                                             (xpaths-samples-map an-xpath))])
+                                     pagination-cands)
 
-           pagination-token-ds  (map
-                                 (fn [an-xpath]
-                                   [an-xpath (let [xp-toks (xpaths-tokenized an-xpath)]
-                                               (sort-by
-                                                count
-                                                (reduce
-                                                 clojure.set/union
-                                                 (map
-                                                  (fn [a-tok-map]
-                                                    (:text-tokens a-tok-map))
-                                                  xp-toks))))])
-                                 pagination-cands)
+               pagination-token-ds  (map
+                                     (fn [an-xpath]
+                                       [an-xpath (let [xp-toks (xpaths-tokenized an-xpath)]
+                                                   (sort-by
+                                                    count
+                                                    (reduce
+                                                     clojure.set/union
+                                                     (map
+                                                      (fn [a-tok-map]
+                                                        (:text-tokens a-tok-map))
+                                                      xp-toks))))])
+                                     pagination-cands)
 
-           picked-xpath         (pick-paginator-weakest pagination-token-ds)
+               picked-xpath         (pick-paginator-weakest pagination-token-ds)
 
-           picked-links         (reduce
-                                 concat
-                                 (map
-                                  #(xpaths-hrefs %)
-                                  (map first picked-xpath)))]
-       
-       [picked-xpath picked-links])))
+               picked-links         (reduce
+                                     concat
+                                     (map
+                                      #(xpaths-hrefs %)
+                                      (map first picked-xpath)))]
+           
+           [picked-xpath (distinct picked-links)])
+
+         ;else just eval the submitted xpaths and deliver ze results
+         (let [picked-xpath xpaths
+               picked-links (reduce
+                             concat
+                             (map
+                              #(xpaths-hrefs %)
+                              (map first picked-xpath)))]
+           [picked-xpath (distinct picked-links)])))))

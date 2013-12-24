@@ -32,29 +32,35 @@
     (let [url        (-> queue first :url)
           body       (-> url client/get :body)
           decision   (extractor/extract-richest body url visited)
+          xpaths     (:xpaths decision)
           links      (:links decision)
           score      (:action-score decision)]
       (do
         (if (< (* 0.75 (/ sum-score num-decisions)) score)
-          (let [pagination-l (second
-                              (extractor/weak-pagination-detector
-                               body
-                               url
-                               (concat visited queue)))
+          (let [paging-decis (extractor/weak-pagination-detector
+                              body
+                              (first queue)
+                              (concat visited queue))
+                pagination-l (second paging-decis)
 
                 new-queue    (do
                                (println :links links)
-                               (println :pagination pagination-l)
+                               (println :pagination paging-decis)
                                (println)
-                               (concat (map #({:url %
-                                               :pagination? true}) pagination-l)
+                               (concat (map (fn [a-link]
+                                              {:url a-link
+                                               :pagination? true
+                                               :content-xpaths xpaths
+                                               :paging-xpaths (first paging-decis)}) ; xpaths are what we picked on this page. no need to re-learn anything
+                                            pagination-l)
                                        (rest queue)
                                        (map
-                                        #({:url %})
+                                        (fn [x] {:url x})
                                         (filter
                                          (fn [a-link]
                                            (and (not (some #{a-link} visited))
-                                                (not (some #{a-link} (set (map #(-> % :url) queue))))))
+                                                (not (some #{a-link} (set
+                                                                      (map #(-> % :url) queue))))))
                                          links))))
                 new-visited  (conj visited url)
                 new-num-dec  (inc num-decisions)

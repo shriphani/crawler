@@ -130,47 +130,73 @@
 
 (defn extract-above-average-richest
   "Extract above-average richness XPaths"
-  ([page-src url]
-     (extract-above-average-richest page-src url (set [])))
+  ([page-src url-ds]
+     (extract-above-average-richest page-src url-ds (set [])))
 
-  ([page-src url blacklist]
-     (let [in-host-xpaths-hrefs (state-action page-src url blacklist)
+  ([page-src url-ds blacklist]
+     (let [url        (:url url-ds)
+           paginated? (-> url-ds :pagination?)
+           in-host-xpaths-hrefs (state-action page-src url blacklist)
            xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)
-           xpaths-scored        (score-actions xpaths-tokenized)
-           mean-richness        (/ (apply + (map second xpaths-scored))
-                                   (count xpaths-scored))
-
-           ; return xpaths and scores of items who clocked above the
-           ; mean richness of the webpage
-           
-           decision             (filter
-                                 (fn [[xpath score]]
-                                   (>= score mean-richness))
-                                 (reverse
-                                  (sort-by second xpaths-scored)))
-
-           ; links at the chosen XPaths
-           decision-links       (flatten
-                                 (map
-                                  (fn [[a-decision score]]
-                                    (map
-                                     #(-> % :href)
-                                     (in-host-xpaths-hrefs a-decision)))
-                                  decision))
-
-           ; this guy is computing the score products of the decisions alone
-           decision-scores      (/ (reduce
-                                    (fn [acc [a-decision score]]
-                                      (+ acc score))
-                                    0
-                                    decision)
-                                   (count decision))]
-       (do
-         (println :url url)
-         (println :decision decision)
-         {:links decision-links
-          :action-score decision-scores
-          :xpaths (map first decision)}))))
+           xpaths-scored        (score-actions xpaths-tokenized)]
+       
+       (if-not paginated?
+         (let [mean-richness        (/ (apply + (map second xpaths-scored))
+                                       (count xpaths-scored))
+               
+                                        ; return xpaths and scores of items who clocked above the
+                                        ; mean richness of the webpage
+               
+               decision             (filter
+                                     (fn [[xpath score]]
+                                       (>= score mean-richness))
+                                     (reverse
+                                      (sort-by second xpaths-scored)))
+               
+                                        ; links at the chosen XPaths
+               decision-links       (flatten
+                                     (map
+                                      (fn [[a-decision score]]
+                                        (map
+                                         #(-> % :href)
+                                         (in-host-xpaths-hrefs a-decision)))
+                                      decision))
+               
+                                        ; this guy is computing the score products of the decisions alone
+               decision-scores      (/ (reduce
+                                        (fn [acc [a-decision score]]
+                                          (+ acc score))
+                                        0
+                                        decision)
+                                       (count decision))]
+          (do
+            (println :url url)
+            (println :decision decision)
+            {:links decision-links
+             :action-score decision-scores
+             :xpaths (map first decision)}))
+         
+         (let [decision (-> url-ds :content-xpaths)
+               decision-links (flatten
+                               (map
+                                (fn [a-decision]
+                                  (map
+                                   #(-> % :href)
+                                   (in-host-xpaths-hrefs a-decision)))
+                                decision))
+               decision-scores (/ (reduce
+                                   (fn [acc a-decision]
+                                     (+ acc (xpaths-scored a-decision)))
+                                   0
+                                   decision)
+                                  (count decision))]
+           (do
+             (println :url url)
+             (println :decision decision)
+             (println "PAGINATED")
+             {:links decision-links
+              :action-score decision-scores
+              :xpaths decision}))))))
 
 (defn pagination?
   "Args:

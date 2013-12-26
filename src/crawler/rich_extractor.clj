@@ -129,7 +129,7 @@
         :action-score (xpaths-scored decision)})))
 
 (defn extract-above-average-richest
-  "Extract XPaths with above average # of tokens"
+  "Extract above-average richness XPaths"
   ([page-src url]
      (extract-above-average-richest page-src url (set [])))
 
@@ -139,11 +139,17 @@
            xpaths-scored        (score-actions xpaths-tokenized)
            mean-richness        (/ (apply + (map second xpaths-scored))
                                    (count xpaths-scored))
+
+           ; return xpaths and scores of items who clocked above the
+           ; mean richness of the webpage
+           
            decision             (filter
                                  (fn [[xpath score]]
                                    (>= score mean-richness))
                                  (reverse
                                   (sort-by second xpaths-scored)))
+
+           ; links at the chosen XPaths
            decision-links       (flatten
                                  (map
                                   (fn [[a-decision score]]
@@ -152,15 +158,19 @@
                                      (in-host-xpaths-hrefs a-decision)))
                                   decision))
 
+           ; this guy is computing the score products of the decisions alone
            decision-scores      (/ (reduce
                                     (fn [acc [a-decision score]]
                                       (+ acc score))
                                     0
                                     decision)
                                    (count decision))]
-       {:links decision-links
-        :action-score decision-scores
-        :xpaths (map first decision)})))
+       (do
+         (println :url url)
+         (println :decision decision)
+         {:links decision-links
+          :action-score decision-scores
+          :xpaths (map first decision)}))))
 
 (defn pagination?
   "Args:

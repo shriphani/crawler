@@ -96,6 +96,7 @@
                                               (not (some #{x} (set blacklist))))
                                             (xpaths-hrefs xpath)))))
                                candidates-ordered))]
+    (println candidates-ordered)
     to-sample-links))
 
 (defn score-xpaths
@@ -279,7 +280,7 @@
            
            paginated? (-> url-ds :pagination?)
 
-           xpaths (-> url-ds :paging-xpaths)
+           xpath (-> url-ds :src-xpath)
 
            in-host-xpaths-hrefs (state-action page-src url blacklist)
            
@@ -347,19 +348,15 @@
 
                picked-xpath         (pick-paginator-weakest pagination-token-ds)
 
-               picked-links         (reduce
-                                     concat
+               picked-links         (into
+                                     {}
                                      (map
-                                      #(xpaths-hrefs %)
+                                      (fn [x]
+                                        [x (xpaths-hrefs x)])
                                       (map first picked-xpath)))]
            
-           [picked-xpath (distinct picked-links)])
+           picked-links)
 
          ;else just eval the submitted xpaths and deliver ze results
-         (let [picked-xpath xpaths
-               picked-links (reduce
-                             concat
-                             (map
-                              #(xpaths-hrefs %)
-                              (map first picked-xpath)))]
-           [picked-xpath (distinct picked-links)])))))
+         (let [picked-links {xpath (xpaths-hrefs xpath)}]
+           picked-links)))))

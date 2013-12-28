@@ -154,12 +154,14 @@
                                       (sort-by second xpaths-scored)))
                
                                         ; links at the chosen XPaths
-               decision-links       (flatten
+               decision-links       (into
+                                     {}
                                      (map
                                       (fn [[a-decision score]]
-                                        (map
-                                         #(-> % :href)
-                                         (in-host-xpaths-hrefs a-decision)))
+                                        [a-decision
+                                         (map
+                                          #(-> % :href)
+                                          (in-host-xpaths-hrefs a-decision))])
                                       decision))
                
                                         ; this guy is computing the score products of the decisions alone
@@ -172,17 +174,17 @@
           (do
             (println :url url)
             (println :decision decision)
-            {:links decision-links
-             :action-score decision-scores
-             :xpaths (map first decision)}))
+            {:decision decision-links
+             :score decision-scores}))
          
          (let [decision (-> url-ds :content-xpaths)
-               decision-links (flatten
-                               (map
-                                (fn [a-decision]
-                                  (map
-                                   #(-> % :href)
-                                   (in-host-xpaths-hrefs a-decision)))
+               decision-links (into
+                               {} (map
+                                   (fn [a-decision]
+                                     [a-decision
+                                      (map
+                                       #(-> % :href)
+                                       (in-host-xpaths-hrefs a-decision))])
                                 decision))
                decision-scores (/ (reduce
                                    (fn [acc a-decision]
@@ -194,9 +196,8 @@
              (println :url url)
              (println :decision decision)
              (println "PAGINATED")
-             {:links decision-links
-              :action-score decision-scores
-              :xpaths decision}))))))
+             {:decision decision-links
+              :score decision-scores}))))))
 
 (defn pagination?
   "Args:

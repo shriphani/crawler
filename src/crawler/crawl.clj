@@ -1,12 +1,17 @@
 (ns crawler.crawl
   "Initial crawl setup"
   (:require [clj-http.client :as client]
-            [crawler.rich-extractor :as extractor]))
+            [clojure.java.io :as io]
+            [crawler.rich-extractor :as extractor])
+  (:use [clojure.pprint :only [pprint]]))
 
 
 (defn write
-  [content]
-  (println :write (content :url)))
+  [content filename]
+  (pprint
+   content
+   (io/writer
+    filename :append true)))
 
 (defn distinct-by-key
  [coll k]
@@ -76,6 +81,10 @@
       (do
         (println :total-score (/ sum-score num-decisions))
         (println :cur-page-score score)
+        (write
+         {:url url
+          :body body}
+         "crawl.json")
         (if (or paginated?
                 (< (* 0.75
                       (/ sum-score num-decisions))

@@ -276,23 +276,19 @@
      (weak-pagination-detector page-src url-ds (set [])))
 
   ([page-src url-ds blacklist]
-     (let [url (-> url-ds :url)
-           
+     (let [url        (-> url-ds :url)
            paginated? (-> url-ds :pagination?)
-
-           xpath (-> url-ds :src-xpath)
+           xpath      (-> url-ds :src-xpath)
 
            in-host-xpaths-hrefs (state-action page-src url blacklist)
-           
            xpaths-hrefs         (into
                                  {} (map
                                      (fn [[xpath nodes]]
                                        [xpath (map #(-> % :href) nodes)])
-                                     in-host-xpaths-hrefs))]
+                                     in-host-xpaths-hrefs))
+           xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)]
        (if-not paginated?
-         (let [xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)
-               
-               xpaths-scored        (sort-by second
+         (let [xpaths-scored        (sort-by second
                                              (score-actions xpaths-tokenized))
                
                mean-richness        (/ (apply + (map second xpaths-scored))
@@ -353,12 +349,22 @@
                                      (map
                                       (fn [x]
                                         [x {:links (xpaths-hrefs x)
-                                            :vocab (-> xpath (xpaths-tokenized) :text-tokens)}])
+                                            :vocab (reduce
+                                                    concat
+                                                    (map
+                                                     (fn [tok-info]
+                                                       (-> tok-info :text-tokens))
+                                                     (xpaths-tokenized x)))}])
                                       (map first picked-xpath)))]
            
            picked-links)
 
          ;else just eval the submitted xpaths and deliver ze results
          (let [picked-links {xpath {:links (xpaths-hrefs xpath)
-                                    :vocab (-> (xpaths-tokenized xpath) :text-tokens)}}]
+                                    :vocab (reduce
+                                            concat
+                                            (map
+                                             (fn [tok-info]
+                                               (-> tok-info :text-tokens))
+                                             (xpaths-tokenized xpath)))}}]
            picked-links)))))

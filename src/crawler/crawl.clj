@@ -115,7 +115,7 @@
                               (fn [[xpath info]]
                                 (:vocab info))
                               paging-dec)
-
+                
                 new-globals  (merge-with concat
                                          globals
                                          {:paging-vocab paging-vocab})
@@ -160,7 +160,7 @@
                                                     :pagination? true
                                                     :content-xpaths xpaths}))
                                                links))
-                                            paging-dec))
+                                            paging-xp-ls))
                                       :url))
 
                 

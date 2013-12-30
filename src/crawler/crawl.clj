@@ -44,29 +44,35 @@
   (if (and (not (zero? limit))
            (or (seq (-> queues :content))
                (seq (-> queues :pagination))))
-    (let [content-q  (-> queues :content)         ; holds the content queues
-          paging-q   (-> queues :pagination)      ; holds the pagination queues
+    (let [content-q   (-> queues :content)         ; holds the content queues
+          paging-q    (-> queues :pagination)      ; holds the pagination queues
           
-          queue-kw   (cond
-                      (empty? content-q)
-                      :pagination
+          queue-kw    (cond
+                       (empty? content-q)
+                       :pagination
 
-                      (empty? paging-q)
-                      :content
+                       (empty? paging-q)
+                       :content
 
-                      :else
-                      (if (even? (int (/ (count visited) 10)))
-                        :pagination :content))
-          queue      (queues queue-kw)
-          
-          url        (-> queue first :url)
-          body       (-> url client/get :body)
-          paginated? (-> queue first :pagination?)
-          extracted  (extractor/extract-above-average-richest
-                      body (first queue) (clojure.set/union visited queue))
-          decision   (:decision extracted)
-          xpaths     (map first decision)
-          score      (:score extracted)]
+                       :else
+                       (if (even? (int (/ (count visited) 10)))
+                         :pagination :content))
+
+          queue       (queues queue-kw)
+
+          url         (-> queue first :url)
+          body        (-> url client/get :body)
+          new-visited (conj visited url)
+          paginated?  (-> queue first :pagination?)
+
+          ;; extract from whatever needs extracting
+          extracted   (extractor/extract-above-average-richest
+                       body
+                       (first queue)
+                       (clojure.set/union visited queue))
+          decision    (:decision extracted)
+          xpaths      (map first decision)
+          score       (:score extracted)]
       (do
         (println :total-score (/ sum-score num-decisions))
         (println :cur-page-score score)
@@ -75,7 +81,7 @@
                       (/ sum-score num-decisions))
                    score))
           
-          (let [; the decision made by the pagination component
+          (let [;; the decision made by the pagination component
                 paging-dec   (extractor/weak-pagination-detector
                               body
                               (first queue)
@@ -83,7 +89,8 @@
                                                  (map #(-> % :url) content-q)
                                                  (map #(-> % :url) paging-q)
                                                  [url]))
-                
+
+                ;; add to content-q if anything needs adding/removing
                 content-q'   (concat (if (= :content queue-kw)
                                        (rest content-q) content-q)
                                      (distinct-by-key
@@ -105,6 +112,7 @@
                                         decision))
                                       :url))
 
+                ;; add to paging-q if anything needs adding/removing
                 paging-q'    (concat (if (= :pagination queue-kw)
                                        (rest paging-q) paging-q)
                                      (distinct-by-key
@@ -124,7 +132,8 @@
                                                links))
                                             paging-dec))
                                       :url))
-                new-visited  (conj visited url)
+
+                
                 new-num-dec  (inc num-decisions)
                 new-scr      (+ score sum-score)
                 new-lim      (dec limit)]
@@ -142,7 +151,6 @@
                                  :pagination (rest paging-q)}
                                 {:content (rest content-q)
                                  :pagination paging-q})
-                  new-visited (conj visited url)
                   new-num-dec num-decisions
                   new-scr     sum-score
                   new-lim     (dec limit)]

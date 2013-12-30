@@ -43,9 +43,12 @@
    We have pagination and content queues.
    A decision looks like:
 
-   [XPath {:links []}]"
-  [queues visited num-decisions sum-score limit]
+   [XPath {:links []}]
+
+   globals: use this to store global info for the crawler"
+  [queues visited num-decisions sum-score limit globals]
   (Thread/sleep 2000)
+  (println globals)
   (if (and (not (zero? limit))
            (or (seq (-> queues :content))
                (seq (-> queues :pagination))))
@@ -101,6 +104,22 @@
                                                  (map #(-> % :url) paging-q)
                                                  [url]))
 
+                ;; pagination's xpath and links
+                paging-xp-ls (into
+                              {} (map
+                                  (fn [[xpath info]]
+                                    [xpath (:links info)])
+                                  paging-dec))
+
+                paging-vocab (map
+                              (fn [[xpath info]]
+                                (:vocab info))
+                              paging-dec)
+
+                new-globals  (merge-with concat
+                                         globals
+                                         {:paging-vocab paging-vocab})
+                
                 ;; add to content-q if anything needs adding/removing
                 content-q'   (concat (if (= :content queue-kw)
                                        (rest content-q) content-q)
@@ -153,7 +172,8 @@
                    new-visited
                    new-num-dec
                    new-scr
-                   new-lim))
+                   new-lim
+                   new-globals))
           (do
             (println :no-links-chosen)
             (println)
@@ -169,5 +189,6 @@
                      new-visited
                      new-num-dec
                      new-scr
-                     new-lim))))))
+                     new-lim
+                     globals))))))
     {:visited visited}))

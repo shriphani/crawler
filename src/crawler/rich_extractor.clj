@@ -352,11 +352,13 @@
                                      {}
                                      (map
                                       (fn [x]
-                                        [x (xpaths-hrefs x)])
+                                        [x {:links (xpaths-hrefs x)
+                                            :vocab (-> xpath (xpaths-tokenized) :text-tokens)}])
                                       (map first picked-xpath)))]
            
            picked-links)
 
          ;else just eval the submitted xpaths and deliver ze results
-         (let [picked-links {xpath (xpaths-hrefs xpath)}]
+         (let [picked-links {xpath {:links (xpaths-hrefs xpath)
+                                    :vocab (-> (xpaths-tokenized xpath) :text-tokens)}}]
            picked-links)))))

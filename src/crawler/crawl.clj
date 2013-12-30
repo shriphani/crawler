@@ -180,11 +180,38 @@
           (do
             (println :no-links-chosen)
             (println)
-            (let [new-queue   (if (= :pagination queue-kw)
-                                {:content content-q
-                                 :pagination (rest paging-q)}
-                                {:content (rest content-q)
-                                 :pagination paging-q})
+            (let [paging-dec   (extractor/weak-pagination-detector
+                                body
+                                (first queue)
+                                globals
+                                (clojure.set/union visited
+                                                   (map #(-> % :url) content-q)
+                                                   (map #(-> % :url) paging-q)
+                                                   [url]))
+
+                ;; pagination's xpath and links
+                  paging-xp-ls (into
+                                {} (map
+                                    (fn [[xpath info]]
+                                      [xpath (:links info)])
+                                    paging-dec))
+                  
+                  paging-vocab (reduce
+                                clojure.set/union
+                                (map
+                                 (fn [[xpath info]]
+                                   (:vocab info))
+                                 paging-dec))
+                  
+                  new-globals  (merge-with clojure.set/union
+                                         globals
+                                         {:paging-vocab paging-vocab})
+                  
+                  new-queue    (if (= :pagination queue-kw)
+                                 {:content content-q
+                                  :pagination (rest paging-q)}
+                                 {:content (rest content-q)
+                                  :pagination paging-q})
                   new-num-dec num-decisions
                   new-scr     sum-score
                   new-lim     (dec limit)]
@@ -193,5 +220,5 @@
                      new-num-dec
                      new-scr
                      new-lim
-                     globals))))))
+                     new-globals))))))
     {:visited visited}))

@@ -304,14 +304,31 @@
                                       (fn [[xpath score]]
                                         (< score mean-richness))
                                       xpaths-scored))
+
+               xpaths-considered'   (if (and vocabulary (not (empty? vocabulary)))
+                                      (filter
+                                       (fn [[xpath links]]
+                                         (let [xpath-text-tokens (reduce
+                                                                  clojure.set/union
+                                                                  (map
+                                                                   (fn [a-tok-map]
+                                                                     (set (:text-tokens a-tok-map)))
+                                                                   (xpaths-tokenized xpath)))]
+                                           (not
+                                            (empty?
+                                             (clojure.set/intersection
+                                              vocabulary xpath-text-tokens)))))
+                                       xpaths-considered)
+                                      xpaths-considered)
                
                xpaths-samples       (map
                                      (fn [[xpath links]]
                                        [xpath (sample/sample-some-links links blacklist)])
-                                     xpaths-considered)
+                                     xpaths-considered')
                
                xpaths-samples-map   (into {} xpaths-samples)
-               
+
+
                pagination-cands     (map
                                      first
                                      (filter

@@ -267,19 +267,22 @@
    Args:
     page-src : body
     url-ds : url datastructure (bubbled with some info like are we paginated etc)
+    global-info : stores some global statistics the crawler has computed.
     blacklist : what not to get
 
    Returns:
     Pagination candidates
     (one or more xpaths)."
-  ([page-src url-ds]
-     (weak-pagination-detector page-src url-ds (set [])))
+  ([page-src url-ds global-info]
+     (weak-pagination-detector page-src url-ds global-info (set [])))
 
-  ([page-src url-ds blacklist]
+  ([page-src url-ds global-info blacklist]
      (let [url        (-> url-ds :url)
            paginated? (-> url-ds :pagination?)
            xpath      (-> url-ds :src-xpath)
 
+           vocabulary (-> global-info :paging-vocab)
+           
            in-host-xpaths-hrefs (state-action page-src url blacklist)
            xpaths-hrefs         (into
                                  {} (map
@@ -350,10 +353,10 @@
                                       (fn [x]
                                         [x {:links (xpaths-hrefs x)
                                             :vocab (reduce
-                                                    concat
+                                                    clojure.set/union
                                                     (map
                                                      (fn [tok-info]
-                                                       (-> tok-info :text-tokens))
+                                                       (set (-> tok-info :text-tokens)))
                                                      (xpaths-tokenized x)))}])
                                       (map first picked-xpath)))]
            
@@ -362,9 +365,9 @@
          ;else just eval the submitted xpaths and deliver ze results
          (let [picked-links {xpath {:links (xpaths-hrefs xpath)
                                     :vocab (reduce
-                                            concat
+                                            clojure.set/union
                                             (map
                                              (fn [tok-info]
-                                               (-> tok-info :text-tokens))
+                                               (set (-> tok-info :text-tokens)))
                                              (xpaths-tokenized xpath)))}}]
            picked-links)))))

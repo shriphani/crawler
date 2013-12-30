@@ -99,6 +99,7 @@
                 paging-dec   (extractor/weak-pagination-detector
                               body
                               (first queue)
+                              globals
                               (clojure.set/union visited
                                                  (map #(-> % :url) content-q)
                                                  (map #(-> % :url) paging-q)
@@ -111,12 +112,14 @@
                                     [xpath (:links info)])
                                   paging-dec))
 
-                paging-vocab (map
-                              (fn [[xpath info]]
-                                (:vocab info))
-                              paging-dec)
+                paging-vocab (reduce
+                              clojure.set/union
+                              (map
+                               (fn [[xpath info]]
+                                 (:vocab info))
+                               paging-dec))
                 
-                new-globals  (merge-with concat
+                new-globals  (merge-with clojure.set/union
                                          globals
                                          {:paging-vocab paging-vocab})
                 

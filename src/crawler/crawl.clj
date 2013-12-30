@@ -82,8 +82,10 @@
         (println :total-score (/ sum-score num-decisions))
         (println :cur-page-score score)
         (write
-         {:url url
-          :body body}
+         {:url       url
+          :body      body
+          :src-url   (-> queue first :source)
+          :src-xpath (-> queue first :src-xpath)}
          "crawl.json")
         (if (or paginated?
                 (< (* 0.75

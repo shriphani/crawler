@@ -227,3 +227,14 @@
                      new-lim
                      new-globals))))))
     {:visited visited}))
+
+(defn crawl
+  [start crawler-type num-docs]
+  (cond (= :richness crawler-type)
+        (crawl-richest {:content [{:url start}]
+                        :pagination []}
+                       (set [])
+                       1
+                       0
+                       num-docs
+                       {})))

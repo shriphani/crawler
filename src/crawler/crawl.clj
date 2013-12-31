@@ -8,10 +8,8 @@
 
 (defn write
   [content filename]
-  (pprint
-   content
-   (io/writer
-    filename :append true)))
+  (println (-> content :url class))
+  (spit filename (with-out-str (prn content)) :append true))
 
 (defn distinct-by-key
  [coll k]
@@ -84,102 +82,109 @@
       (do
         (println :total-score (/ sum-score num-decisions))
         (println :cur-page-score score)
-        (write
-         {:url       url
-          :body      body
-          :src-url   (-> queue first :source)
-          :src-xpath (-> queue first :src-xpath)}
-         "crawl.json")
         (if (or paginated?
                 (< (* 0.75
                       (/ sum-score num-decisions))
                    score))
-          
-          (let [;; the decision made by the pagination component
-                paging-dec   (extractor/weak-pagination-detector
-                              body
-                              (first queue)
-                              globals
-                              (clojure.set/union visited
-                                                 (map #(-> % :url) content-q)
-                                                 (map #(-> % :url) paging-q)
-                                                 [url]))
+          (do
+            (write
+             {:url       url
+              :body      body
+              :src-url   (-> queue first :source)
+              :src-xpath (-> queue first :src-xpath)}
+             "crawl.json")
+            (let [ ;; the decision made by the pagination component
+                  paging-dec   (extractor/weak-pagination-detector
+                                body
+                                (first queue)
+                                globals
+                                (clojure.set/union visited
+                                                   (map #(-> % :url) content-q)
+                                                   (map #(-> % :url) paging-q)
+                                                   [url]))
+                  
+                  ;; pagination's xpath and links
+                  paging-xp-ls (into
+                                {} (map
+                                    (fn [[xpath info]]
+                                     [xpath (:links info)])
+                                    paging-dec))
+                  
+                  paging-vocab (reduce
+                                clojure.set/union
+                                (map
+                                 (fn [[xpath info]]
+                                   (:vocab info))
+                                 paging-dec))
+                  
+                  new-globals  (merge-with clojure.set/union
+                                           globals
+                                           {:paging-vocab paging-vocab})
+                  
+                  ;; add to content-q if anything needs adding/removing
+                  content-q'   (concat (if (= :content queue-kw)
+                                         (rest content-q) content-q)
+                                       (distinct-by-key
+                                        (flatten
+                                         (map
+                                          (fn [[x links]]
+                                            (filter
+                                             identity
+                                             (map
+                                              (fn [a-link]
+                                                (when-not (and (some #{a-link} visited)
+                                                               (some #{a-link}
+                                                                     (set
+                                                                      (map #(-> % :url) content-q))))
+                                                  {:url a-link
+                                                   :source url
+                                                   :src-xpath x}))
+                                              links)))
+                                          decision))
+                                        :url))
 
-                ;; pagination's xpath and links
-                paging-xp-ls (into
-                              {} (map
-                                  (fn [[xpath info]]
-                                    [xpath (:links info)])
-                                  paging-dec))
+                  ;; add to paging-q if anything needs adding/removing
+                  paging-q'    (concat (if (= :pagination queue-kw)
+                                         (rest paging-q) paging-q)
+                                       (distinct-by-key
+                                        (flatten
+                                         (map (fn [[xpath links]]
+                                                (map
+                                                 (fn [a-link]
+                                                   (when-not (and (some #{a-link} visited)
+                                                                  (some #{a-link}
+                                                                        (set
+                                                                         (map #(-> % :url) content-q))))
+                                                     {:url a-link
+                                                      :source url
+                                                      :src-xpath xpath
+                                                      :pagination? true
+                                                      :content-xpaths xpaths}))
+                                                 links))
+                                              paging-xp-ls))
+                                        :url))
 
-                paging-vocab (reduce
-                              clojure.set/union
-                              (map
-                               (fn [[xpath info]]
-                                 (:vocab info))
-                               paging-dec))
                 
-                new-globals  (merge-with clojure.set/union
-                                         globals
-                                         {:paging-vocab paging-vocab})
-                
-                ;; add to content-q if anything needs adding/removing
-                content-q'   (concat (if (= :content queue-kw)
-                                       (rest content-q) content-q)
-                                     (distinct-by-key
-                                      (flatten
-                                       (map
-                                        (fn [[x links]]
-                                          (filter
-                                           identity
-                                           (map
-                                            (fn [a-link]
-                                              (when-not (and (some #{a-link} visited)
-                                                             (some #{a-link}
-                                                                   (set
-                                                                    (map #(-> % :url) content-q))))
-                                                {:url a-link
-                                                 :source url
-                                                 :src-xpath x}))
-                                            links)))
-                                        decision))
-                                      :url))
-
-                ;; add to paging-q if anything needs adding/removing
-                paging-q'    (concat (if (= :pagination queue-kw)
-                                       (rest paging-q) paging-q)
-                                     (distinct-by-key
-                                      (flatten
-                                       (map (fn [[xpath links]]
-                                              (map
-                                               (fn [a-link]
-                                                 (when-not (and (some #{a-link} visited)
-                                                                (some #{a-link}
-                                                                      (set
-                                                                       (map #(-> % :url) content-q))))
-                                                   {:url a-link
-                                                    :source url
-                                                    :src-xpath xpath
-                                                    :pagination? true
-                                                    :content-xpaths xpaths}))
-                                               links))
-                                            paging-xp-ls))
-                                      :url))
-
-                
-                new-num-dec  (inc num-decisions)
-                new-scr      (+ score sum-score)
-                new-lim      (dec limit)]
-            (recur {:content content-q'
-                    :pagination paging-q'}
-                   new-visited
-                   new-num-dec
-                   new-scr
-                   new-lim
-                   new-globals))
+                  new-num-dec  (inc num-decisions)
+                  new-scr      (+ score sum-score)
+                  new-lim      (dec limit)]
+              (recur {:content content-q'
+                      :pagination paging-q'}
+                     new-visited
+                     new-num-dec
+                     new-scr
+                     new-lim
+                     new-globals)))
           (do
             (println :no-links-chosen)
             (println)
+            (write
+             {:url       url
+              :body      body
+              :src-url   (-> queue first :source)
+              :src-xpath (-> queue first :src-xpath)
+              :leaf?     true}
+             "crawl.json")
             (let [paging-dec   (extractor/weak-pagination-detector
                                 body
                                 (first queue)

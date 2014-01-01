@@ -388,3 +388,9 @@
                                                (set (-> tok-info :text-tokens)))
                                              (xpaths-tokenized xpath)))}}]
            picked-links)))))
+
+(defn leaf?
+  [sum-score num-decisions cur-score]
+  (>= (* 0.75
+         (/ sum-score num-decisions))
+      cur-score))

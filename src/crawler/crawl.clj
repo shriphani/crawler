@@ -2,13 +2,12 @@
   "Initial crawl setup"
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
-            [crawler.rich-extractor :as extractor])
+            [crawler.rich-extractor :as rich-extractor])
   (:use [clojure.pprint :only [pprint]]))
 
 
 (defn write
   [content filename]
-  (println (-> content :url class))
   (spit filename (with-out-str (prn content)) :append true))
 
 (defn distinct-by-key
@@ -72,20 +71,19 @@
           paginated?  (-> queue first :pagination?)
 
           ;; extract from whatever needs extracting
-          extracted   (extractor/extract-above-average-richest
+          extracted   (rich-extractor/extract-above-average-richest
                        body
                        (first queue)
                        (clojure.set/union visited queue))
           decision    (:decision extracted)
           xpaths      (map first decision)
-          score       (:score extracted)]
+          score       (:score extracted)
+          leaf?       (rich-extractor/leaf? sum-score num-decisions score)]
       (do
         (println :total-score (/ sum-score num-decisions))
         (println :cur-page-score score)
         (if (or paginated?
-                (< (* 0.75
-                      (/ sum-score num-decisions))
-                   score))
+                (not leaf?))
           (do
             (write
              {:url       url
@@ -94,7 +92,7 @@
               :src-xpath (-> queue first :src-xpath)}
              "crawl.json")
             (let [ ;; the decision made by the pagination component
-                  paging-dec   (extractor/weak-pagination-detector
+                  paging-dec   (rich-extractor/weak-pagination-detector
                                 body
                                 (first queue)
                                 globals
@@ -185,7 +183,7 @@
               :src-xpath (-> queue first :src-xpath)
               :leaf?     true}
              "crawl.json")
-            (let [paging-dec   (extractor/weak-pagination-detector
+            (let [paging-dec   (rich-extractor/weak-pagination-detector
                                 body
                                 (first queue)
                                 globals

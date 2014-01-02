@@ -20,7 +20,8 @@
   [page-src]
   (let [cleaner (new HtmlCleaner)
         props   (.getProperties cleaner)
-        _       (.setPruneTags props "script")]
+        _       (.setPruneTags props "script, style")
+        _       (.setOmitComments props true)]
     (.clean cleaner page-src)))
 
 (defn anchor-tags

@@ -282,6 +282,13 @@ id and class tag constraints are also added"
                                               (.getValue))
                                           "nofollow")
                                     (catch NullPointerException e true))
+                                  
+                                  (= (-> a-tag
+                                         (.getAttributes)
+                                         (.getNamedItem "href")
+                                         (.getValue)
+                                         uri/host)
+                                     (uri/host url))
                                   (not= (uri/scheme (-> a-tag
                                                         (.getAttributes)
                                                         (.getNamedItem "href")

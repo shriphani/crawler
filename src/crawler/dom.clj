@@ -283,12 +283,6 @@ id and class tag constraints are also added"
                                           "nofollow")
                                     (catch NullPointerException e true))
                                   
-                                  (= (-> a-tag
-                                         (.getAttributes)
-                                         (.getNamedItem "href")
-                                         (.getValue)
-                                         uri/host)
-                                     (uri/host url))
                                   (not= (uri/scheme (-> a-tag
                                                         (.getAttributes)
                                                         (.getNamedItem "href")
@@ -305,19 +299,22 @@ id and class tag constraints are also added"
 
            nodes-xpaths   (map vector
                                xpaths-a-tags
-                               (map
+                               (filter
                                 (fn [x]
-                                  (let [link (-> x
-                                                 (.getAttributes)
-                                                 (.getNamedItem "href")
-                                                 (.getValue))]
-                                    {:node x
-                                     :href (try (uri/fragment
-                                                 (uri/resolve-uri url link) nil)
-                                                (catch Exception e nil))
-                                     :text (-> x
-                                               (.getTextContent))}))
-                                a-tags-w-hrefs))]
+                                  (= (uri/host url) (-> x :href uri/host)))
+                                (map
+                                 (fn [x]
+                                   (let [link (-> x
+                                                  (.getAttributes)
+                                                  (.getNamedItem "href")
+                                                  (.getValue))]
+                                     {:node x
+                                      :href (try (uri/fragment
+                                                  (uri/resolve-uri url link) nil)
+                                                 (catch Exception e nil))
+                                      :text (-> x
+                                                (.getTextContent))}))
+                                 a-tags-w-hrefs)))]
 
        (reduce
         (fn [acc [an-xpath node]]

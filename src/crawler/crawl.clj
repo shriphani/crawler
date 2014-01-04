@@ -1,12 +1,24 @@
 (ns crawler.crawl
   "Initial crawl setup"
   (:require [clj-http.client :as client]
-            [crawler.rich-extractor :as extractor]))
+            [clojure.java.io :as io]
+            [crawler.rich-extractor :as rich-extractor])
+  (:use [clojure.pprint :only [pprint]]))
 
 
 (defn write
-  [content]
-  (println :write (content :url)))
+  [content filename]
+  (spit filename (with-out-str (prn content)) :append true))
+
+(defn distinct-by-key
+ [coll k]
+ (reduce
+  (fn [acc v]
+    (if (some #{(v k)} (set (map #(k %) acc)))
+      acc
+      (cons v acc)))
+  []
+  coll))
 
 (defn crawl-richest
   "Main crawl routine
@@ -18,110 +30,209 @@
    Representation for content XPath is important. What kind
    of representation to use? Target-cluster?
 
-   Queue looks like: [{:url <url>
+   A queue looks like: [{:url <url>
                       :content-decision <content-xpath>
                       :pag-decision <pag-xpath>
                       :paginated?}
                       .
                       .
                       .]
-   misc: {:num-pages-to-max ..}. Number of pages to follow overall.
-   what is the base idea."
-  [queue visited num-decisions sum-score limit options]
+   We have pagination and content queues.
+   A decision looks like:
+
+   [XPath {:links []}]
+
+   globals: use this to store global info for the crawler"
+  [queues visited num-decisions sum-score limit globals]
   (Thread/sleep 2000)
+  (println globals)
   (if (and (not (zero? limit))
-           (seq queue))
-    (let [url        (-> queue first :url)
-          body       (-> url client/get :body)
-          paginated? (-> queue first :pagination?)
-          p-thus-far (-> options :pagination)
-          decision   (extractor/extract-above-average-richest
-                      body url (clojure.set/union visited queue))
-          xpaths     (:xpaths decision)
-          links      (:links decision)
-          score      (:action-score decision)]
+           (or (seq (-> queues :content))
+               (seq (-> queues :pagination))))
+    (let [content-q   (-> queues :content)         ; holds the content queues
+          paging-q    (-> queues :pagination)      ; holds the pagination queues
+          
+          queue-kw    (cond
+                       (empty? content-q)
+                       :pagination
+
+                       (empty? paging-q)
+                       :content
+
+                       :else
+                       (if (even? (int (/ (count visited) 10)))
+                         :pagination :content))
+
+          queue       (queues queue-kw)
+
+          url         (-> queue first :url)
+          body        (-> url client/get :body)
+          new-visited (conj visited url)
+          paginated?  (-> queue first :pagination?)
+
+          ;; extract from whatever needs extracting
+          extracted   (rich-extractor/extract-above-average-richest
+                       body
+                       (first queue)
+                       (clojure.set/union visited queue))
+          decision    (:decision extracted)
+          xpaths      (map first decision)
+          score       (:score extracted)
+          leaf?       (rich-extractor/leaf? sum-score num-decisions score)]
       (do
         (println :total-score (/ sum-score num-decisions))
         (println :cur-page-score score)
-        (if (< (* 0.75 (/ sum-score num-decisions)) score)
-          (let [paging-decis (extractor/weak-pagination-detector
-                              body
-                              (first queue)
-                              (clojure.set/union visited queue))
-                pagination-l (second paging-decis)
-
-                new-queue    (if (<= (-> options :pagination) 10) ; switch order of insertion at 10 urls
-                               (do
-                                 (println :links links)
-                                 (println :pagination paging-decis)
-                                 (println)
-                                 (concat (map
-                                          (fn [a-link]
-                                            {:url a-link
-                                             :pagination? true
-                                             :content-xpaths xpaths
-                                             :paging-xpaths (first paging-decis)}) ; xpaths are what we picked on this page. no need to re-learn anything
-                                          pagination-l)
-                                         (rest queue)
+        (if (or paginated?
+                (not leaf?))
+          (do
+            (write
+             {:url       url
+              :body      body
+              :src-url   (-> queue first :source)
+              :src-xpath (-> queue first :src-xpath)}
+             "crawl.json")
+            (let [ ;; the decision made by the pagination component
+                  paging-dec   (rich-extractor/weak-pagination-detector
+                                body
+                                (first queue)
+                                globals
+                                (clojure.set/union visited
+                                                   (map #(-> % :url) content-q)
+                                                   (map #(-> % :url) paging-q)
+                                                   [url]))
+                  
+                  ;; pagination's xpath and links
+                  paging-xp-ls (into
+                                {} (map
+                                    (fn [[xpath info]]
+                                     [xpath (:links info)])
+                                    paging-dec))
+                  
+                  paging-vocab (reduce
+                                clojure.set/union
+                                (map
+                                 (fn [[xpath info]]
+                                   (:vocab info))
+                                 paging-dec))
+                  
+                  new-globals  (merge-with clojure.set/union
+                                           globals
+                                           {:paging-vocab paging-vocab})
+                  
+                  ;; add to content-q if anything needs adding/removing
+                  content-q'   (concat (if (= :content queue-kw)
+                                         (rest content-q) content-q)
+                                       (distinct-by-key
+                                        (flatten
                                          (map
-                                          (fn [x] {:url x})
-                                          (filter
-                                           (fn [a-link]
-                                             (and (not (some #{a-link} visited))
-                                                  (not (some #{a-link} (set
-                                                                        (map #(-> % :url) queue))))))
-                                           links))))
-                               (do
-                                 (println :links links)
-                                 (println :pagination paging-decis)
-                                 (println)
-                                 (concat
-                                  (rest queue)
-                                  (map
-                                   (fn [x] {:url x})
-                                   (filter
-                                    (fn [a-link]
-                                      (and (not (some #{a-link}
-                                                      visited))
-                                           (not (some #{a-link}
-                                                      (set
-                                                       (map #(-> % :url) queue))))))
-                                           links))
-                                  (map (fn [a-link]
-                                         {:url a-link
-                                          :pagination? true
-                                          :content-xpaths xpaths
-                                          :paging-xpaths (first paging-decis)}) ; xpaths are what we picked on this page. no need to re-learn anything
-                                       pagination-l))))
-                new-visited  (conj visited url)
-                new-num-dec  (inc num-decisions)
-                new-scr      (+ score sum-score)
-                new-lim      (dec limit)
-                new-opt      (if paginated?
-                               (merge
-                                options
-                                {:pagination (+ (-> options :pagination) 1)})
-                               (merge options {:pagination 0}))]
-            (recur new-queue
-                   new-visited
-                   new-num-dec
-                   new-scr
-                   new-lim
-                   new-opt))
+                                          (fn [[x links]]
+                                            (filter
+                                             identity
+                                             (map
+                                              (fn [a-link]
+                                                (when-not (and (some #{a-link} visited)
+                                                               (some #{a-link}
+                                                                     (set
+                                                                      (map #(-> % :url) content-q))))
+                                                  {:url a-link
+                                                   :source url
+                                                   :src-xpath x}))
+                                              links)))
+                                          decision))
+                                        :url))
+
+                  ;; add to paging-q if anything needs adding/removing
+                  paging-q'    (concat (if (= :pagination queue-kw)
+                                         (rest paging-q) paging-q)
+                                       (distinct-by-key
+                                        (flatten
+                                         (map (fn [[xpath links]]
+                                                (map
+                                                 (fn [a-link]
+                                                   (when-not (and (some #{a-link} visited)
+                                                                  (some #{a-link}
+                                                                        (set
+                                                                         (map #(-> % :url) content-q))))
+                                                     {:url a-link
+                                                      :source url
+                                                      :src-xpath xpath
+                                                      :pagination? true
+                                                      :content-xpaths xpaths}))
+                                                 links))
+                                              paging-xp-ls))
+                                        :url))
+
+                
+                  new-num-dec  (inc num-decisions)
+                  new-scr      (+ score sum-score)
+                  new-lim      (dec limit)]
+              (recur {:content content-q'
+                      :pagination paging-q'}
+                     new-visited
+                     new-num-dec
+                     new-scr
+                     new-lim
+                     new-globals)))
           (do
             (println :no-links-chosen)
             (println)
-                                        ; pagination must still be chosen though
-            (let [new-queue   (rest queue)
-                  new-visited (conj visited url)
+            (write
+             {:url       url
+              :body      body
+              :src-url   (-> queue first :source)
+              :src-xpath (-> queue first :src-xpath)
+              :leaf?     true}
+             "crawl.json")
+            (let [paging-dec   (rich-extractor/weak-pagination-detector
+                                body
+                                (first queue)
+                                globals
+                                (clojure.set/union visited
+                                                   (map #(-> % :url) content-q)
+                                                   (map #(-> % :url) paging-q)
+                                                   [url]))
+
+                ;; pagination's xpath and links
+                  paging-xp-ls (into
+                                {} (map
+                                    (fn [[xpath info]]
+                                      [xpath (:links info)])
+                                    paging-dec))
+                  
+                  paging-vocab (reduce
+                                clojure.set/union
+                                (map
+                                 (fn [[xpath info]]
+                                   (:vocab info))
+                                 paging-dec))
+                  
+                  new-globals  (merge-with clojure.set/union
+                                         globals
+                                         {:paging-vocab paging-vocab})
+                  
+                  new-queue    (if (= :pagination queue-kw)
+                                 {:content content-q
+                                  :pagination (rest paging-q)}
+                                 {:content (rest content-q)
+                                  :pagination paging-q})
                   new-num-dec num-decisions
                   new-scr     sum-score
-                  new-lim     (dec limit)
-                  new-opt     options]
+                  new-lim     (dec limit)]
               (recur new-queue
                      new-visited
                      new-num-dec
                      new-scr
                      new-lim
-                     new-opt))))))
+                     new-globals))))))
     {:visited visited}))
+
+(defn crawl
+  [start crawler-type num-docs]
+  (cond (= :richness crawler-type)
+        (crawl-richest {:content [{:url start}]
+                        :pagination []}
+                       (set [])
+                       1
+                       0
+                       num-docs
+                       {})))

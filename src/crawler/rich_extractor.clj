@@ -96,6 +96,7 @@
                                               (not (some #{x} (set blacklist))))
                                             (xpaths-hrefs xpath)))))
                                candidates-ordered))]
+    (println candidates-ordered)
     to-sample-links))
 
 (defn score-xpaths
@@ -154,12 +155,14 @@
                                       (sort-by second xpaths-scored)))
                
                                         ; links at the chosen XPaths
-               decision-links       (flatten
+               decision-links       (into
+                                     {}
                                      (map
                                       (fn [[a-decision score]]
-                                        (map
-                                         #(-> % :href)
-                                         (in-host-xpaths-hrefs a-decision)))
+                                        [a-decision
+                                         (map
+                                          #(-> % :href)
+                                          (in-host-xpaths-hrefs a-decision))])
                                       decision))
                
                                         ; this guy is computing the score products of the decisions alone
@@ -172,17 +175,17 @@
           (do
             (println :url url)
             (println :decision decision)
-            {:links decision-links
-             :action-score decision-scores
-             :xpaths (map first decision)}))
+            {:decision decision-links
+             :score decision-scores}))
          
          (let [decision (-> url-ds :content-xpaths)
-               decision-links (flatten
-                               (map
-                                (fn [a-decision]
-                                  (map
-                                   #(-> % :href)
-                                   (in-host-xpaths-hrefs a-decision)))
+               decision-links (into
+                               {} (map
+                                   (fn [a-decision]
+                                     [a-decision
+                                      (map
+                                       #(-> % :href)
+                                       (in-host-xpaths-hrefs a-decision))])
                                 decision))
                decision-scores (/ (reduce
                                    (fn [acc a-decision]
@@ -194,9 +197,8 @@
              (println :url url)
              (println :decision decision)
              (println "PAGINATED")
-             {:links decision-links
-              :action-score decision-scores
-              :xpaths decision}))))))
+             {:decision decision-links
+              :score decision-scores}))))))
 
 (defn pagination?
   "Args:
@@ -265,32 +267,31 @@
    Args:
     page-src : body
     url-ds : url datastructure (bubbled with some info like are we paginated etc)
+    global-info : stores some global statistics the crawler has computed.
     blacklist : what not to get
 
    Returns:
     Pagination candidates
     (one or more xpaths)."
-  ([page-src url-ds]
-     (weak-pagination-detector page-src url-ds (set [])))
+  ([page-src url-ds global-info]
+     (weak-pagination-detector page-src url-ds global-info (set [])))
 
-  ([page-src url-ds blacklist]
-     (let [url (-> url-ds :url)
-           
+  ([page-src url-ds global-info blacklist]
+     (let [url        (-> url-ds :url)
            paginated? (-> url-ds :pagination?)
+           xpath      (-> url-ds :src-xpath)
 
-           xpaths (-> url-ds :paging-xpaths)
-
-           in-host-xpaths-hrefs (state-action page-src url blacklist)
+           vocabulary (-> global-info :paging-vocab)
            
+           in-host-xpaths-hrefs (state-action page-src url blacklist)
            xpaths-hrefs         (into
                                  {} (map
                                      (fn [[xpath nodes]]
                                        [xpath (map #(-> % :href) nodes)])
-                                     in-host-xpaths-hrefs))]
+                                     in-host-xpaths-hrefs))
+           xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)]
        (if-not paginated?
-         (let [xpaths-tokenized     (tokenize-actions in-host-xpaths-hrefs)
-               
-               xpaths-scored        (sort-by second
+         (let [xpaths-scored        (sort-by second
                                              (score-actions xpaths-tokenized))
                
                mean-richness        (/ (apply + (map second xpaths-scored))
@@ -303,14 +304,31 @@
                                       (fn [[xpath score]]
                                         (< score mean-richness))
                                       xpaths-scored))
+
+               xpaths-considered'   (if (and vocabulary (not (empty? vocabulary)))
+                                      (filter
+                                       (fn [[xpath links]]
+                                         (let [xpath-text-tokens (reduce
+                                                                  clojure.set/union
+                                                                  (map
+                                                                   (fn [a-tok-map]
+                                                                     (set (:text-tokens a-tok-map)))
+                                                                   (xpaths-tokenized xpath)))]
+                                           (not
+                                            (empty?
+                                             (clojure.set/intersection
+                                              vocabulary xpath-text-tokens)))))
+                                       xpaths-considered)
+                                      xpaths-considered)
                
                xpaths-samples       (map
                                      (fn [[xpath links]]
                                        [xpath (sample/sample-some-links links blacklist)])
-                                     xpaths-considered)
+                                     xpaths-considered')
                
                xpaths-samples-map   (into {} xpaths-samples)
-               
+
+
                pagination-cands     (map
                                      first
                                      (filter
@@ -346,19 +364,33 @@
 
                picked-xpath         (pick-paginator-weakest pagination-token-ds)
 
-               picked-links         (reduce
-                                     concat
+               picked-links         (into
+                                     {}
                                      (map
-                                      #(xpaths-hrefs %)
+                                      (fn [x]
+                                        [x {:links (xpaths-hrefs x)
+                                            :vocab (reduce
+                                                    clojure.set/union
+                                                    (map
+                                                     (fn [tok-info]
+                                                       (set (-> tok-info :text-tokens)))
+                                                     (xpaths-tokenized x)))}])
                                       (map first picked-xpath)))]
            
-           [picked-xpath (distinct picked-links)])
+           picked-links)
 
          ;else just eval the submitted xpaths and deliver ze results
-         (let [picked-xpath xpaths
-               picked-links (reduce
-                             concat
-                             (map
-                              #(xpaths-hrefs %)
-                              (map first picked-xpath)))]
-           [picked-xpath (distinct picked-links)])))))
+         (let [picked-links {xpath {:links (xpaths-hrefs xpath)
+                                    :vocab (reduce
+                                            clojure.set/union
+                                            (map
+                                             (fn [tok-info]
+                                               (set (-> tok-info :text-tokens)))
+                                             (xpaths-tokenized xpath)))}}]
+           picked-links)))))
+
+(defn leaf?
+  [sum-score num-decisions cur-score]
+  (>= (* 0.75
+         (/ sum-score num-decisions))
+      cur-score))

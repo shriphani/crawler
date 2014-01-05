@@ -268,7 +268,7 @@ id and class tag constraints are also added"
   
   ([a-processed-page url blacklist]
      (let [a-tags         ($x:node+ ".//a" a-processed-page) ; anchor tags
-
+           
            a-tags-w-hrefs (filter
                                         ; the node must have a href
                            (fn [a-tag]
@@ -294,9 +294,9 @@ id and class tag constraints are also added"
                                                    (.getValue))}
                                              (set blacklist)))))
                            a-tags)
-
+           
            xpaths-a-tags  (map #(-> % xpath-to-node first) a-tags-w-hrefs)
-
+           
            nodes-xpaths   (map vector
                                xpaths-a-tags
                                (filter
@@ -315,10 +315,10 @@ id and class tag constraints are also added"
                                       :text (-> x
                                                 (.getTextContent))}))
                                  a-tags-w-hrefs)))]
-
+       
        (reduce
         (fn [acc [an-xpath node]]
-          (merge-with concat acc {an-xpath [node]})) {} nodes-xpaths))))
+          (merge-with clojure.set/union acc {an-xpath (set [node])})) {} nodes-xpaths))))
 
 (defn minimum-maximal-xpath-set-processed
   "This helper routine exists so we don't reparse

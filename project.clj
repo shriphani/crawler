@@ -24,4 +24,4 @@
                  [org.clojure/tools.logging "0.2.6"]
                  [org.bovinegenius/exploding-fish "0.3.3"]]
   :main crawler.test-system
-  :jvm-opts ["-Xmx3g"])
+  :jvm-opts ["-Xmx5g"])

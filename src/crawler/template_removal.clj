@@ -7,19 +7,19 @@
 (def my-cs (cookies/cookie-store))
 
 (defn look-at
-  ([a-link]
-     (look-at a-link (set [])))
+  ([a-link cookie]
+     (look-at a-link cookie (set [])))
 
-  ([a-link blacklist]
-     (try (let [body  (-> a-link (client/get {:cookie-store my-cs}) :body)]
+  ([a-link cookie blacklist]
+     (try (let [body  (-> a-link (client/get {:cookie-store cookie}) :body)]
             (extractor/state-action body a-link blacklist))
           (catch Exception e nil))))
 
 (defn all-xpaths
-  ([page-src url]
-     (all-xpaths page-src url (set [])))
+  ([page-src url cookie]
+     (all-xpaths page-src url (set []) cookie))
 
-  ([page-src url blacklist]
+  ([page-src url blacklist cookie]
      (let [infos   (extractor/state-action page-src url blacklist)
 
            samples          (reduce
@@ -46,7 +46,7 @@
                                                     (map (fn [x]
                                                            (do
                                                              (Thread/sleep 2000)
-                                                             (look-at x))) l))
+                                                             (look-at x cookie (set [])))) l))
                                      
                                      action-space-map (into
                                                        {}

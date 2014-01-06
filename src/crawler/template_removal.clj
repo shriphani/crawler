@@ -6,21 +6,12 @@
 
 (def my-cs (cookies/cookie-store))
 
-(defn look-at-cookie
-  ([a-link]
-     (look-at a-link (set [])))
-
-  ([a-link blacklist]
-     (try (let [body  (-> a-link (client/get {:cookie-store my-cs}) :body)]
-            (extractor/state-action body a-link blacklist))
-          (catch Exception e nil))))
-
 (defn look-at
   ([a-link]
      (look-at a-link (set [])))
 
   ([a-link blacklist]
-     (try (let [body  (-> a-link (client/get) :body)]
+     (try (let [body  (-> a-link (client/get {:cookie-store my-cs}) :body)]
             (extractor/state-action body a-link blacklist))
           (catch Exception e nil))))
 

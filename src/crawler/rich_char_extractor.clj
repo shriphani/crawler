@@ -41,13 +41,12 @@
            xpath-nav-info       (map
                                  (fn [[xpath info]]
                                    {:xpath xpath
-                                    :score (double
-                                            (/ (reduce
-                                                (fn [acc an-info]
-                                                  (+ acc (:num-chars an-info)))
-                                                0
-                                                info)
-                                               page-wide-nav-chars))
+                                    :score (reduce
+                                            (fn [acc an-info]
+                                              (+ acc (:num-chars an-info)))
+                                            0
+                                            info)
+                                    
                                     :hrefs (reduce
                                             (fn [acc an-info]
                                               (cons (:href an-info) acc))

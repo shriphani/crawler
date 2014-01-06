@@ -20,10 +20,6 @@
   []
   coll))
 
-(declare extractor) ; the extraction module must be assigned before
-                                        ; crawl is called
-(declare )
-
 (defn crawl-richest
   "Main crawl routine
    First, order all the links by their exploration potential.

@@ -2,7 +2,9 @@
   "Initial crawl setup"
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
-            [crawler.rich-extractor :as rich-extractor])
+            [crawler.rich-extractor :as rich-extractor]
+            [crawler.template-removal :as template-removal]
+            [clj-http.cookies :as cookies])
   (:use [clojure.pprint :only [pprint]]))
 
 
@@ -225,6 +227,19 @@
                      new-lim
                      new-globals))))))
     {:visited visited}))
+
+(def my-cs (cookies/cookie-store)) ; for removing that SID nonsense
+
+(defn download-with-cookie
+  [a-link]
+  (try (-> a-link (client/get {:cookie-store my-cs}) :body)
+       (catch Exception e nil)))
+
+(defn crawl-informative
+  [start]
+  (let [start-body   (download-with-cookie start)
+        to-eliminate (template-removal/all-xpaths start-body start my-cs)]
+    to-eliminate))
 
 (defn crawl
   [start crawler-type num-docs]

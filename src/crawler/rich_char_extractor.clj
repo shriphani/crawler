@@ -4,7 +4,9 @@
 
 (defn leaf?
   [src-num target-num]
-  (<= 0.5 (/ target-num src-num)))
+  (and
+   (-> src-num nil? not)
+   (<= 0.5 (/ target-num src-num))))
 
 (defn state-action
   "Args:
@@ -33,7 +35,7 @@
                                                (not (some #{href} template-links)))
                                              infos)]))
                                  xpaths-hrefs-text)
-           
+
            xpaths-anchors-chars (map
                                  (fn [[xpath nodes]]
                                    [xpath (map
@@ -71,14 +73,14 @@
                                                (+ acc (:num-chars an-info)))
                                              0
                                              info)
-                                    
+
                                      :hrefs (reduce
                                              (fn [acc an-info]
                                                (cons (:href an-info) acc))
                                              '()
                                              info)})
                                   xpaths-anchors-chars))]
-       
+
        {:total-nav-info page-wide-nav-chars
         :xpath-nav-info (sort-by :score xpath-nav-info)})))
 

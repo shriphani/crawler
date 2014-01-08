@@ -2,6 +2,10 @@
   "Character based extraction as opposed to token based extraction"
   (require [crawler.dom :as dom]))
 
+(defn leaf?
+  [src-num target-num]
+  (<= 0.5 (/ target-num src-num)))
+
 (defn state-action
   "Args:
     page-src : the body

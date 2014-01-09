@@ -310,77 +310,81 @@
        (sample-sitemap [{:url start}] (set []) to-eliminate [])))
 
   ([queue visited to-eliminate leaf-paths]
-     (do
-       (Thread/sleep 1000)
-       (println :url (-> queue first :url))
-       (println :src-ulr (-> queue first :src-url))
-       (println :src-xpath (-> queue first :src-xpath))
-       (println :score-seq (-> queue first :src-nav-num))
-       (let [url     (-> queue first :url)
-             src-xp  (-> queue first :src-xpath)
-             src-nav-num (-> queue first :src-nav-num)
-             body    (download-with-cookie url)
+     (if (seq queue)
+      (do
+        (Thread/sleep 1000)
+        (println :url (-> queue first :url))
+        (println :src-ulr (-> queue first :src-url))
+        (println :src-xpath (-> queue first :src-xpath))
+        (println :score-seq (-> queue first :src-nav-num))
+        (let [url     (-> queue first :url)
+              src-xp  (-> queue first :src-xpath)
+              src-nav-num (-> queue first :src-nav-num)
+              body    (download-with-cookie url)
              
-             ;; ask the rich extractor to sample and extract on this page.
-             content    (try (rich-char-extractor/state-action
-                              body url to-eliminate (clojure.set/union
-                                                     (set visited)
-                                                     (set [url])
-                                                     (set (map :url queue))))
-                             (catch Exception e nil))
-             leaf?      (or (not body)
-                            (rich-char-extractor/leaf?
-                             (first src-nav-num) (cur-nav-fraction body content)))
-             _          (println :leaf? leaf?)
-             _          (println :src-score (try (double (first src-nav-num))
-                                                 (catch Exception e nil)))
-             _          (println :target-score (double
-                                                (cur-nav-fraction body content)))
-             mined      (when-not leaf?
-                          (rich-char-extractor/filter-content
-                           content))
-             mined-links (reverse
-                          (filter
-                           #(and (-> % :url)
-                                 (not (some #{(-> % :url)} (clojure.set/union
-                                                            (set visited)
-                                                            (set [url])
-                                                            (set (map (fn [x] (:url x)) queue))))))
-                           (reduce
-                            concat
-                            (map
-                             (fn [{xpath :xpath score :score hrefs :hrefs text :texts}]
-                               (map
-                                (fn [h]
-                                  {:url h
-                                   :src-xpath (cons {:content xpath
+              ;; ask the rich extractor to sample and extract on this page.
+              content    (try (rich-char-extractor/state-action
+                               body url to-eliminate (clojure.set/union
+                                                      (set visited)
+                                                      (set [url])
+                                                      (set (map :url queue))))
+                              (catch Exception e nil))
+              leaf?      (or (not body)
+                             (rich-char-extractor/leaf?
+                              (first src-nav-num) (cur-nav-fraction body content)))
+              _          (println :leaf? leaf?)
+              _          (println :src-score (try (double (first src-nav-num))
+                                                  (catch Exception e nil)))
+              _          (println :target-score (try
+                                                  (double
+                                                   (cur-nav-fraction body content))
+                                                  (catch Exception e nil)))
+              mined      (when-not leaf?
+                           (rich-char-extractor/filter-content
+                            content))
+              mined-links (reverse
+                           (filter
+                            #(and (-> % :url)
+                                  (not (some #{(-> % :url)} (clojure.set/union
+                                                             (set visited)
+                                                             (set [url])
+                                                             (set (map (fn [x] (:url x)) queue))))))
+                            (reduce
+                             concat
+                             (map
+                              (fn [{xpath :xpath score :score hrefs :hrefs text :texts}]
+                                (map
+                                 (fn [h]
+                                   {:url h
+                                    :src-xpath (cons {:content xpath
                                         ;:pagination
                                         ;pagination
-                                                     }
-                                                    src-xp)
-                                   :src-url url
-                                   :src-nav-num (cons (if body
-                                                        (cur-nav-fraction body content)
-                                                        0)
-                                                      src-nav-num)})
-                                hrefs))
-                             mined))))
-             _          (println :mined (count mined-links))]
-         (if-not leaf?
-           (recur (concat (rest queue)
-                          mined-links)
-                  (clojure.set/union visited
-                                     (set [url]))
-                  to-eliminate
-                  leaf-paths)
-           (recur
-            (rest queue)
-            (clojure.set/union visited (set [url]))
-            to-eliminate
-            (cons
-             (cons {:content nil}
-                   src-xp)
-             leaf-paths)))))))
+                                                      }
+                                                     src-xp)
+                                    :src-url url
+                                    :src-nav-num (cons (if body
+                                                         (cur-nav-fraction body content)
+                                                         0)
+                                                       src-nav-num)})
+                                 hrefs))
+                              mined))))
+              _          (println :mined mined-links)]
+          (if (and (not leaf?) (seq mined-links))
+            (recur (concat (rest queue)
+                           mined-links)
+                   (clojure.set/union visited
+                                      (set [url]))
+                   to-eliminate
+                   leaf-paths)
+            (recur
+             (rest queue)
+             (clojure.set/union visited (set [url]))
+             to-eliminate
+             (cons
+              (cons {:content nil}
+                    src-xp)
+              leaf-paths)))))
+      (frequencies leaf-paths))))
 
 (defn crawl
   [start crawler-type num-docs]

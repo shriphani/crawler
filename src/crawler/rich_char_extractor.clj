@@ -43,7 +43,8 @@
                                              {:href (:href a-node)
                                               :num-chars (-> a-node
                                                              :text
-                                                             count)})
+                                                             count)
+                                              :text (:text a-node)})
                                            nodes)])
                                  template-removed)
 
@@ -77,6 +78,11 @@
                                      :hrefs (reduce
                                              (fn [acc an-info]
                                                (cons (:href an-info) acc))
+                                             '()
+                                             info)
+                                     :texts (reduce
+                                             (fn [acc an-info]
+                                               (cons (:text an-info) acc))
                                              '()
                                              info)})
                                   xpaths-anchors-chars))]

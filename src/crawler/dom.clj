@@ -295,30 +295,29 @@ id and class tag constraints are also added"
                                              (set blacklist)))))
                            a-tags)
            
-           xpaths-a-tags  (map #(-> % xpath-to-node first) a-tags-w-hrefs)
-           
-           nodes-xpaths   (map vector
-                               xpaths-a-tags
-                               (filter
-                                (fn [x]
-                                  (= (uri/host url) (-> x :href uri/host)))
-                                (map
-                                 (fn [x]
-                                   (let [link (-> x
-                                                  (.getAttributes)
-                                                  (.getNamedItem "href")
-                                                  (.getValue))]
-                                     {:node x
-                                      :href (try (uri/fragment
-                                                  (uri/resolve-uri url link) nil)
-                                                 (catch Exception e nil))
-                                      :text (-> x
-                                                (.getTextContent))}))
-                                 a-tags-w-hrefs)))]
+           nodes-xpaths   (map
+                           (fn [x]
+                             [(-> x :node xpath-to-node first) x])
+                           (filter
+                            (fn [x]
+                              (= (uri/host url) (-> x :href uri/host)))
+                            (map
+                             (fn [x]
+                               (let [link (-> x
+                                              (.getAttributes)
+                                              (.getNamedItem "href")
+                                              (.getValue))]
+                                 {:node x
+                                  :href (try (uri/fragment
+                                              (uri/resolve-uri url link) nil)
+                                             (catch Exception e nil))
+                                  :text (-> x
+                                            (.getTextContent))}))
+                             a-tags-w-hrefs)))]
        
        (reduce
         (fn [acc [an-xpath node]]
-          (merge-with clojure.set/union acc {an-xpath (set [node])})) {} nodes-xpaths))))
+          (merge-with concat acc {an-xpath [node]})) {} nodes-xpaths))))
 
 (defn minimum-maximal-xpath-set-processed
   "This helper routine exists so we don't reparse

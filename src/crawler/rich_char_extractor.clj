@@ -6,7 +6,7 @@
   [src-num target-num]
   (and
    (-> src-num nil? not)
-   (<= 0.5 (/ target-num src-num))))
+   (>= 0.1 (/ target-num src-num))))
 
 (defn state-action
   "Args:

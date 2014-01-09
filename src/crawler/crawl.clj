@@ -2,7 +2,9 @@
   "Initial crawl setup"
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
+            [crawler.dom :as dom]
             [crawler.rich-extractor :as rich-extractor]
+            [crawler.rich-char-extractor :as rich-char-extractor]
             [crawler.template-removal :as template-removal]
             [clj-http.cookies :as cookies])
   (:use [clojure.pprint :only [pprint]]))
@@ -53,7 +55,7 @@
                (seq (-> queues :pagination))))
     (let [content-q   (-> queues :content)         ; holds the content queues
           paging-q    (-> queues :pagination)      ; holds the pagination queues
-          
+
           queue-kw    (cond
                        (empty? content-q)
                        :pagination
@@ -102,25 +104,25 @@
                                                    (map #(-> % :url) content-q)
                                                    (map #(-> % :url) paging-q)
                                                    [url]))
-                  
+
                   ;; pagination's xpath and links
                   paging-xp-ls (into
                                 {} (map
                                     (fn [[xpath info]]
                                      [xpath (:links info)])
                                     paging-dec))
-                  
+
                   paging-vocab (reduce
                                 clojure.set/union
                                 (map
                                  (fn [[xpath info]]
                                    (:vocab info))
                                  paging-dec))
-                  
+
                   new-globals  (merge-with clojure.set/union
                                            globals
                                            {:paging-vocab paging-vocab})
-                  
+
                   ;; add to content-q if anything needs adding/removing
                   content-q'   (concat (if (= :content queue-kw)
                                          (rest content-q) content-q)
@@ -164,7 +166,7 @@
                                               paging-xp-ls))
                                         :url))
 
-                
+
                   new-num-dec  (inc num-decisions)
                   new-scr      (+ score sum-score)
                   new-lim      (dec limit)]
@@ -200,18 +202,18 @@
                                     (fn [[xpath info]]
                                       [xpath (:links info)])
                                     paging-dec))
-                  
+
                   paging-vocab (reduce
                                 clojure.set/union
                                 (map
                                  (fn [[xpath info]]
                                    (:vocab info))
                                  paging-dec))
-                  
+
                   new-globals  (merge-with clojure.set/union
                                          globals
                                          {:paging-vocab paging-vocab})
-                  
+
                   new-queue    (if (= :pagination queue-kw)
                                  {:content content-q
                                   :pagination (rest paging-q)}
@@ -235,11 +237,150 @@
   (try (-> a-link (client/get {:cookie-store my-cs}) :body)
        (catch Exception e nil)))
 
+(defn cur-nav-fraction
+  [body space]
+  (let [processed    (dom/process-page body)
+        text-content (apply
+                      + (map
+                         count
+                         (-> processed
+                             (.getText)
+                             (clojure.string/split #"\s+"))))
+        nav-content  (:total-nav-info space)]
+    (/ nav-content text-content)))
+
 (defn crawl-informative
-  [start]
-  (let [start-body   (download-with-cookie start)
-        to-eliminate (template-removal/all-xpaths start-body start my-cs)]
-    to-eliminate))
+  "Args:
+    start: Good entry point
+
+   Args alt:
+    queues: pagination and content queues
+    visited: visited links
+    globals: global info
+    to-eliminate: global decision-space pruning"
+  ([start limit]
+     (let [start-body   (download-with-cookie start)
+           to-eliminate (template-removal/all-xpaths start-body start my-cs)]
+       (crawl-informative {:url start}
+                          (set [])
+                          {}
+                          to-eliminate
+                          limit)))
+
+  ([queues visited globals to-eliminate limit]
+     (if (and (not (zero? limit))
+              (or (seq (-> queues :content))
+                  (seq (-> queues :pagination))))
+       (let [content-q   (-> queues :content)         ; holds the content queues
+             paging-q    (-> queues :pagination)      ; holds the pagination queues
+
+             queue-kw    (cond
+                          (empty? content-q)
+                          :pagination
+
+                          (empty? paging-q)
+                          :content
+
+                          :else
+                          (if (even? (int (/ (count visited) 10)))
+                            :pagination :content))
+             
+             queue       (queues queue-kw)
+
+             url         (-> queue first :url)
+             body        (-> url download-with-cookie)
+             new-visited (conj visited url)
+             paginated?  (-> queue first :pagination?)  ; ignore this
+                                        ; guy. Not yet necessary
+
+             space       (rich-char-extractor/state-action
+                          body url to-eliminate)
+
+             prev-nav-num (-> queue first :prev-nav)
+             cur-nav-num  (cur-nav-fraction body space)
+             leaf?        (rich-char-extractor/leaf?
+                           prev-nav-num
+                           cur-nav-num)]
+         leaf?))))
+
+(defn sample-sitemap
+  ([start]
+     (let [start-body   (download-with-cookie start)
+           to-eliminate (template-removal/all-xpaths start-body start my-cs)]
+       (sample-sitemap [{:url start}] (set []) to-eliminate [])))
+
+  ([queue visited to-eliminate leaf-paths]
+     (do
+       (Thread/sleep 1000)
+       (println :url (-> queue first :url))
+       (println :src-ulr (-> queue first :src-url))
+       (println :src-xpath (-> queue first :src-xpath))
+       (println :score-seq (-> queue first :src-nav-num))
+       (let [url     (-> queue first :url)
+             src-xp  (-> queue first :src-xpath)
+             src-nav-num (-> queue first :src-nav-num)
+             body    (download-with-cookie url)
+             
+             ;; ask the rich extractor to sample and extract on this page.
+             content    (try (rich-char-extractor/state-action
+                              body url to-eliminate (clojure.set/union
+                                                     (set visited)
+                                                     (set [url])
+                                                     (set (map :url queue))))
+                             (catch Exception e nil))
+             leaf?      (or (not body)
+                            (rich-char-extractor/leaf?
+                             (first src-nav-num) (cur-nav-fraction body content)))
+             _          (println :leaf? leaf?)
+             _          (println :src-score (try (double (first src-nav-num))
+                                                 (catch Exception e nil)))
+             _          (println :target-score (double
+                                                (cur-nav-fraction body content)))
+             mined      (when-not leaf?
+                          (rich-char-extractor/filter-content
+                           content))
+             mined-links (reverse
+                          (filter
+                           #(and (-> % :url)
+                                 (not (some #{(-> % :url)} (clojure.set/union
+                                                            (set visited)
+                                                            (set [url])
+                                                            (set (map (fn [x] (:url x)) queue))))))
+                           (reduce
+                            concat
+                            (map
+                             (fn [{xpath :xpath score :score hrefs :hrefs text :texts}]
+                               (map
+                                (fn [h]
+                                  {:url h
+                                   :src-xpath (cons {:content xpath
+                                        ;:pagination
+                                        ;pagination
+                                                     }
+                                                    src-xp)
+                                   :src-url url
+                                   :src-nav-num (cons (if body
+                                                        (cur-nav-fraction body content)
+                                                        0)
+                                                      src-nav-num)})
+                                hrefs))
+                             mined))))
+             _          (println :mined (count mined-links))]
+         (if-not leaf?
+           (recur (concat (rest queue)
+                          mined-links)
+                  (clojure.set/union visited
+                                     (set [url]))
+                  to-eliminate
+                  leaf-paths)
+           (recur
+            (rest queue)
+            (clojure.set/union visited (set [url]))
+            to-eliminate
+            (cons
+             (cons {:content nil}
+                   src-xp)
+             leaf-paths)))))))
 
 (defn crawl
   [start crawler-type num-docs]

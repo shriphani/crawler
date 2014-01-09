@@ -288,10 +288,12 @@ id and class tag constraints are also added"
                                                         (.getNamedItem "href")
                                                         (.getValue)))
                                         "javascript")
-                                  (not (some #{(-> a-tag
-                                                   (.getAttributes)
-                                                   (.getNamedItem "href")
-                                                   (.getValue))}
+                                  (not (some #{(uri/resolve-uri
+                                                url
+                                                (-> a-tag
+                                                    (.getAttributes)
+                                                    (.getNamedItem "href")
+                                                    (.getValue)))}
                                              (set blacklist)))))
                            a-tags)
            

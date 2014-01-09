@@ -31,7 +31,6 @@
                                                 (and (not (some #{a-link} (:links acc)))
                                                      (not= a-link url)))
                                               hrefs))]
-                                 (println :xpath xpath :picked picked)
                                  (if picked
                                    {:links (clojure.set/union (:links acc) (set picked))
                                     :content (cons [xpath picked] (:content acc))}
@@ -42,7 +41,6 @@
            sampled          (reduce
                              (fn [acc [x l]]
                                (let [action-space (do
-                                                    (println :sampling l)
                                                     (map (fn [x]
                                                            (do
                                                              (Thread/sleep 2000)

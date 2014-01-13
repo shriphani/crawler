@@ -1,6 +1,8 @@
 (ns crawler.rich-char-extractor
   "Character based extraction as opposed to token based extraction"
-  (require [crawler.dom :as dom]))
+  (require [crawler.dom :as dom]
+           [crawler.tree-edit-distance :as ted]
+           [net.cgrand.enlive-html :as html]))
 
 (defn leaf?
   [src-num target-num]
@@ -104,3 +106,26 @@
        :score (/ score (:total-nav-info content))
        :hrefs hrefs})
     (:xpath-nav-info content))))
+
+(defn pagination?
+  "Even 1 pagination is good."
+  [{xpath :xpath hrefs :hrefs texts :texts} src-tree]
+  (let [to-sample (sample-quarter hrefs)
+        page-sims (map
+                   #(ted/tree-edit-distance
+                     src-tree (ted/load-tree %))
+                   to-sample)]
+
+    (seq
+     (filter #(<= 0.8 %) page-sims))))
+
+(defn detect-pagination
+  "Pagination detection module.
+   First, we kick off from the least useful guys
+   and go to the most useful guys. Along the way,
+   bundle some shit up."
+  [normalized-decision-space body]
+  (let [tree1  (html/html-resource
+                (java.io.StringReader. body))
+        sorted (sort-by :score normalized-decision-space)]
+    (filter #(pagination? % tree1) sorted)))

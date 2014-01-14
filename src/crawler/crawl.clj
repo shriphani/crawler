@@ -6,6 +6,7 @@
             [crawler.rich-extractor :as rich-extractor]
             [crawler.rich-char-extractor :as rich-char-extractor]
             [crawler.template-removal :as template-removal]
+            [crawler.utils :as utils]
             [clj-http.cookies :as cookies])
   (:use [clojure.pprint :only [pprint]]))
 
@@ -230,13 +231,6 @@
                      new-globals))))))
     {:visited visited}))
 
-(def my-cs (cookies/cookie-store)) ; for removing that SID nonsense
-
-(defn download-with-cookie
-  [a-link]
-  (try (-> a-link (client/get {:cookie-store my-cs}) :body)
-       (catch Exception e nil)))
-
 (defn cur-nav-fraction
   [body space]
   (let [processed    (dom/process-page body)
@@ -259,8 +253,8 @@
     globals: global info
     to-eliminate: global decision-space pruning"
   ([start limit]
-     (let [start-body   (download-with-cookie start)
-           to-eliminate (template-removal/all-xpaths start-body start my-cs)]
+     (let [start-body   (utils/download-with-cookie start)
+           to-eliminate (template-removal/all-xpaths start-body start utils/my-cs)]
        (crawl-informative {:url start}
                           (set [])
                           {}
@@ -312,7 +306,7 @@
   ([queue visited to-eliminate leaf-paths]
      (if (seq queue)
       (do
-        (Thread/sleep 1000)
+        (Thread/sleep 2000)
         (println :url (-> queue first :url))
         (println :src-ulr (-> queue first :src-url))
         (println :src-xpath (-> queue first :src-xpath))
@@ -332,6 +326,8 @@
               leaf?      (or (not body)
                              (rich-char-extractor/leaf?
                               (first src-nav-num) (cur-nav-fraction body content)))
+
+              ;; doing something stupid?
               _          (println :leaf? leaf?)
               _          (println :src-score (try (double (first src-nav-num))
                                                   (catch Exception e nil)))

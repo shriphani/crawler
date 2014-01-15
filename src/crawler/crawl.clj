@@ -301,9 +301,9 @@
   ([start]
      (let [start-body   (download-with-cookie start)
            to-eliminate (template-removal/all-xpaths start-body start my-cs)]
-       (sample-sitemap [{:url start}] (set []) to-eliminate [])))
+       (sample-sitemap [{:url start}] (set []) (set []) to-eliminate [])))
 
-  ([queue visited to-eliminate leaf-paths]
+  ([queue visited observed to-eliminate leaf-paths]
      (if (seq queue)
        (do
         (Thread/sleep 2000)
@@ -322,6 +322,7 @@
                                body url to-eliminate (clojure.set/union
                                                       (set visited)
                                                       (set [url])
+                                                      (set observed)
                                                       (set (map :url queue))))
                               (catch Exception e nil))
 
@@ -343,44 +344,88 @@
               mined      (when-not leaf?
                            (rich-char-extractor/filter-content
                             content))
-              mined-links (try
-                           (reverse
-                            (filter
-                             #(and (-> % :url)
-                                   (not (some #{(-> % :url)} (clojure.set/union
-                                                              (set visited)
-                                                              (set [url])
-                                                              (set (map (fn [x] (:url x)) queue))))))
-                             (reduce
-                              concat
-                              (map
-                               (fn [{xpath :xpath score :score hrefs :hrefs text :texts}]
-                                 ;; take only a 25 % sample from here.
-                                 (take
-                                  (Math/ceil (/ (count hrefs) 4))
+              
+              obs-links  (try
+                           (distinct-by-key
+                            (reverse
+                             (filter
+                              #(and (-> % :url)
+                                    (not (some #{(-> % :url)} (clojure.set/union
+                                                               (set visited)
+                                                               (set [url])
+                                                               (set (map (fn [x] (:url x)) queue))))))
+                              (reduce
+                               concat
+                               (map
+                                (fn [{xpath :xpath score :score hrefs :hrefs text :texts}]
+                                  ;; take only a 25 % sample from here.
                                   (map
                                    (fn [h]
                                      {:url h
                                       :src-xpath (cons xpath src-xp)
                                       :src-url url
                                       :src-nav-num (cons (if body score 0) src-nav-num)})
-                                   hrefs)))
-                               mined))))
-                           (catch Exception e []))]
-          (if (and (not leaf?) (seq mined-links))
-            (recur (concat (rest queue)
-                           mined-links)
-                   (clojure.set/union visited
-                                      (set [url]))
-                   to-eliminate
-                   leaf-paths)
-            (recur
-             (rest queue)
-             (clojure.set/union visited (set [url]))
-             to-eliminate
-             (cons
-              nil
-              leaf-paths)))))
+                                   hrefs))
+                                mined))))
+                             :url)
+                            (catch Exception e []))              
+              
+              mined-links (try
+                            (distinct-by-key
+                             (reverse
+                              (filter
+                              #(and (-> % :url)
+                                    (not (some #{(-> % :url)} (clojure.set/union
+                                                               (set visited)
+                                                               (set [url])
+                                                               (set (map (fn [x] (:url x)) queue))))))
+                              (reduce
+                               concat
+                               (map
+                                (fn [{xpath :xpath score :score hrefs :hrefs text :texts}]
+                                  ;; take only a 25 % sample from here.
+                                  (take
+                                   (Math/ceil (/ (count hrefs) 4))
+                                   (map
+                                    (fn [h]
+                                      {:url h
+                                       :src-xpath (cons xpath src-xp)
+                                       :src-url url
+                                       :src-nav-num (cons (if body score 0) src-nav-num)})
+                                    hrefs)))
+                                mined))))
+                             :url)
+                            (catch Exception e []))]
+          (cond
+           (and (not leaf?) (seq mined-links))
+           (recur (concat (rest queue)
+                          mined-links)
+                  (clojure.set/union visited
+                                     (set [url]))
+                  (clojure.set/union observed (set obs-links))
+                  to-eliminate
+                  leaf-paths)
+
+           (and
+            (not leaf?)
+            (not
+             (seq mined-links)))
+           (recur
+            (rest queue)
+            (clojure.set/union visited (set [url]))
+            observed
+            to-eliminate
+            leaf-paths)
+
+           :else
+           (recur
+            (rest queue)
+            (clojure.set/union visited (set [url]))
+            observed
+            to-eliminate
+            (cons
+             (cons nil src-xp)
+             leaf-paths)))))
       (frequencies leaf-paths))))
 
 (defn crawl

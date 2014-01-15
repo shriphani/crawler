@@ -315,7 +315,7 @@
               src-xp  (-> queue first :src-xpath)
               src-nav-num (-> queue first :src-nav-num)
               body    (download-with-cookie url)
-             
+              
               ;; ask the rich extractor to sample and extract on this page.
               content    (try (rich-char-extractor/state-action
                                body url to-eliminate (clojure.set/union
@@ -323,17 +323,20 @@
                                                       (set [url])
                                                       (set (map :url queue))))
                               (catch Exception e nil))
+              
+              score   (cur-nav-fraction body content)
+              
               leaf?      (or (not body)
                              (rich-char-extractor/leaf?
-                              (first src-nav-num) (cur-nav-fraction body content)))
+                              (first src-nav-num)
+                              score))
 
               ;; doing something stupid?
               _          (println :leaf? leaf?)
               _          (println :src-score (try (double (first src-nav-num))
                                                   (catch Exception e nil)))
               _          (println :target-score (try
-                                                  (double
-                                                   (cur-nav-fraction body content))
+                                                  (double score)
                                                   (catch Exception e nil)))
               mined      (when-not leaf?
                            (rich-char-extractor/filter-content
@@ -352,19 +355,11 @@
                                 (map
                                  (fn [h]
                                    {:url h
-                                    :src-xpath (cons {:content xpath
-                                        ;:pagination
-                                        ;pagination
-                                                      }
-                                                     src-xp)
+                                    :src-xpath (cons xpath src-xp)
                                     :src-url url
-                                    :src-nav-num (cons (if body
-                                                         (cur-nav-fraction body content)
-                                                         0)
-                                                       src-nav-num)})
+                                    :src-nav-num (cons (if body score 0) src-nav-num)})
                                  hrefs))
-                              mined))))
-              _          (println :mined mined-links)]
+                              mined))))]
           (if (and (not leaf?) (seq mined-links))
             (recur (concat (rest queue)
                            mined-links)

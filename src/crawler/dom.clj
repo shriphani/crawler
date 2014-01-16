@@ -130,6 +130,37 @@
            (.getValue))
        (catch Exception e nil)))
 
+(defn child-position
+  [parent a-w3c-node]
+  (let [child-node-list (.getChildNodes parent)
+        child-nodes-cnt (.getLength child-node-list)]
+    (.indexOf
+     (map
+      #(.isSameNode
+        a-w3c-node
+        (.item child-node-list %))
+      (range child-nodes-cnt))
+     true)))
+
+(defn is-first-child?
+  [a-w3c-node]
+  (let [parent (.getParentNode a-w3c-node)]
+    (and parent
+         (= 0 (child-position
+               parent a-w3c-node)))))
+
+(defn is-last-child?
+  [a-w3c-node]
+  (let [parent (.getParentNode a-w3c-node)]
+    (and parent
+         (=
+          (-
+           (.getLength
+            (.getChildNodes parent))
+           1)
+          (child-position
+           parent a-w3c-node)))))
+
 (defn tag-id-class-node
   "Returns a list containing a tag's name, its id
 - formatted slightly - and its classes - formatted slightly"
@@ -140,25 +171,34 @@
         silent-fail-attr  (fn [attr key] (try (.getValue
                                               (.getNamedItem attr key))
                                              (catch Exception e nil)))
-        
-        attributes        (.getAttributes a-w3c-node)]
 
-    (list (.getNodeName a-w3c-node)
+        
+        attributes        (.getAttributes a-w3c-node)
+
+        is-first?         (is-first-child? a-w3c-node)
+
+        is-last?          (is-last-child? a-w3c-node)]
+
+    (list (.getNodeName a-w3c-node)               ; name
           (-> attributes
               (silent-fail-attr "id")
-              format-attr)
+              format-attr)                        ; id
           (map
            format-attr
            (-> attributes
                (silent-fail-attr "class")
-               (silent-fail-split #"\s+"))))))
+               (silent-fail-split #"\s+")))       ; class
+
+          is-first?
+          
+          is-last?)))    
 
 (defn tag-id-class->xpath
   "Args:
     a-tag-id-class : a tag, its id and a list of classes
    Returns:
     a component that fits in an xpath"
-  [[tag id class-list]]
+  [[tag id class-list is-first? is-last?]]
   (let [formatted-id      (format "contains(@id,'%s')" id)
         formatted-classes (map
                            #(format "contains(@class,'%s')" %)
@@ -166,8 +206,24 @@
     
 
     (if (not (empty? class-list)) 
-      (map #(format "%s[%s]" tag %) formatted-classes)
-      (list tag))))
+      (map #(cond (and (not is-first?)
+                       (not is-last?))             
+                  (format "%s[%s]" tag %)
+
+                  is-first?
+                  (format "%s[%s][1]" tag %)
+
+                  is-last?
+                  (format "%s[%s][last()]" tag %)) formatted-classes)
+      (cond (and (not is-first?)
+                 (not is-last?))
+            (list tag)
+
+            is-first?
+            (list (format "%s[1]" tag))
+
+            is-last?
+            (list (format "%s[last()]" tag))))))
 
 (defn tag-node->xpath
   [a-tagnode]

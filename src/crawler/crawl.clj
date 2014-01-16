@@ -243,60 +243,6 @@
         nav-content  (:total-nav-info space)]
     (/ nav-content text-content)))
 
-(defn crawl-informative
-  "Args:
-    start: Good entry point
-
-   Args alt:
-    queues: pagination and content queues
-    visited: visited links
-    globals: global info
-    to-eliminate: global decision-space pruning"
-  ([start limit]
-     (let [start-body   (utils/download-with-cookie start)
-           to-eliminate (template-removal/all-xpaths start-body start utils/my-cs)]
-       (crawl-informative {:url start}
-                          (set [])
-                          {}
-                          to-eliminate
-                          limit)))
-
-  ([queues visited globals to-eliminate limit]
-     (if (and (not (zero? limit))
-              (or (seq (-> queues :content))
-                  (seq (-> queues :pagination))))
-       (let [content-q   (-> queues :content)         ; holds the content queues
-             paging-q    (-> queues :pagination)      ; holds the pagination queues
-
-             queue-kw    (cond
-                          (empty? content-q)
-                          :pagination
-
-                          (empty? paging-q)
-                          :content
-
-                          :else
-                          (if (even? (int (/ (count visited) 10)))
-                            :pagination :content))
-             
-             queue       (queues queue-kw)
-
-             url         (-> queue first :url)
-             body        (-> url download-with-cookie)
-             new-visited (conj visited url)
-             paginated?  (-> queue first :pagination?)  ; ignore this
-                                        ; guy. Not yet necessary
-
-             space       (rich-char-extractor/state-action
-                          body url to-eliminate)
-
-             prev-nav-num (-> queue first :prev-nav)
-             cur-nav-num  (cur-nav-fraction body space)
-             leaf?        (rich-char-extractor/leaf?
-                           prev-nav-num
-                           cur-nav-num)]
-         leaf?))))
-
 (defn sample-sitemap
   ([start]
      (sample-sitemap start 10))   ; at least 10 threads please
@@ -464,10 +410,30 @@
              leaf-paths)
             (dec limit)))))
        {:to-remove to-eliminate
-        :model     (reverse
+        :models     (reverse
                     (sort-by
                      second
                      (frequencies leaf-paths)))})))
+
+(defn crawl-site-extract
+  ([site model]
+     (crawl-site-extract
+      site
+      model
+      (set [])
+      [{:url             site
+        :remaining-model model}]))
+
+  ([site model visited queue]
+     (let [url (-> queue first :url)])))
+
+(defn crawl-site
+  [start {to-eliminate :to-remove models :models}]
+  (map
+   (fn [[model score]]
+     (let [in-order-model (reverse model)]
+       (crawl-site-extract start in-order-model)))
+   models))
 
 (defn crawl
   [start crawler-type num-docs]

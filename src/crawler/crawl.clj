@@ -299,9 +299,12 @@
 
 (defn sample-sitemap
   ([start]
-     (let [start-body   (download-with-cookie start)
-           to-eliminate (template-removal/all-xpaths start-body start my-cs)]
-       (sample-sitemap [{:url start}] (set []) (set []) to-eliminate [] 10)))
+     (sample-sitemap start 10))   ; at least 10 threads please
+  
+  ([start limit]
+     (let [start-body   (utils/download-with-cookie start)
+           to-eliminate (template-removal/all-xpaths start-body start utils/my-cs)]
+       (sample-sitemap [{:url start}] (set []) (set []) to-eliminate [] limit)))
 
   ([queue visited observed to-eliminate leaf-paths limit]
      (if (and
@@ -352,7 +355,7 @@
               _          (println :src-score (try (double (first src-nav-num))
                                                   (catch Exception e nil)))
               _          (println :target-score (try
-                                                  (double score)
+                                                  (double l-score)
                                                   (catch Exception e nil)))
               mined      (when-not leaf?
                            (rich-char-extractor/filter-content
@@ -377,7 +380,7 @@
                                concat
                                (map
                                 (fn [{xpath :xpath
-                                     score :score
+                                     l-score :score
                                      hrefs :hrefs
                                      text  :texts}]
                                   ;; take only a 25 % sample from here.
@@ -411,7 +414,7 @@
                                concat
                                (map
                                 (fn [{xpath :xpath
-                                     score :score
+                                     l-score :score
                                      hrefs :hrefs
                                      text  :texts}]
                                   ;; take only a 25 % sample from here.
@@ -460,7 +463,11 @@
              (cons nil src-xp)
              leaf-paths)
             (dec limit)))))
-      (frequencies leaf-paths))))
+       {:to-remove to-eliminate
+        :model     (reverse
+                    (sort-by
+                     second
+                     (frequencies leaf-paths)))})))
 
 (defn crawl
   [start crawler-type num-docs]

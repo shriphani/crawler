@@ -40,14 +40,15 @@
 
            xpaths-anchors-chars (map
                                  (fn [[xpath nodes]]
-                                   [xpath (map
-                                           (fn [a-node]
-                                             {:href (:href a-node)
-                                              :num-chars (-> a-node
-                                                             :text
-                                                             count)
-                                              :text (:text a-node)})
-                                           nodes)])
+                                   [xpath (distinct
+                                           (map
+                                            (fn [a-node]
+                                              {:href (:href a-node)
+                                               :num-chars (-> a-node
+                                                              :text
+                                                              count)
+                                               :text (:text a-node)})
+                                            nodes))])
                                  template-removed)
 
            page-wide-nav-chars  (reduce
@@ -70,23 +71,26 @@
                                     (-> % :hrefs count zero?)))
                                  (map
                                   (fn [[xpath info]]
-                                    {:xpath xpath
-                                     :score (reduce
-                                             (fn [acc an-info]
-                                               (+ acc (:num-chars an-info)))
-                                             0
-                                             info)
-
-                                     :hrefs (reduce
-                                             (fn [acc an-info]
-                                               (cons (:href an-info) acc))
-                                             '()
-                                             info)
-                                     :texts (reduce
-                                             (fn [acc an-info]
-                                               (cons (:text an-info) acc))
-                                             '()
-                                             info)})
+                                    (let [potential-xpath xpath
+                                          potential-score (reduce
+                                                           (fn [acc an-info]
+                                                             (+ acc (:num-chars an-info)))
+                                                           0
+                                                           info)
+                                          potential-hrefs (reduce
+                                                           (fn [acc an-info]
+                                                             (cons (:href an-info) acc))
+                                                           '()
+                                                           info)
+                                          potential-texts (reduce
+                                                           (fn [acc an-info]
+                                                             (cons (:text an-info) acc))
+                                                           '()
+                                                           info)]
+                                      {:xpath potential-xpath
+                                       :score potential-score
+                                       :hrefs potential-hrefs
+                                       :texts potential-texts}))
                                   xpaths-anchors-chars))]
 
        {:total-nav-info page-wide-nav-chars

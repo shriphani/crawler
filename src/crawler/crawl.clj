@@ -283,8 +283,8 @@
                                                              (set visited)
                                                              (set [url])
                                                              (set (map :url queue))))
-                              (catch Exception e nil))
-
+                                     (catch Exception e nil))
+              
               score   (try (cur-nav-fraction body content)
                            (catch Exception e nil))
 
@@ -306,6 +306,10 @@
               mined      (when-not leaf?
                            (rich-char-extractor/filter-content
                             content))
+
+              observed   (when-not leaf?
+                           (rich-char-extractor/filter-content
+                            unchecked-content))
               
               obs-links  (try
                            (distinct-by-key
@@ -326,7 +330,7 @@
                                concat
                                (map
                                 (fn [{xpath :xpath
-                                     l-score :score
+                                     score :score
                                      hrefs :hrefs
                                      text  :texts}]
                                   ;; take only a 25 % sample from here.
@@ -337,7 +341,7 @@
                                       :src-url url
                                       :src-nav-num (cons (if body l-score 0) src-nav-num)})
                                    hrefs))
-                                mined))))
+                                observed))))
                             :url)
                            (catch Exception e []))              
               
@@ -360,7 +364,7 @@
                                concat
                                (map
                                 (fn [{xpath :xpath
-                                     l-score :score
+                                     score :score
                                      hrefs :hrefs
                                      text  :texts}]
                                   ;; take only a 25 % sample from here.
@@ -371,11 +375,19 @@
                                       {:url h
                                        :src-xpath (cons xpath src-xp)
                                        :src-url url
-                                       :src-nav-num (cons (if body l-score 0) src-nav-num)})
+                                       :src-nav-num (cons (if body score 0) src-nav-num)})
                                     hrefs)))
                                 mined))))
                              :url)
-                            (catch Exception e []))]
+                            (catch Exception e []))
+
+              mined-obs-links (if-not leaf?
+                               (/ (- (count obs-links)
+                                     (count mined-links))
+                                  (count obs-links))
+                               :leaf)
+
+              _ (println :retained mined-obs-links)]
           (cond
            (and (not leaf?) (seq mined-links))
            (recur (concat (rest queue)

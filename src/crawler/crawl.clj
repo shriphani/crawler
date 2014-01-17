@@ -279,10 +279,7 @@
                               (catch Exception e nil))
 
               unchecked-content (try (rich-char-extractor/state-action
-                                      body url to-eliminate (clojure.set/union
-                                                             (set visited)
-                                                             (set [url])
-                                                             (set (map :url queue))))
+                                      body url to-eliminate [])
                                      (catch Exception e nil))
               
               score   (try (cur-nav-fraction body content)
@@ -334,13 +331,27 @@
                                      hrefs :hrefs
                                      text  :texts}]
                                   ;; take only a 25 % sample from here.
-                                  (map
-                                   (fn [h]
-                                     {:url h
-                                      :src-xpath (cons xpath src-xp)
-                                      :src-url url
-                                      :src-nav-num (cons (if body l-score 0) src-nav-num)})
-                                   hrefs))
+                                  (let [text-sizes (map count text)
+                                        text-mean  (/
+                                                    (apply + text-sizes)
+                                                    (count text-sizes))
+                                        text-diffs (map
+                                                    #(Math/pow
+                                                      (- text-mean %) 2)
+                                                    text-sizes)
+                                        text-stdev (Math/sqrt
+                                                    (apply + text-diffs))]
+                                   (map
+                                    (fn [h]
+                                      {:url h
+                                       :src-xpath (cons xpath src-xp)
+                                       :src-url url
+                                       :src-nav-num (cons
+                                                     (if body l-score 0)
+                                                     src-nav-num)
+                                       :text-mean  text-mean
+                                       :text-stdev text-stdev})
+                                    hrefs)))
                                 observed))))
                             :url)
                            (catch Exception e []))              
@@ -370,24 +381,33 @@
                                   ;; take only a 25 % sample from here.
                                   (take
                                    (Math/ceil (/ (count hrefs) 4))
-                                   (map
-                                    (fn [h]
-                                      {:url h
-                                       :src-xpath (cons xpath src-xp)
-                                       :src-url url
-                                       :src-nav-num (cons (if body score 0) src-nav-num)})
-                                    hrefs)))
+                                   (let [text-sizes (map count text)
+                                         text-mean  (/
+                                                     (apply + text-sizes)
+                                                     (count text-sizes))
+                                         text-diffs (map
+                                                     #(Math/pow
+                                                       (- text-mean %) 2)
+                                                     text-sizes)
+                                         text-stdev (Math/sqrt
+                                                     (apply + text-diffs))]
+                                     
+                                     (map
+                                      (fn [h]
+                                        {:url h
+                                         :src-xpath (cons xpath src-xp)
+                                         :src-url url
+                                         :src-nav-num (cons
+                                                       (if body l-score 0)
+                                                       src-nav-num)
+                                         :text-mean  text-mean
+                                         :text-stdev text-stdev})
+                                      hrefs))))
                                 mined))))
                              :url)
                             (catch Exception e []))
 
-              mined-obs-links (if-not leaf?
-                               (/ (- (count obs-links)
-                                     (count mined-links))
-                                  (count obs-links))
-                               :leaf)
-
-              _ (println :retained mined-obs-links)]
+              _  (println :mined (count mined-links))]
           (cond
            (and (not leaf?) (seq mined-links))
            (recur (concat (rest queue)

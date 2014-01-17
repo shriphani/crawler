@@ -5,6 +5,7 @@
            [net.cgrand.enlive-html :as html]))
 
 (defn leaf?
+  "Examples are used to to RTDM style stuff."
   [src-num target-num]
   (and
    (-> src-num nil? not)
@@ -105,10 +106,11 @@
    (fn [x]
      (->> x :score (<= 0.1)))
    (map
-    (fn [{xpath :xpath score :score hrefs :hrefs}]
+    (fn [{xpath :xpath score :score hrefs :hrefs texts :texts}]
       {:xpath xpath
        :score (/ score (:total-nav-info content))
-       :hrefs hrefs})
+       :hrefs hrefs
+       :texts texts})
     (:xpath-nav-info content))))
 
 (defn sample-quarter

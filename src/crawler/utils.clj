@@ -3,6 +3,7 @@
 
 (ns crawler.utils
   (:require [clj-http.client :as client]
+            [clj-http.cookies :as cookies]
             [org.bovinegenius [exploding-fish :as uri]])
   (:use [clojure.tools.logging :only (info error)]
         [clj-logging-config.log4j]))
@@ -190,3 +191,10 @@ escape characters. then call re-pattern on it"
   [a-url]
   (let [url-path (-> a-url uri/path)]
     (if url-path (last (map tokenize (clojure.string/split url-path #"/"))) "")))
+
+(def my-cs (cookies/cookie-store)) ; for removing that SID nonsense
+
+(defn download-with-cookie
+  [a-link]
+  (try (-> a-link (client/get {:cookie-store my-cs}) :body)
+       (catch Exception e nil)))

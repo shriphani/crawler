@@ -383,3 +383,7 @@ id and class tag constraints are also added"
         (fn [acc [an-xpath node]]
           (merge-with
            concat acc {an-xpath [node]})) {} nodes-xpaths))))
+
+(defn split-items
+  [xpaths-hrefs-tokens]
+  xpaths-hrefs-tokens)

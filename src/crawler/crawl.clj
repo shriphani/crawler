@@ -268,6 +268,9 @@
               src-nav-num (-> queue first :src-nav-num)
               body    (utils/download-with-cookie url)
 
+
+              src-text-mean  (-> queue first :text-mean)
+              src-text-stdev (-> queue first :text-stdev)
               
               ;; ask the rich extractor to sample and extract on this page.
               content    (try (rich-char-extractor/state-action
@@ -407,7 +410,11 @@
                              :url)
                             (catch Exception e []))
 
-              _  (println :mined (count mined-links))]
+              _ (println
+                 :means
+                 (when src-text-mean
+                  (rich-char-extractor/detect-recommender-engine-links
+                   src-text-mean src-text-stdev mined body)))]
           (cond
            (and (not leaf?) (seq mined-links))
            (recur (concat (rest queue)

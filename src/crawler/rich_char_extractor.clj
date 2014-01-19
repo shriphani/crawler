@@ -2,7 +2,8 @@
   "Character based extraction as opposed to token based extraction"
   (require [crawler.dom :as dom]
            [crawler.similarity :as similarity]
-           [net.cgrand.enlive-html :as html]))
+           [net.cgrand.enlive-html :as html]
+           [crawler.utils :as utils]))
 
 (defn leaf?
   "Examples are used to to RTDM style stuff."
@@ -96,6 +97,38 @@
 
        {:total-nav-info page-wide-nav-chars
         :xpath-nav-info (sort-by :score xpath-nav-info)})))
+
+(defn detect-recommender-engine-links
+  [src-text-mean src-text-stdev decision-space body]
+  (let [means (map
+               (fn [{xpaths :xpaths
+                    hrefs  :hrefs
+                    score  :score
+                    texts  :texts}]
+                 (let [text-sizes (map count texts)
+                       text-mean  (/
+                                   (apply + text-sizes)
+                                   (count text-sizes))]
+                   [{:xpaths xpaths
+                     :hrefs  hrefs
+                     :score  score
+                     :texts  texts}
+                    text-mean]))
+               decision-space)]
+    (map
+     (fn [[stuff a-mean]]
+       (let [res        (- a-mean src-text-mean)
+             candidate? (or (<= res src-text-stdev)
+                            (<= res (* (- 1.0)
+                                       src-text-stdev)))]
+         (when candidate?
+           (let [links (:hrefs stuff)]
+             (some
+              #(<= 0.8
+                   (similarity/tree-edit-distance-html
+                    body (utils/download-with-cookie %)))
+              (take 3 links))))))
+     means)))
 
 (defn filter-content
   "Helper routine you can use to filter

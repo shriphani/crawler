@@ -332,25 +332,30 @@ id and class tag constraints are also added"
                                       (.getAttributes)
                                       (.getNamedItem "href"))
                                   (try
-                                    (not= (-> a-tag
-                                              (.getAttributes)
-                                              (.getNamedItem "rel")
-                                              (.getValue))
-                                          "nofollow")
+                                    (not=
+                                     (-> a-tag
+                                         (.getAttributes)
+                                         (.getNamedItem "rel")
+                                         (.getValue))
+                                     "nofollow")
                                     (catch NullPointerException e true))
                                   
-                                  (not= (uri/scheme (-> a-tag
-                                                        (.getAttributes)
-                                                        (.getNamedItem "href")
-                                                        (.getValue)))
-                                        "javascript")
-                                  (not (some #{(uri/resolve-uri
-                                                url
-                                                (-> a-tag
-                                                    (.getAttributes)
-                                                    (.getNamedItem "href")
-                                                    (.getValue)))}
-                                             (set blacklist)))))
+                                  (not=
+                                   (uri/scheme
+                                    (-> a-tag
+                                        (.getAttributes)
+                                        (.getNamedItem "href")
+                                        (.getValue)))
+                                   "javascript")
+                                  (not
+                                   (some
+                                    #{(uri/resolve-uri
+                                       url
+                                       (-> a-tag
+                                           (.getAttributes)
+                                           (.getNamedItem "href")
+                                           (.getValue)))}
+                                    (set blacklist)))))
                            a-tags)
            
            nodes-xpaths   (map
@@ -366,16 +371,18 @@ id and class tag constraints are also added"
                                               (.getNamedItem "href")
                                               (.getValue))]
                                  {:node x
-                                  :href (try (uri/fragment
-                                              (uri/resolve-uri url link) nil)
-                                             (catch Exception e nil))
-                                  :text (-> x
-                                            (.getTextContent))}))
+                                  :href (try
+                                          (uri/fragment
+                                           (uri/resolve-uri url link)
+                                           nil)
+                                          (catch Exception e nil))
+                                  :text (.getTextContent x)}))
                              a-tags-w-hrefs)))]
        
        (reduce
         (fn [acc [an-xpath node]]
-          (merge-with concat acc {an-xpath [node]})) {} nodes-xpaths))))
+          (merge-with
+           concat acc {an-xpath [node]})) {} nodes-xpaths))))
 
 (defn minimum-maximal-xpath-set-processed
   "This helper routine exists so we don't reparse

@@ -130,6 +130,37 @@
            (.getValue))
        (catch Exception e nil)))
 
+(defn child-position
+  [parent a-w3c-node]
+  (let [child-node-list (.getChildNodes parent)
+        child-nodes-cnt (.getLength child-node-list)]
+    (.indexOf
+     (map
+      #(.isSameNode
+        a-w3c-node
+        (.item child-node-list %))
+      (range child-nodes-cnt))
+     true)))
+
+(defn is-first-child?
+  [a-w3c-node]
+  (let [parent (.getParentNode a-w3c-node)]
+    (and parent
+         (= 0 (child-position
+               parent a-w3c-node)))))
+
+(defn is-last-child?
+  [a-w3c-node]
+  (let [parent (.getParentNode a-w3c-node)]
+    (and parent
+         (=
+          (-
+           (.getLength
+            (.getChildNodes parent))
+           1)
+          (child-position
+           parent a-w3c-node)))))
+
 (defn tag-id-class-node
   "Returns a list containing a tag's name, its id
 - formatted slightly - and its classes - formatted slightly"
@@ -140,25 +171,34 @@
         silent-fail-attr  (fn [attr key] (try (.getValue
                                               (.getNamedItem attr key))
                                              (catch Exception e nil)))
-        
-        attributes        (.getAttributes a-w3c-node)]
 
-    (list (.getNodeName a-w3c-node)
+        
+        attributes        (.getAttributes a-w3c-node)
+
+        is-first?         (is-first-child? a-w3c-node)
+
+        is-last?          (is-last-child? a-w3c-node)]
+
+    (list (.getNodeName a-w3c-node)               ; name
           (-> attributes
               (silent-fail-attr "id")
-              format-attr)
+              format-attr)                        ; id
           (map
            format-attr
            (-> attributes
                (silent-fail-attr "class")
-               (silent-fail-split #"\s+"))))))
+               (silent-fail-split #"\s+")))       ; class
+
+          is-first?
+          
+          is-last?)))    
 
 (defn tag-id-class->xpath
   "Args:
     a-tag-id-class : a tag, its id and a list of classes
    Returns:
     a component that fits in an xpath"
-  [[tag id class-list]]
+  [[tag id class-list is-first? is-last?]]
   (let [formatted-id      (format "contains(@id,'%s')" id)
         formatted-classes (map
                            #(format "contains(@class,'%s')" %)
@@ -166,8 +206,24 @@
     
 
     (if (not (empty? class-list)) 
-      (map #(format "%s[%s]" tag %) formatted-classes)
-      (list tag))))
+      (map #(cond (and (not is-first?)
+                       (not is-last?))             
+                  (format "%s[%s]" tag %)
+
+                  is-first?
+                  (format "%s[%s][1]" tag %)
+
+                  is-last?
+                  (format "%s[%s][last()]" tag %)) formatted-classes)
+      (cond (and (not is-first?)
+                 (not is-last?))
+            (list tag)
+
+            is-first?
+            (list (format "%s[1]" tag))
+
+            is-last?
+            (list (format "%s[last()]" tag))))))
 
 (defn tag-node->xpath
   [a-tagnode]
@@ -276,25 +332,30 @@ id and class tag constraints are also added"
                                       (.getAttributes)
                                       (.getNamedItem "href"))
                                   (try
-                                    (not= (-> a-tag
-                                              (.getAttributes)
-                                              (.getNamedItem "rel")
-                                              (.getValue))
-                                          "nofollow")
+                                    (not=
+                                     (-> a-tag
+                                         (.getAttributes)
+                                         (.getNamedItem "rel")
+                                         (.getValue))
+                                     "nofollow")
                                     (catch NullPointerException e true))
                                   
-                                  (not= (uri/scheme (-> a-tag
-                                                        (.getAttributes)
-                                                        (.getNamedItem "href")
-                                                        (.getValue)))
-                                        "javascript")
-                                  (not (some #{(uri/resolve-uri
-                                                url
-                                                (-> a-tag
-                                                    (.getAttributes)
-                                                    (.getNamedItem "href")
-                                                    (.getValue)))}
-                                             (set blacklist)))))
+                                  (not=
+                                   (uri/scheme
+                                    (-> a-tag
+                                        (.getAttributes)
+                                        (.getNamedItem "href")
+                                        (.getValue)))
+                                   "javascript")
+                                  (not
+                                   (some
+                                    #{(uri/resolve-uri
+                                       url
+                                       (-> a-tag
+                                           (.getAttributes)
+                                           (.getNamedItem "href")
+                                           (.getValue)))}
+                                    (set blacklist)))))
                            a-tags)
            
            nodes-xpaths   (map
@@ -310,286 +371,15 @@ id and class tag constraints are also added"
                                               (.getNamedItem "href")
                                               (.getValue))]
                                  {:node x
-                                  :href (try (uri/fragment
-                                              (uri/resolve-uri url link) nil)
-                                             (catch Exception e nil))
-                                  :text (-> x
-                                            (.getTextContent))}))
+                                  :href (try
+                                          (uri/fragment
+                                           (uri/resolve-uri url link)
+                                           nil)
+                                          (catch Exception e nil))
+                                  :text (.getTextContent x)}))
                              a-tags-w-hrefs)))]
        
        (reduce
         (fn [acc [an-xpath node]]
-          (merge-with concat acc {an-xpath [node]})) {} nodes-xpaths))))
-
-(defn minimum-maximal-xpath-set-processed
-  "This helper routine exists so we don't reparse
-the page several times"
-  [processed-pg]
-  (let [a-tags        ($x:node+ ".//a" processed-pg)
-
-        href-nodes    (filter
-                       identity (map #(-> %
-                                          (.getAttributes)
-                                          (.getNamedItem "href"))
-                                     a-tags))
-        
-        links         (set (map #(.getNodeValue %) href-nodes))
-
-        xpaths-a-tags (map
-                       first
-                       (reverse
-                        (sort-by
-                         second
-                         (anchor-tag-xpaths-nodes a-tags))))]
-
-    (:xpaths (-> (reduce
-                  (fn [acc xpath]
-                    (let [xpath-links (set
-                                       (filter
-                                        #(not (re-find file-format-ignore-regex %))
-                                        (filter
-                                         identity
-                                         (map #(try (uri/fragment (-> % :attrs :href StringEscapeUtils/unescapeHtml) nil)
-                                                    (catch Exception e nil))
-                                              ($x xpath processed-pg)))))]
-                      (if (= (clj-set/intersection (:links acc) xpath-links)
-                             xpath-links)
-                        acc
-                        (merge-with clj-set/union acc {:links  xpath-links
-                                                       :xpaths #{xpath}}))))
-                  {:xpaths (set [])
-                   :links  (set [])}
-                  xpaths-a-tags)))))
-
-(defn minimum-maximal-xpath-set
-  "A maximal xpath set is a set of xpaths
-sufficient to span all the anchor tags on a 
-page. The minimum here refers to the cardinality
-of the xpath set."
-  [page-src src-link]
-  (let [processed (html->xml-doc page-src)
-        xpaths    (minimum-maximal-xpath-set-processed processed)]
-    (reduce
-     (fn [acc [xpath hrefs]]
-       (merge-with clojure.set/union acc {xpath hrefs}))
-     {}
-     (map
-      vector
-      xpaths
-      (map
-       (fn [xpath]
-         (set
-          (filter
-           #(not (re-find file-format-ignore-regex (first %)))
-           (filter
-            #(-> % first identity)
-            (map
-             (fn [res]
-               (let [link (-> res
-                              :attrs
-                              :href
-                              StringEscapeUtils/unescapeHtml)
-                     text (->> res
-                               :text
-                               utils/tokenize)]
-                 [(try
-                    (uri/resolve-uri
-                     src-link
-                     (uri/fragment
-                      (if (= "javascript" (uri/scheme link))
-                        nil link)
-                      nil))
-                    (catch Exception e nil))
-                  text]))
-             (filter
-              identity ($x xpath processed))))))) xpaths)))))
-
-(defn node-path-to-root
-  "A version of path-root-seq for
-org.w3c.dom.Node objects"
-  ([a-node]
-     (node-path-to-root a-node []))
-  
-  ([a-node cur-path]
-     (let [parent (.getParentNode a-node)]
-       (if parent
-         (recur parent (cons a-node cur-path))
-         (cons a-node cur-path)))))
-
-(defn xpath->records
-  "Nodes that are immediate children of the LCA 
-of the nodes returned by an xpath.
-Processed page is the output of html->xml-doc.
-This routine is not correct and we don't really
-care about its correctness for now"
-  [xpath processed-page]
-  (let [nodes ($x:node+ xpath processed-page)]
-    (loop [cur-nodes nodes prev-nodes []]
-      (let [potential-parent (reduce (fn [acc v]
-                                       (if (and acc
-                                                (.isSameNode acc v))
-                                         acc
-                                         nil))
-                                     cur-nodes)]
-        (if-not potential-parent
-          (recur (map #(.getParentNode %) cur-nodes) cur-nodes)
-          (reduce (fn [acc v] 
-                    (if (empty? acc)
-                      [v]
-                      (if (.isSameNode (last acc) v)
-                        acc
-                        (conj acc v))))
-                  []
-                  prev-nodes))))))
-
-(defn tooltips
-  [a-node]
-  (try
-    ($x:text+ ".//@title" a-node)
-    (catch RuntimeException e '())))
-
-(defn relative-dates
-  [a-node]
-  (filter
-   #(= (count %) 1)
-   (map
-    dates/dates-in-text
-    (tooltips a-node))))
-
-(defn neighborhood-text
-  "Text from the neighborhood of the elements
-returned by this xpath on our page"
-  [xpath processed-page]
-  (map #(dates/dates-in-text
-         (str/join
-          " "
-          (str/split (.getTextContent %) #"\s+")))
-       (xpath->records xpath processed-page)))
-
-(defn xpath-records-dates-processed-page
-  [xpath processed-page]
-  (let [num-records      (count 
-                          (xpath->records 
-                           xpath processed-page))
-
-        dategroups-found (count
-                          (filter 
-                           (fn [x] (> (count x) 0))
-                           (neighborhood-text xpath processed-page)))]
-    
-    (when-not (= num-records 0)
-      {:ratio (/ dategroups-found num-records)
-       :num-records num-records})))
-
-(defn xpath-records-dates
-  "An xpath returns nodes. We check how many of these
-result in nodes that are indexed by a clear date"
-  [xpath processed-pg]
-  (xpath-records-dates-processed-page xpath processed-pg))
-
-(defn xpaths-ranked
-  ([page-src]
-     (xpaths-ranked page-src 0.70))
-  ([page-src ratio]
-     (let [processed-pg (html->xml-doc page-src)
-           xpaths       (:xpaths (minimum-maximal-xpath-set-processed processed-pg))]
-       (reverse
-        (sort-by
-         (fn [x] (:num-records (second x)))
-         (filter
-          #(> (:ratio (second %)) ratio)
-          (filter
-           #(identity (second %))
-           (map (fn [xpath]
-                  (list
-                   xpath
-                   (xpath-records-dates xpath processed-pg))) 
-                xpaths))))))))
-
-(defn same-node-set?
-  "Checks if the nodes returned are the same"
-  [node-set1 node-set2]
-  (reduce
-   (fn [out-acc a-node]
-     (and
-      out-acc
-      (reduce
-       (fn [acc another-node]
-         (or acc (.isEqualNode a-node another-node)))
-       false
-       node-set2)))
-   true
-   node-set1))
-
-(defn xpath-nodes
-  [xpath page-src]
-  (let [processed (html->xml-doc page-src)]
-    ($x:node+ xpath processed)))
-
-(defn equal-xpaths?
-  "Xpaths are equal either if the strings are the same
-or the returned records/nodes in the page are the same"
-  [xpath1 xpath2 page-src]
-  (or (= xpath1 xpath2)
-      (same-node-set? (xpath-nodes xpath1 page-src)
-                      (xpath-nodes xpath2 page-src))))
-
-(defn resolve-anchor-nodes
-  ([xpath node]
-     (resolve-anchor-nodes xpath node node))
-  ([xpath node stored]
-   (let [parent-node                (.getParentNode node)
-         anchor-children            ($x:node+ ".//a" parent-node)
-         xpaths-to-anchor-children  (reduce
-                                     (fn [acc x]
-                                       (merge-with + acc {x 1}))
-                                     {}
-                                     (map #(first (xpath-to-node %)) anchor-children))]
-
-     (cond (> (xpaths-to-anchor-children xpath) 1)
-           [(first (xpath-to-node node)) node]
-
-           (= (.getNodeName parent-node) "#document")
-           [xpath stored]
-
-           :else
-           (recur xpath parent-node stored)))))
-
-(defn minimum-maximal-xpath-records
-  "Given a set of xpaths, we compute the xpaths that
-are sufficient to generate all the distinct records"
-  [xpaths processed-page]
-
-  (let [xpath-nodes      (map #($x:node+ % processed-page) xpaths)
-        xpaths-nodes-map (into {} (map vector xpaths xpath-nodes))
-        potential-recs   (map (fn [[xpath nodes]]
-                                (map (fn [node]
-                                       (resolve-anchor-nodes xpath node)) nodes))
-                              xpaths-nodes-map)]
-    (into {}
-          (map
-           (fn [[xpath nodes]]
-             [xpath (distinct nodes)])
-           (reduce
-            (fn [acc [xpath node]]
-              (merge-with concat acc {xpath [node]}))
-            {}
-            (partition 2 (flatten potential-recs)))))))
-
-(defn date-indexed-records-filter
-  "records-sets: returned by minimum-maximal-xpath-records"
-  [records-sets]
-  (first
-   (filter
-    #(> (count %) 5)
-    records-sets)))
-
-(defn node-text
-  "Text = text nodes + tooltips"
-  [a-node]
-  (apply
-   str
-   (.getTextContent a-node)
-   (str/join " " (tooltips a-node))))
-
-  
+          (merge-with
+           concat acc {an-xpath [node]})) {} nodes-xpaths))))

@@ -369,6 +369,34 @@ id and class tag constraints are also added"
        ;;     concat acc {an-xpath [node]})) {} nodes-xpaths)
        nodes-paths)))
 
+(defn path->xpath
+  [path positions]
+  (clojure.string/join
+   "/"
+   (cons
+    "/"
+    (map
+     (fn [i]
+       (let [[tag class pos] (nth path i)]
+         (if (some #{i} (set positions))
+           (if class
+             (format "%s[contains(@class, '%s')][%d]" tag class (inc pos))
+             (format "%s[%d]" tag (inc pos)))
+           (if class
+             (format "%s[contains(@class, '%s')]" tag class)
+             (format "%s" tag)))))
+     (range
+      (count path))))))
+
+(defn generate-xpath
+  "Generates an xpath for a set of nodes by incoporating
+   position information"
+  [[positions nodes]]
+  (map
+   (fn [[path a-node]]
+     [(path->xpath path positions) a-node])
+   nodes))
+
 (defn xpaths-hrefs-tokens
   [nodes-paths]
   (let [node-objs     (map
@@ -422,5 +450,14 @@ id and class tag constraints are also added"
                          #(map
                            :obj
                            (second %))
-                         grouped-nodes))]
-    pos-path-nodes))
+                         grouped-nodes))
+
+        xpath-nodes    (reduce
+                        concat
+                        (map generate-xpath
+                             pos-path-nodes))]
+    (reduce
+     (fn [acc v]
+       (merge-with concat acc {(first v) [(second v)]}))
+     {}
+     xpath-nodes)))

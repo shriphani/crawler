@@ -198,3 +198,16 @@ escape characters. then call re-pattern on it"
   [a-link]
   (try (-> a-link (client/get {:cookie-store my-cs}) :body)
        (catch Exception e nil)))
+
+(defn positions-at
+  ".indexOf variant that finds multiple instances"
+  [collection item]
+  (let [v-collection (into [] collection)]
+    (reduce
+     (fn [acc i]
+       (if (= item (nth v-collection i))
+         (cons i acc)
+         acc))
+     []
+     (range
+      (count v-collection)))))

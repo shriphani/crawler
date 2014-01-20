@@ -381,16 +381,46 @@ id and class tag constraints are also added"
         grouped-nodes (group-by :path node-objs)
 
         ;; next grouping is done using a position frequency
-        ;; method
-        positions     (map
-                       (fn [a-group]
-                         (let [objs (map :obj (second a-group))
-                               poss (map
-                                     (fn [an-obj]
-                                       (map last
-                                        (first an-obj)))
-                                     objs)]
-                           poss))
-                       grouped-nodes)]
+        ;; method. This tells us in each node-group, where to
+        ;; insert positions
+        positions      (map
+                        (fn [a-group]
+                          (let [objs           (map :obj (second a-group))
+                                
+                                poss           (map
+                                                (fn [an-obj]
+                                                  (map last
+                                                       (first an-obj)))
+                                                objs)
+                                
+                                num-as         (count poss)
+                                
+                                positions-freq (into
+                                                [] (map
+                                                    #(-> % distinct count)
+                                                    (apply
+                                                     map vector poss)))
+                                
+                                accum-scr      (into [] (reductions * positions-freq))
+                                
+                                where          (utils/positions-at
+                                                (map
+                                                 (fn [i]
+                                                   (and
+                                                    (not= (nth positions-freq i) 1)
+                                                    (< (nth accum-scr i) num-as)))
+                                                 (range
+                                                  (count accum-scr)))
+                                                true)]
+                            where))
+                        grouped-nodes)
 
-    positions))
+        pos-path-nodes (map
+                        vector
+                        positions
+                        (map
+                         #(map
+                           :obj
+                           (second %))
+                         grouped-nodes))]
+    pos-path-nodes))

@@ -436,7 +436,14 @@ id and class tag constraints are also added"
                                                        #(-> % distinct count)
                                                        (apply
                                                         map vector poss)))
-                                   
+
+                                   positions-inc  (filter
+                                                   #(and (not= % 1)
+                                                         (not= % num-as))
+                                                   positions-freq)
+
+                                   positions-max  (or nil (when (seq positions-inc) (apply max positions-inc)))
+
                                    accum-scr      (reverse
                                                    (into [] (reductions * (reverse positions-freq))))
                                    
@@ -445,7 +452,8 @@ id and class tag constraints are also added"
                                                     (fn [i]
                                                       (and
                                                        (not= (nth positions-freq i) 1)
-                                                       (< (nth accum-scr i) num-as)))
+                                                       (< (nth accum-scr i) num-as)
+                                                       (not= (nth positions-freq i) positions-max)))
                                                     (range
                                                      (count accum-scr)))
                                                    true)]

@@ -429,7 +429,8 @@ id and class tag constraints are also added"
                                                     (apply
                                                      map vector poss)))
                                 
-                                accum-scr      (into [] (reductions * positions-freq))
+                                accum-scr      (reverse
+                                                (into [] (reductions * (reverse positions-freq))))
                                 
                                 where          (utils/positions-at
                                                 (map

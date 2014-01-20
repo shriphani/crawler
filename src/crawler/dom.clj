@@ -461,4 +461,3 @@ id and class tag constraints are also added"
        (merge-with concat acc {(first v) [(second v)]}))
      {}
      xpath-nodes)))
->>>>>>> xpath_position_info

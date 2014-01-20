@@ -133,33 +133,19 @@
 (defn child-position
   [parent a-w3c-node]
   (let [child-node-list (.getChildNodes parent)
-        child-nodes-cnt (.getLength child-node-list)]
+        child-nodes-cnt (.getLength child-node-list)
+        child-nodes     (filter
+                         (fn [a-node]
+                           (= (.getNodeName a-node)
+                              (.getNodeName a-w3c-node)))
+                         (map
+                          #(.item child-node-list %)
+                          (range child-nodes-cnt)))]
     (.indexOf
      (map
-      #(.isSameNode
-        a-w3c-node
-        (.item child-node-list %))
-      (range child-nodes-cnt))
+      #(.isSameNode % a-w3c-node)
+      child-nodes)
      true)))
-
-(defn is-first-child?
-  [a-w3c-node]
-  (let [parent (.getParentNode a-w3c-node)]
-    (and parent
-         (= 0 (child-position
-               parent a-w3c-node)))))
-
-(defn is-last-child?
-  [a-w3c-node]
-  (let [parent (.getParentNode a-w3c-node)]
-    (and parent
-         (=
-          (-
-           (.getLength
-            (.getChildNodes parent))
-           1)
-          (child-position
-           parent a-w3c-node)))))
 
 (defn tag-id-class-node
   "Returns a list containing a tag's name, its id
@@ -175,55 +161,40 @@
         
         attributes        (.getAttributes a-w3c-node)
 
-        is-first?         (is-first-child? a-w3c-node)
+        position          (child-position
+                           (.getParentNode a-w3c-node)
+                           a-w3c-node)]
 
-        is-last?          (is-last-child? a-w3c-node)]
-
-    (list (.getNodeName a-w3c-node)               ; name
-          (-> attributes
-              (silent-fail-attr "id")
-              format-attr)                        ; id
-          (map
-           format-attr
-           (-> attributes
-               (silent-fail-attr "class")
-               (silent-fail-split #"\s+")))       ; class
-
-          is-first?
+    (list (.getNodeName a-w3c-node)
           
-          is-last?)))    
+          (first
+           (map
+            format-attr
+            (-> attributes
+                (silent-fail-attr "class")
+                (silent-fail-split #"\s+"))))
+
+          position)))
 
 (defn tag-id-class->xpath
   "Args:
     a-tag-id-class : a tag, its id and a list of classes
    Returns:
     a component that fits in an xpath"
-  [[tag id class-list is-first? is-last?]]
-  (let [formatted-id      (format "contains(@id,'%s')" id)
-        formatted-classes (map
-                           #(format "contains(@class,'%s')" %)
-                           class-list)]
+  [[tag class-list position]]
+  (let [formatted-class (first
+                         (map
+                          #(format "contains(@class,'%s')" %)
+                          class-list))]
     
 
     (if (not (empty? class-list)) 
-      (map #(cond (and (not is-first?)
-                       (not is-last?))             
-                  (format "%s[%s]" tag %)
-
-                  is-first?
-                  (format "%s[%s][1]" tag %)
-
-                  is-last?
-                  (format "%s[%s][last()]" tag %)) formatted-classes)
-      (cond (and (not is-first?)
-                 (not is-last?))
-            (list tag)
-
-            is-first?
-            (list (format "%s[1]" tag))
-
-            is-last?
-            (list (format "%s[last()]" tag))))))
+      (if (not position)    
+        (format "%s[%s]" tag formatted-class)
+        (format "%s[%s][%d]" tag formatted-class position))
+      (if (not position)
+        (list tag)
+        (list (format "%s[%d]" tag position))))))
 
 (defn tag-node->xpath
   [a-tagnode]
@@ -236,6 +207,11 @@
   (-> a-w3c-node
       tag-id-class-node
       tag-id-class->xpath))
+
+(defn w3c-node->ds
+  [a-w3c-node]
+  (-> a-w3c-node
+      tag-id-class-node))
 
 (defn tags->xpath
   "Given a sequence of tags, we construct an XPath
@@ -264,6 +240,10 @@ id and class tag constraints are also added"
    ["/"]
    (map w3c-node->xpath nodes-seq)))
 
+(defn nodes->ds
+  [nodes-seq]
+  (map w3c-node->ds nodes-seq))
+
 (defn xpath-to-custom-root
   [a-node the-root]
   (let [path-to-root (path-root-seq-nodes-2 a-node the-root)]
@@ -273,6 +253,11 @@ id and class tag constraints are also added"
   [a-node]
   (let [path-to-root (path-root-seq-nodes a-node)]
     (nodes->xpath path-to-root)))
+
+(defn ds-to-node
+  [a-node]
+  (let [path-to-root (path-root-seq-nodes a-node)]
+    (nodes->ds path-to-root)))
 
 (defn anchor-tag-xpaths-nodes
   [nodes]
@@ -314,11 +299,10 @@ id and class tag constraints are also added"
 
 (def file-format-ignore-regex #".jpg$|.css$|.gif$|.png$|.xml$")
 
-(defn xpaths-hrefs-tokens
-  "Args:
-    a-processed-page: a processed page
-    url: a url
-    "
+(defn page-nodes-hrefs-text
+  "An intermediate step in producing a space of
+   decisions. Returns the path to a node, the href
+   attrib value and the associated text"
   ([a-processed-page url]
      (xpaths-hrefs-tokens a-processed-page url (set [])))
   
@@ -358,9 +342,9 @@ id and class tag constraints are also added"
                                     (set blacklist)))))
                            a-tags)
            
-           nodes-xpaths   (map
+           nodes-paths    (map
                            (fn [x]
-                             [(-> x :node xpath-to-node first) x])
+                             [(-> x :node ds-to-node) x])
                            (filter
                             (fn [x]
                               (= (uri/host url) (-> x :href uri/host)))
@@ -379,7 +363,34 @@ id and class tag constraints are also added"
                                   :text (.getTextContent x)}))
                              a-tags-w-hrefs)))]
        
-       (reduce
-        (fn [acc [an-xpath node]]
-          (merge-with
-           concat acc {an-xpath [node]})) {} nodes-xpaths))))
+       ;; (reduce
+       ;;  (fn [acc [an-xpath node]]
+       ;;    (merge-with
+       ;;     concat acc {an-xpath [node]})) {} nodes-xpaths)
+       nodes-paths)))
+
+(defn xpaths-hrefs-tokens
+  [nodes-paths]
+  (let [node-objs     (map
+                       (fn [[path an-obj]]
+                         {:path (map drop-last path)
+                          :obj  [path an-obj]})
+                       nodes-paths)
+
+        ;; initial grouping is by style and dom position
+        grouped-nodes (group-by :path node-objs)
+
+        ;; next grouping is done using a position frequency
+        ;; method
+        positions     (map
+                       (fn [a-group]
+                         (let [objs (map :obj (second a-group))
+                               poss (map
+                                     (fn [an-obj]
+                                       (map last
+                                        (first an-obj)))
+                                     objs)]
+                           poss))
+                       grouped-nodes)]
+
+    positions))

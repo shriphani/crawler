@@ -304,7 +304,7 @@ id and class tag constraints are also added"
    decisions. Returns the path to a node, the href
    attrib value and the associated text"
   ([a-processed-page url]
-     (xpaths-hrefs-tokens a-processed-page url (set [])))
+     (page-nodes-hrefs-text a-processed-page url (set [])))
   
   ([a-processed-page url blacklist]
      (let [a-tags         ($x:node+ ".//a" a-processed-page) ; anchor tags

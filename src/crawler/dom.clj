@@ -423,6 +423,8 @@ id and class tag constraints are also added"
                            (fn [a-group]
                              (let [objs           (map :obj (second a-group))
                                    
+                                   path-length    (-> a-group first count)
+
                                    poss           (map
                                                    (fn [an-obj]
                                                      (map last
@@ -447,16 +449,18 @@ id and class tag constraints are also added"
                                    accum-scr      (reverse
                                                    (into [] (reductions * (reverse positions-freq))))
                                    
-                                   where          (utils/positions-at
-                                                   (map
-                                                    (fn [i]
-                                                      (and
-                                                       (not= (nth positions-freq i) 1)
-                                                       (< (nth accum-scr i) num-as)
-                                                       (not= (nth positions-freq i) positions-max)))
-                                                    (range
-                                                     (count accum-scr)))
-                                                   true)]
+                                   where          (filter
+                                                   #(not= (dec path-length) %)
+                                                   (utils/positions-at
+                                                    (map
+                                                     (fn [i]
+                                                       (and
+                                                        (not= (nth positions-freq i) 1)
+                                                        (< (nth accum-scr i) num-as)
+                                                        (not= (nth positions-freq i) positions-max)))
+                                                     (range
+                                                      (count accum-scr)))
+                                                    true))]
                                where))
                            grouped-nodes)
 

@@ -454,6 +454,127 @@
                      second
                      (frequencies leaf-paths)))})))
 
+(defn look-ahead-and-prepare
+  [xpaths-and-urls src-path]
+  (reduce
+   (fn [acc {xpath :xpath hrefs :hrefs texts :texts}]
+     (let [stuff (filter
+                  identity
+                  (map
+                   (fn [a-link]
+                     (when-not (some #{a-link} (:visited acc))
+                       (do
+                         (Thread/sleep 2000)
+                         (println :visiting a-link)
+                         (let [body (utils/download-with-cookie a-link)]
+                           {:body body
+                            :url  a-link
+                            :path (cons xpath src-path)}))))                   
+                   hrefs))]
+       (merge-with concat acc {:bodies stuff :visited hrefs})))
+   {}
+   xpaths-and-urls))
+
+(defn sample-sitemap-lookahead
+  "Lookahead based crawler.
+   Decisions made based on specified lookahead.
+   Default lookahead = 1 (I don't see the point of 2 but whatevs bro).
+
+   The meat of this routine expects:
+   - body-queue : bodies crawled in the previous phase (and those
+                  we selected
+   - visited    : same old
+
+   - leaf?      : leaf node detection routine must be supplied.
+                  replace this with what is needed. For tomorrow's
+                  meeting spin up a structure driven crawler.
+
+   - extract    : extractor module
+
+   Performs bfs traversal with 1 lookahead."
+  ([entry-point leaf? extract stop?]
+     (sample-sitemap-lookahead entry-point 1 leaf? extract stop?))
+  
+  ([entry-point lookahead leaf? extract stop?]
+     (let [body           (utils/download-with-cookie entry-point)
+           body-queue-ele {:url  entry-point
+                           :body body}]
+      (sample-sitemap-lookahead
+       [body-queue-ele]
+       [entry-point]
+       lookahead
+       leaf?
+       extract
+       stop?
+       []
+       50)))
+
+  ([body-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit]
+     (do
+       (println :queue-size (count body-queue))
+       (println :visited (count visited))
+       (println :leaves-left leaf-limit)
+       (println :url (-> body-queue first :url))
+       (cond (or (empty? body-queue)
+                 (stop? {:visited    (count visited)
+                         :leaf-left  leaf-limit
+                         :body       (-> body-queue first :body)}))
+             (do
+               (println :crawl-done)
+               {:model leaf-paths})
+             
+             (leaf? (-> body-queue first :body))
+             (do
+               (println :leaf-reached)
+               (let [{new-bodies  :bodies
+                      new-visited :visited}
+                     (-> body-queue
+                         first
+                         :body
+                         (extract
+                          (-> body-queue first :url)
+                          {}
+                          (set visited))
+                         :xpath-nav-info
+                         look-ahead-and-prepare)]
+                 
+                 (recur (concat (rest body-queue)
+                                new-visited)
+                        (clojure.set/union visited (set new-visited))
+                        lookahead
+                        leaf?
+                        extract
+                        stop?
+                        (cons
+                         (-> body-queue first :path)
+                         leaf-paths)
+                        (dec leaf-limit))))
+
+             :else
+             (let [{new-bodies  :bodies
+                    new-visited :visited}
+                   (try
+                     (-> body-queue
+                        first
+                        :body
+                        (extract
+                         (-> body-queue first :url)
+                         {}
+                         (set visited))
+                        :xpath-nav-info
+                        (look-ahead-and-prepare
+                         (-> body-queue first :path)))
+                     (catch NullPointerException e nil))]
+               (do
+                 (recur (concat (rest body-queue) new-bodies)
+                        (clojure.set/union visited new-visited)
+                        lookahead
+                        leaf?
+                        extract
+                        stop?
+                        leaf-paths
+                        leaf-limit)))))))
+
 (defn crawl-site-extract
   ([site model]
      (crawl-site-extract

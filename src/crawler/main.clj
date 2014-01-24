@@ -17,7 +17,8 @@
                                   x example-body))]
     (crawl/sample-sitemap-lookahead start-url
                                     structure-driven-leaf?
-                                    structure-driven/extractor)))
+                                    structure-driven/extractor
+                                    structure-driven/stop?)))
 
 (defn -main
   [& args]

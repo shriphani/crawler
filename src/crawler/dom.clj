@@ -398,12 +398,12 @@ id and class tag constraints are also added"
    nodes))
 
 (defn xpaths-hrefs-tokens
-  ([body url]
-     (xpaths-hrefs-tokens body url (set [])))
+  ([processed-body url]
+     (xpaths-hrefs-tokens processed-body url (set [])))
 
-  ([body url blacklist]
+  ([processed-body url blacklist]
      (let [nodes-paths   (page-nodes-hrefs-text
-                          (html->xml-doc body)
+                          processed-body
                           url
                           blacklist)
 

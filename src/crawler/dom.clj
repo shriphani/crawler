@@ -402,10 +402,9 @@ id and class tag constraints are also added"
      (xpaths-hrefs-tokens processed-body url (set [])))
 
   ([processed-body url blacklist]
-     (let [nodes-paths   (page-nodes-hrefs-text
-                          processed-body
-                          url
-                          blacklist)
+     (let [nodes-paths   (page-nodes-hrefs-text processed-body
+                                                url
+                                                blacklist)
 
            node-objs     (map
                           (fn [[path an-obj]]

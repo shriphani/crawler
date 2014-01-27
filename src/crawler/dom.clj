@@ -449,18 +449,16 @@ id and class tag constraints are also added"
                                    accum-scr      (reverse
                                                    (into [] (reductions * (reverse positions-freq))))
                                    
-                                   where          (filter
-                                                   #(not= (dec path-length) %)
-                                                   (utils/positions-at
-                                                    (map
-                                                     (fn [i]
-                                                       (and
-                                                        (not= (nth positions-freq i) 1)
-                                                        (< (nth accum-scr i) num-as)
-                                                        (not= (nth positions-freq i) positions-max)))
-                                                     (range
-                                                      (count accum-scr)))
-                                                    true))]
+                                   where          (utils/positions-at
+                                                   (map
+                                                    (fn [i]
+                                                      (and
+                                                       (not= (nth positions-freq i) 1)
+                                                       (< (nth accum-scr i) num-as)
+                                                       (not= (nth positions-freq i) positions-max)))
+                                                    (range
+                                                     (count accum-scr)))
+                                                   true)]
                                where))
                            grouped-nodes)
 

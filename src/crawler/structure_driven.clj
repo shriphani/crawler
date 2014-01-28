@@ -11,12 +11,16 @@
   (<= 200 visited))
 
 (defn leaf?
-  [body example-leaf]
-  (let [sim (similarity/tree-edit-distance-html
-             body
-             example-leaf)]
-    (do
-      (println :similarity sim)
-      (<= 0.8 sim))))
+  "A leaf for a structure driven crawler"
+  ([body example-leaf]
+     (leaf? body example-leaf 0.8))
+  
+  ([body example-leaf thresh]
+     (let [sim (similarity/tree-edit-distance-html
+                body
+                example-leaf)]
+       (do
+         (println :similarity sim)
+         (<= thresh sim)))))
 
 (def extractor rc-extractor/state-action)

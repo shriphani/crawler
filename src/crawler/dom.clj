@@ -136,8 +136,10 @@
         child-nodes-cnt (.getLength child-node-list)
         child-nodes     (filter
                          (fn [a-node]
-                           (= (.getNodeName a-node)
-                              (.getNodeName a-w3c-node)))
+                           (and (= (.getNodeName a-node)
+                                   (.getNodeName a-w3c-node))
+                                (= (node-class a-node)
+                                   (node-class a-w3c-node))))
                          (map
                           #(.item child-node-list %)
                           (range child-nodes-cnt)))]
@@ -398,6 +400,9 @@ id and class tag constraints are also added"
    nodes))
 
 (defn xpaths-hrefs-tokens
+  "Utilize an initial class-based grouping.
+   Then add position information in the XPath to
+   achieve a finer grouping."
   ([processed-body url]
      (xpaths-hrefs-tokens processed-body url (set [])))
 

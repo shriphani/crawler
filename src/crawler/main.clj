@@ -7,8 +7,8 @@
 
 (def crawler-options
   [[nil "--structure-driven" "Use the structure driven crawler"]
-   [nil "--start" "Entry point for the structure driven crawler"]
-   [nil "--example" "Example leaf page url for the structure driven crawler"]])
+   [nil "--start START" "Entry point for the structure driven crawler"]
+   [nil "--example EXAMPLE" "Example leaf page url for the structure driven crawler"]])
 
 (defn structure-driven-crawler
   [start-url example-body]

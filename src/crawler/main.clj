@@ -15,10 +15,10 @@
   (let [structure-driven-leaf? (fn [x]
                                  (structure-driven/leaf?
                                   x example-body))]
-    (crawl/sample-sitemap-lookahead start-url
-                                    structure-driven-leaf?
-                                    structure-driven/extractor
-                                    structure-driven/stop?)))
+    (crawl/build-sitemap start-url
+                         structure-driven-leaf?
+                         structure-driven/extractor
+                         structure-driven/stop?)))
 
 (defn -main
   [& args]

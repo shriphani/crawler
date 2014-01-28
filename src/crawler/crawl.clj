@@ -455,17 +455,20 @@
                      (frequencies leaf-paths)))})))
 
 (defn prepare
-  [xpaths-and-urls src-path]
+  [xpaths-and-urls src-path url]
   (reduce
    (fn [acc {xpath :xpath hrefs :hrefs texts :texts}]
-     (let [stuff (filter
-                  identity
-                  (map
-                   (fn [a-link]
-                     (when-not (some #{a-link} (:visited acc))
-                       {:url  a-link
-                        :path (cons xpath src-path)}))                   
-                   hrefs))]
+     (let [stuff (distinct-by-key
+                  (filter
+                   identity
+                   (map
+                    (fn [a-link]
+                      (when-not (some #{a-link} (:visited acc))
+                        {:url  a-link
+                         :path (cons xpath src-path)
+                         :src-url url}))                   
+                    hrefs))
+                  :url)]
        (merge-with concat acc {:bodies stuff :visited hrefs})))
    {}
    xpaths-and-urls))
@@ -505,11 +508,13 @@
 
   ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit]
      (do
-       (Thread/sleep 2000)
+       (Thread/sleep 1000)
        (println :queue-size (count url-queue))
        (println :visited (count visited))
        (println :leaves-left leaf-limit)
        (println :url (-> url-queue first :url))
+       (println :src-url (-> url-queue first :src-url))
+       (println :src-path (-> url-queue first :path))
        (let [url  (-> url-queue first :url)
              body (utils/download-with-cookie url)]
         (cond (or (empty? url-queue)
@@ -518,7 +523,7 @@
                           :body       body}))
               (do
                 (println :crawl-done)
-                {:model leaf-paths})
+                {:model (frequencies leaf-paths)})
              
               (leaf? body)
               (do
@@ -529,15 +534,22 @@
                           (extract
                            (-> url-queue first :url)
                            {}
-                           (set visited))
+                           (clojure.set/union
+                            (set visited)
+                            (set [url])
+                            (map
+                             #(-> % :url)
+                             url-queue)))
                           :xpath-nav-info
                           (prepare
-                           (-> url-queue first :path)))]
+                           (-> url-queue first :path)
+                           url))]
                  
                   (recur (concat (rest url-queue)
                                  new-bodies)
-                         (clojure.set/union visited
-                                            (set [url]))
+                         (clojure.set/union
+                          (set visited)
+                          (set [url]))
                          lookahead
                          leaf?
                          extract
@@ -555,11 +567,17 @@
                           (extract
                            url
                            {}
-                           (conj (set visited)
-                                 url))
+                           (clojure.set/union
+                            (set visited)
+                            (set [url])
+                            (set
+                             (map
+                              #(-> % :url)
+                              url-queue))))
                           :xpath-nav-info
                           (prepare
-                           (-> url-queue first :path)))
+                           (-> url-queue first :path)
+                           url))
                       (catch NullPointerException e nil))]
                 (do
                   (recur (concat (rest url-queue) new-bodies)

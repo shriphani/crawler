@@ -96,7 +96,8 @@
                                   xpaths-anchors-chars))]
 
        {:total-nav-info page-wide-nav-chars
-        :xpath-nav-info (sort-by :score xpath-nav-info)})))
+        :xpath-nav-info (reverse
+                         (sort-by :score xpath-nav-info))})))
 
 (defn detect-recommender-engine-links
   [src-text-mean src-text-stdev decision-space body]

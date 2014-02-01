@@ -4,7 +4,8 @@
    The structure driven crawler fetches a navigation
    pattern = XPath seq"
   (:require [crawler.rich-char-extractor :as rc-extractor]
-            [crawler.similarity :as similarity]))
+            [crawler.similarity :as similarity]
+            [crawler.utils :as utils]))
 
 (defn stop?
   [{visited :visited}]
@@ -19,7 +20,7 @@
                 body
                 example-leaf)]
        (do
-         (println :similarity sim)
+         (utils/sayln :similarity sim)
          (<= thresh sim)))))
 
 (def extractor rc-extractor/state-action)

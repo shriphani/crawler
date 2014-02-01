@@ -442,7 +442,7 @@ id and class tag constraints are also added"
    Then add position information in the XPath to
    achieve a finer grouping."
   ([processed-body url]
-     (xpaths-hrefs-tokens processed-body url (set [])))
+     (xpaths-hrefs-tokens-with-position processed-body url (set [])))
 
   ([processed-body url blacklist]
      (let [nodes-paths   (page-nodes-hrefs-text processed-body

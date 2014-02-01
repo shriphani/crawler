@@ -590,33 +590,4 @@
                           leaf-paths
                           leaf-limit))))))))
 
-(defn crawl-site-extract
-  ([site model]
-     (crawl-site-extract
-      site
-      model
-      (set [])
-      [{:url             site
-        :remaining-model model}]))
 
-  ([site model visited queue]
-     (let [url (-> queue first :url)])))
-
-(defn crawl-site
-  [start {to-eliminate :to-remove models :models}]
-  (map
-   (fn [[model score]]
-     (let [in-order-model (reverse model)]
-       (crawl-site-extract start in-order-model)))
-   models))
-
-(defn crawl
-  [start crawler-type num-docs]
-  (cond (= :richness crawler-type)
-        (crawl-richest {:content [{:url start}]
-                        :pagination []}
-                       (set [])
-                       1
-                       0
-                       num-docs
-                       {})))

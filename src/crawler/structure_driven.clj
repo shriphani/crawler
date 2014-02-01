@@ -11,7 +11,6 @@
   (<= 100 visited))
 
 (defn leaf?
-  "A leaf for a structure driven crawler"
   ([body example-leaf]
      (leaf? body example-leaf 0.8))
   

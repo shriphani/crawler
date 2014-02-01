@@ -437,7 +437,7 @@ id and class tag constraints are also added"
         {}
         xpaths-nodes-paths))))
 
-(defn xpaths-hrefs-tokens
+(defn xpaths-hrefs-tokens-with-position
   "Utilize an initial class-based grouping.
    Then add position information in the XPath to
    achieve a finer grouping."

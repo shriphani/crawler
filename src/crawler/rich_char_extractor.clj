@@ -21,15 +21,12 @@
      (state-action page-src url template-removed []))
 
   ([page-src url template-removed blacklist]
-     (let [processed-pg         (dom/html->xml-doc page-src)
+     (let [proc-pg              (dom/html->xml-doc page-src)
 
            ; xpaths nodes and associated anchor-text
-           xpaths-hrefs-text    (try
-                                  (dom/xpaths-hrefs-tokens
-                                   processed-pg
-                                   url
-                                   blacklist)
-                                  (catch Exception e nil))
+           xpaths-hrefs-text    (dom/xpaths-hrefs-tokens-no-position proc-pg
+                                                                     url
+                                                                     blacklist)
 
            template-removed     (map
                                  (fn [[xpath infos]]
@@ -38,7 +35,8 @@
                                                             set)]
                                      [xpath (filter
                                              (fn [{_ :node href :href _1 :text}]
-                                               (not (some #{href} template-links)))
+                                               (not
+                                                (some #{href} template-links)))
                                              infos)]))
                                  xpaths-hrefs-text)
 
@@ -78,7 +76,9 @@
                                     (let [potential-xpath xpath
                                           potential-score (reduce
                                                            (fn [acc an-info]
-                                                             (+ acc (:num-chars an-info)))
+                                                             (+
+                                                              acc
+                                                              (:num-chars an-info)))
                                                            0
                                                            info)
                                           potential-hrefs (reduce

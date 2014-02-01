@@ -531,19 +531,16 @@
                 (let [{new-bodies  :bodies
                        new-visited :visited}
                       (-> body
-                          (extract
-                           (-> url-queue first :url)
-                           {}
-                           (clojure.set/union
-                            (set visited)
-                            (set [url])
-                            (map
-                             #(-> % :url)
-                             url-queue)))
+                          (extract (-> url-queue first :url)
+                                   {}
+                                   (clojure.set/union (set visited)
+                                                      (set [url])
+                                                      (map
+                                                       #(-> % :url)
+                                                       url-queue)))
                           :xpath-nav-info
-                          (prepare
-                           (-> url-queue first :path)
-                           url))]
+                          (prepare (-> url-queue first :path)
+                                   url))]
                  
                   (recur (concat (rest url-queue)
                                  new-bodies)
@@ -564,20 +561,18 @@
                      new-visited :visited}
                     (try
                       (-> body
-                          (extract
-                           url
-                           {}
-                           (clojure.set/union
-                            (set visited)
-                            (set [url])
-                            (set
-                             (map
-                              #(-> % :url)
-                              url-queue))))
+                          (extract url
+                                   {}
+                                   (clojure.set/union
+                                    (set visited)
+                                    (set [url])
+                                    (set
+                                     (map
+                                      #(-> % :url)
+                                      url-queue))))
                           :xpath-nav-info
-                          (prepare
-                           (-> url-queue first :path)
-                           url))
+                          (prepare (-> url-queue first :path)
+                                   url))
                       (catch NullPointerException e nil))]
                 (do
                   (recur (concat (rest url-queue) new-bodies)

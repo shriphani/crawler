@@ -33,12 +33,12 @@
                     (cli/parse-opts crawler-options)
                     :options)]
     (cond (:structure-driven options)
-          (let [model  (structure-driven-crawler (-> options :start)
-                                                 (-> options
-                                                     :example
-                                                     utils/download-with-cookie)
-                                                 (-> options :leaf-sim-thresh))]
-            (pprint model))
+          (let [stuff (structure-driven-crawler (-> options :start)
+                                                (-> options
+                                                    :example
+                                                    utils/download-with-cookie)
+                                                (-> options :leaf-sim-thresh))]
+            (pprint stuff))
 
           :else
           (println "Pick one bruh"))))

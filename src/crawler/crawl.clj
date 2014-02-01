@@ -510,9 +510,10 @@
                      extract
                      stop?
                      []
-                     50)))
+                     50
+                     {})))
 
-  ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit]
+  ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit corpus]
      (do
        (Thread/sleep 1000)
        (utils/sayln :queue-size (count url-queue))
@@ -530,7 +531,8 @@
                            :body       body}))
                (do
                  (utils/sayln :crawl-done)
-                 {:model (frequencies leaf-paths)})
+                 {:model  (frequencies leaf-paths)
+                  :corpus corpus})
                
                (leaf? body)
                (do
@@ -561,7 +563,11 @@
                           (cons
                            (-> url-queue first :path)
                            leaf-paths)
-                          (dec leaf-limit))))
+                          (dec leaf-limit)
+                          (let [corpus-entry {url {:body      body
+                                                   :leaf?     true
+                                                   :src-xpath (-> url-queue first :path)}}]
+                            (merge corpus corpus-entry)))))
 
                :else
                (let [{new-bodies  :bodies
@@ -588,6 +594,10 @@
                           extract
                           stop?
                           leaf-paths
-                          leaf-limit))))))))
+                          leaf-limit
+                          (let [corpus-entry {url {:body      body
+                                                   :leaf?     false
+                                                   :src-xpath (-> url-queue first :path)}}]
+                            (merge corpus corpus-entry))))))))))
 
 

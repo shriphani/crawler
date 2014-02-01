@@ -24,10 +24,12 @@
      (let [processed-pg         (dom/html->xml-doc page-src)
 
            ; xpaths nodes and associated anchor-text
-           xpaths-hrefs-text    (dom/xpaths-hrefs-tokens
-                                 processed-pg
-                                 url
-                                 blacklist)
+           xpaths-hrefs-text    (try
+                                  (dom/xpaths-hrefs-tokens
+                                   processed-pg
+                                   url
+                                   blacklist)
+                                  (catch Exception e nil))
 
            template-removed     (map
                                  (fn [[xpath infos]]

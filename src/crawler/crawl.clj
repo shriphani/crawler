@@ -458,18 +458,24 @@
   [xpaths-and-urls src-path url]
   (reduce
    (fn [acc {xpath :xpath hrefs :hrefs texts :texts}]
-     (let [stuff (distinct-by-key
-                  (filter
-                   identity
-                   (map
-                    (fn [a-link]
-                      (when-not (some #{a-link} (:visited acc))
-                        {:url  a-link
-                         :path (cons xpath src-path)
-                         :src-url url}))                   
-                    hrefs))
-                  :url)]
-       (merge-with concat acc {:bodies stuff :visited hrefs})))
+     (let [stuff  (distinct-by-key
+                   (filter
+                    identity
+                    (map
+                     (fn [a-link]
+                       (when-not (some #{a-link} (:visited acc))
+                         {:url  a-link
+                          :path (cons xpath src-path)
+                          :src-url url}))                   
+                     (take (Math/ceil
+                            (/ (count hrefs) 4))
+                           hrefs)))
+                   :url)]
+       (merge-with concat acc {:bodies  stuff
+                               :visited (take
+                                         (Math/ceil
+                                          (/ (count hrefs) 4))
+                                         hrefs)})))
    {}
    xpaths-and-urls))
 
@@ -517,7 +523,8 @@
        (println :src-path (-> url-queue first :path))
        (let [url  (-> url-queue first :url)
              body (utils/download-with-cookie url)]
-        (cond (or (empty? url-queue)
+
+         (cond (or (empty? url-queue)
                   (stop? {:visited    (count visited)
                           :leaf-left  leaf-limit
                           :body       body}))
@@ -535,13 +542,13 @@
                                    {}
                                    (clojure.set/union (set visited)
                                                       (set [url])
-                                                      (map
-                                                       #(-> % :url)
-                                                       url-queue)))
+                                                         (map
+                                                          #(-> % :url)
+                                                          url-queue)))
                           :xpath-nav-info
                           (prepare (-> url-queue first :path)
                                    url))]
-                 
+                  
                   (recur (concat (rest url-queue)
                                  new-bodies)
                          (clojure.set/union
@@ -566,10 +573,9 @@
                                    (clojure.set/union
                                     (set visited)
                                     (set [url])
-                                    (set
-                                     (map
-                                      #(-> % :url)
-                                      url-queue))))
+                                    (set (map
+                                          #(-> % :url)
+                                          url-queue))))
                           :xpath-nav-info
                           (prepare (-> url-queue first :path)
                                    url))

@@ -211,3 +211,9 @@ escape characters. then call re-pattern on it"
      []
      (range
       (count v-collection)))))
+
+(defn sayln
+  "println that prints to stderr"
+  [& stuff]
+  (binding [*out* *err*]
+    (println stuff)))

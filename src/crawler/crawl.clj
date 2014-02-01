@@ -515,80 +515,80 @@
   ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit]
      (do
        (Thread/sleep 1000)
-       (println :queue-size (count url-queue))
-       (println :visited (count visited))
-       (println :leaves-left leaf-limit)
-       (println :url (-> url-queue first :url))
-       (println :src-url (-> url-queue first :src-url))
-       (println :src-path (-> url-queue first :path))
+       (utils/sayln :queue-size (count url-queue))
+       (utils/sayln :visited (count visited))
+       (utils/sayln :leaves-left leaf-limit)
+       (utils/sayln :url (-> url-queue first :url))
+       (utils/sayln :src-url (-> url-queue first :src-url))
+       (utils/sayln :src-path (-> url-queue first :path))
        (let [url  (-> url-queue first :url)
              body (utils/download-with-cookie url)]
 
          (cond (or (empty? url-queue)
-                  (stop? {:visited    (count visited)
-                          :leaf-left  leaf-limit
-                          :body       body}))
-              (do
-                (println :crawl-done)
-                {:model (frequencies leaf-paths)})
-             
-              (leaf? body)
-              (do
-                (println :leaf-reached)
-                (let [{new-bodies  :bodies
-                       new-visited :visited}
-                      (-> body
-                          (extract (-> url-queue first :url)
-                                   {}
-                                   (clojure.set/union (set visited)
-                                                      (set [url])
-                                                         (map
-                                                          #(-> % :url)
-                                                          url-queue)))
-                          :xpath-nav-info
-                          (prepare (-> url-queue first :path)
-                                   url))]
-                  
-                  (recur (concat (rest url-queue)
-                                 new-bodies)
-                         (clojure.set/union
-                          (set visited)
-                          (set [url]))
-                         lookahead
-                         leaf?
-                         extract
-                         stop?
-                         (cons
-                          (-> url-queue first :path)
-                          leaf-paths)
-                         (dec leaf-limit))))
+                   (stop? {:visited    (count visited)
+                           :leaf-left  leaf-limit
+                           :body       body}))
+               (do
+                 (utils/sayln :crawl-done)
+                 {:model (frequencies leaf-paths)})
+               
+               (leaf? body)
+               (do
+                 (utils/sayln :leaf-reached)
+                 (let [{new-bodies  :bodies
+                        new-visited :visited}
+                       (-> body
+                           (extract (-> url-queue first :url)
+                                    {}
+                                    (clojure.set/union (set visited)
+                                                       (set [url])
+                                                       (map
+                                                        #(-> % :url)
+                                                        url-queue)))
+                           :xpath-nav-info
+                           (prepare (-> url-queue first :path)
+                                    url))]
+                   
+                   (recur (concat (rest url-queue)
+                                  new-bodies)
+                          (clojure.set/union
+                           (set visited)
+                           (set [url]))
+                          lookahead
+                          leaf?
+                          extract
+                          stop?
+                          (cons
+                           (-> url-queue first :path)
+                           leaf-paths)
+                          (dec leaf-limit))))
 
-              :else
-              (let [{new-bodies  :bodies
-                     new-visited :visited}
-                    (try
-                      (-> body
-                          (extract url
-                                   {}
-                                   (clojure.set/union
-                                    (set visited)
-                                    (set [url])
-                                    (set (map
-                                          #(-> % :url)
-                                          url-queue))))
-                          :xpath-nav-info
-                          (prepare (-> url-queue first :path)
-                                   url))
-                      (catch NullPointerException e nil))]
-                (do
-                  (recur (concat (rest url-queue) new-bodies)
-                         (clojure.set/union visited (set [url]))
-                         lookahead
-                         leaf?
-                         extract
-                         stop?
-                         leaf-paths
-                         leaf-limit))))))))
+               :else
+               (let [{new-bodies  :bodies
+                      new-visited :visited}
+                     (try
+                       (-> body
+                           (extract url
+                                    {}
+                                    (clojure.set/union
+                                     (set visited)
+                                     (set [url])
+                                     (set (map
+                                           #(-> % :url)
+                                           url-queue))))
+                           :xpath-nav-info
+                           (prepare (-> url-queue first :path)
+                                    url))
+                       (catch NullPointerException e nil))]
+                 (do
+                   (recur (concat (rest url-queue) new-bodies)
+                          (clojure.set/union visited (set [url]))
+                          lookahead
+                          leaf?
+                          extract
+                          stop?
+                          leaf-paths
+                          leaf-limit))))))))
 
 (defn crawl-site-extract
   ([site model]

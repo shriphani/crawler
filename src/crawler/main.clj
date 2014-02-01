@@ -3,7 +3,8 @@
   (:require [clojure.tools.cli :as cli]
             [crawler.crawl :as crawl]
             [crawler.utils :as utils]
-            [crawler.structure-driven :as structure-driven]))
+            [crawler.structure-driven :as structure-driven])
+  (:use [clojure.pprint :only [pprint]]))
 
 (def crawler-options
   [[nil "--structure-driven" "Use the structure driven crawler"]
@@ -32,11 +33,12 @@
                     (cli/parse-opts crawler-options)
                     :options)]
     (cond (:structure-driven options)
-          (structure-driven-crawler (-> options :start)
-                                    (-> options
-                                        :example
-                                        utils/download-with-cookie)
-                                    (-> options :leaf-sim-thresh))
+          (let [model  (structure-driven-crawler (-> options :start)
+                                                 (-> options
+                                                     :example
+                                                     utils/download-with-cookie)
+                                                 (-> options :leaf-sim-thresh))]
+            (pprint model))
 
           :else
           (println "Pick one bruh"))))

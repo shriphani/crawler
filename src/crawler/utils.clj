@@ -216,4 +216,4 @@ escape characters. then call re-pattern on it"
   "println that prints to stderr"
   [& stuff]
   (binding [*out* *err*]
-    (println stuff)))
+    (apply println stuff)))

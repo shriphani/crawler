@@ -33,7 +33,8 @@
   
   ([page-src url blacklist]
      (let [processed-pg      (dom/html->xml-doc page-src)
-           xpaths-hrefs-text (dom/xpaths-hrefs-tokens processed-pg url blacklist)
+           xpaths-hrefs-text (dom/xpaths-hrefs-tokens-no-position
+                              processed-pg url blacklist)
            host              (uri/host url)
            in-host-xhrefs    (into
                               {}
@@ -343,7 +344,7 @@
                                                 {} (map
                                                     (fn [[xpath nodes]]
                                                       [xpath (map #(-> % :href) nodes)])
-                                                    (dom/xpaths-hrefs-tokens
+                                                    (dom/xpaths-hrefs-tokens-no-position
                                                      (dom/html->xml-doc a-sample)
                                                      url))))
                                              (xpaths-samples-map an-xpath))])

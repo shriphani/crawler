@@ -8,7 +8,7 @@
 
 (defn stop?
   [{visited :visited}]
-  (<= 200 visited))
+  (<= 100 visited))
 
 (defn leaf?
   "A leaf for a structure driven crawler"

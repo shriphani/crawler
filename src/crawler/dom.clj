@@ -390,6 +390,21 @@ id and class tag constraints are also added"
      (range
       (count path))))))
 
+(defn path->xpath-no-position
+  [path]
+  (clojure.string/join
+   "/"
+   (cons
+    "/"
+    (map
+     (fn [i]
+       (let [[tag class pos] (nth path i)]
+         (if class
+           (format "%s[contains(@class, '%s')]" tag class)
+           (format "%s" tag))))
+     (range
+      (count path))))))
+
 (defn generate-xpath
   "Generates an xpath for a set of nodes by incoporating
    position information"
@@ -398,6 +413,29 @@ id and class tag constraints are also added"
    (fn [[path a-node]]
      [(path->xpath path positions) a-node])
    nodes))
+
+(defn xpaths-hrefs-tokens-no-position
+  "Grouped only on element position and classes.
+   No position information used in the XPath generated"
+  ([processed-body url]
+     (xpaths-hrefs-tokens-no-position processed-body url (set [])))
+
+  ([processed-body url blacklist]
+     (let [nodes-paths (page-nodes-hrefs-text processed-body
+                                              url
+                                              blacklist)
+
+           xpaths-nodes-paths (map
+                               (fn [[path an-info]]
+                                 [(path->xpath-no-position path) an-info])
+                               nodes-paths)]
+       (reduce
+        (fn [acc [xpath an-info]]
+          (merge-with concat
+                      acc
+                      {xpath [an-info]}))
+        {}
+        xpaths-nodes-paths))))
 
 (defn xpaths-hrefs-tokens
   "Utilize an initial class-based grouping.

@@ -570,6 +570,9 @@
                           (let [corpus-entry {url
                                               {:body      unaltered-state-action
                                                :leaf?     true
+                                               :src-url   (-> url-queue
+                                                              first
+                                                              :src-url)
                                                :src-xpath (-> url-queue
                                                               first
                                                               :path)}}]
@@ -604,6 +607,9 @@
                           (let [corpus-entry {url
                                               {:body      unaltered-state-action
                                                :leaf?     false
+                                               :src-url   (-> url-queue
+                                                              first
+                                                              :src-url)
                                                :src-xpath (-> url-queue
                                                               first
                                                               :path)}}]

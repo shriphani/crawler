@@ -523,7 +523,10 @@
        (utils/sayln :src-url (-> url-queue first :src-url))
        (utils/sayln :src-path (-> url-queue first :path))
        (let [url  (-> url-queue first :url)
-             body (utils/download-with-cookie url)]
+             body (utils/download-with-cookie url)
+
+             unaltered-state-action (try (extract body url {} [])
+                                         (catch Exception e nil))]
 
          (cond (or (empty? url-queue)
                    (stop? {:visited    (count visited)
@@ -564,9 +567,12 @@
                            (-> url-queue first :path)
                            leaf-paths)
                           (dec leaf-limit)
-                          (let [corpus-entry {url {:body      body
-                                                   :leaf?     true
-                                                   :src-xpath (-> url-queue first :path)}}]
+                          (let [corpus-entry {url
+                                              {:body      unaltered-state-action
+                                               :leaf?     true
+                                               :src-xpath (-> url-queue
+                                                              first
+                                                              :path)}}]
                             (merge corpus corpus-entry)))))
 
                :else
@@ -595,9 +601,12 @@
                           stop?
                           leaf-paths
                           leaf-limit
-                          (let [corpus-entry {url {:body      body
-                                                   :leaf?     false
-                                                   :src-xpath (-> url-queue first :path)}}]
+                          (let [corpus-entry {url
+                                              {:body      unaltered-state-action
+                                               :leaf?     false
+                                               :src-xpath (-> url-queue
+                                                              first
+                                                              :path)}}]
                             (merge corpus corpus-entry))))))))))
 
 

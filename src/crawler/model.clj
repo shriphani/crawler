@@ -8,3 +8,9 @@
   [a-model-file]
   (with-open [rdr (io/reader a-model-file)]
     (-> rdr PushbackReader. read)))
+
+(defn identify-paging-filter-candidates
+  [{model :model corpus :corpus}]
+  (group-by
+   first
+   (map first model)))

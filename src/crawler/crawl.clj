@@ -568,14 +568,15 @@
                            leaf-paths)
                           (dec leaf-limit)
                           (let [corpus-entry {url
-                                              {:body      unaltered-state-action
-                                               :leaf?     true
-                                               :src-url   (-> url-queue
-                                                              first
-                                                              :src-url)
-                                               :src-xpath (-> url-queue
-                                                              first
-                                                              :path)}}]
+                                              {:body         body
+                                               :state-action unaltered-state-action
+                                               :leaf?        true
+                                               :src-url      (-> url-queue
+                                                                 first
+                                                                 :src-url)
+                                               :src-xpath    (-> url-queue
+                                                                 first
+                                                                 :path)}}]
                             (merge corpus corpus-entry)))))
 
                :else
@@ -605,14 +606,15 @@
                           leaf-paths
                           leaf-limit
                           (let [corpus-entry {url
-                                              {:body      unaltered-state-action
-                                               :leaf?     false
-                                               :src-url   (-> url-queue
-                                                              first
-                                                              :src-url)
-                                               :src-xpath (-> url-queue
-                                                              first
-                                                              :path)}}]
+                                              {:body         body
+                                               :state-action unaltered-state-action
+                                               :leaf?        false
+                                               :src-url      (-> url-queue
+                                                                 first
+                                                                 :src-url)
+                                               :src-xpath    (-> url-queue
+                                                                 first
+                                                                 :path)}}]
                             (merge corpus corpus-entry))))))))))
 
 

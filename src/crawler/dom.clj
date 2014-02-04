@@ -309,7 +309,8 @@ id and class tag constraints are also added"
      (page-nodes-hrefs-text a-processed-page url (set [])))
   
   ([a-processed-page url blacklist]
-     (let [a-tags         ($x:node+ ".//a" a-processed-page) ; anchor tags
+     (let [a-tags         (try ($x:node+ ".//a" a-processed-page)
+                               (catch Exception e nil)) ; anchor tags
            
            a-tags-w-hrefs (filter
                                         ; the node must have a href
@@ -522,3 +523,29 @@ id and class tag constraints are also added"
           (merge-with concat acc {(first v) [(second v)]}))
         {}
         xpath-nodes))))
+
+(defn refine-xpath
+  [body url xpath size]
+  (let [processed-body (html->xml-doc body)
+        nodes-paths    (page-nodes-hrefs-text processed-body
+                                              url
+                                              [])
+        nodes-paths-x  (filter
+                        (fn [[path an-info]]
+                          (= xpath (path->xpath-no-position path)))
+                        nodes-paths)
+        
+        paths          (map
+                        first
+                        nodes-paths-x)
+
+        counts         (map
+                        (fn [a-path]
+                          (map #(nth % 2) a-path))
+                        paths)
+
+        histogram      (map (fn [x]
+                              (count (distinct x)))
+                            (apply map vector counts))
+        pos            [(.indexOf histogram size)]]
+    (map #(path->xpath (first %) pos) nodes-paths-x)))

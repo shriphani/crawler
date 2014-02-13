@@ -4,6 +4,7 @@
 (ns crawler.utils
   (:require [clj-http.client :as client]
             [clj-http.cookies :as cookies]
+            [clj-time.core :as time]
             [org.bovinegenius [exploding-fish :as uri]])
   (:use [clojure.tools.logging :only (info error)]
         [clj-logging-config.log4j]))
@@ -217,3 +218,26 @@ escape characters. then call re-pattern on it"
   [& stuff]
   (binding [*out* *err*]
     (apply println stuff)))
+
+(defn dated-filename
+  ([] (dated-filename "" ""))
+  ([prefix suffix]
+     (let [cur-time (time/now)
+
+           day (time/day cur-time)
+           mon (time/month cur-time)
+           yr  (time/year cur-time)
+           hr  (time/hour cur-time)
+           min (time/minute cur-time)]
+       (str prefix
+            "-"
+            day
+            "-"
+            mon
+            "-"
+            yr
+            "-"
+            hr
+            "-"
+            min
+            suffix))))

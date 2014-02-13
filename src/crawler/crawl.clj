@@ -50,6 +50,26 @@
    {}
    xpaths-and-urls))
 
+(defn dump-state-model-corpus
+  "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
+  ([state model corpus]
+     (dump-state-model-corpus state model corpus "crawler"))
+
+  ([state model corpus prefix]
+     (let [date-file-prefix (utils/dated-filename prefix "")
+
+           create #(str date-file-prefix %)
+           
+           state-file  (create ".state")
+           model-file  (create ".model")
+           corpus-file (create ".corpus")]
+       (with-open [state-wrtr  (io/writer state-file)
+                   model-wrtr  (io/writer model-file)
+                   corpus-wrtr (io/writer corpus-file)]
+         (do (pprint state state-wrtr)
+             (pprint model model-wrtr)
+             (pprint corpus corpus-wrtr))))))
+
 (defn build-sitemap
   "The base crawler routine
    Decisions made based on specified lookahead.
@@ -105,9 +125,17 @@
                            :body       body}))
                (do
                  (utils/sayln :crawl-done)
-                 {:model  (frequencies leaf-paths)
-                  :corpus corpus})
-               
+                 (dump-state-model-corpus {:url-queue  url-queue
+                                           :visited    visited
+                                           :lookahead  lookahead
+                                           :leaf-paths leaf-paths
+                                           :leaf-limit leaf-limit}
+
+                                          (frequencies leaf-paths)
+
+                                          corpus))
+
+               ;; leaf reached. what do bruh
                (leaf? body)
                (do
                  (utils/sayln :leaf-reached)

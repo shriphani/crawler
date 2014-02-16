@@ -7,7 +7,8 @@
             [crawler.rich-char-extractor :as rich-char-extractor]
             [crawler.template-removal :as template-removal]
             [crawler.utils :as utils]
-            [clj-http.cookies :as cookies])
+            [clj-http.cookies :as cookies]
+            (org.bovinegenius [exploding-fish :as uri]))
   (:use [clojure.pprint :only [pprint]]))
 
 
@@ -132,7 +133,9 @@
 
                                           (frequencies leaf-paths)
 
-                                          corpus))
+                                          corpus
+
+                                          (uri/host (uri/uri url))))
 
                ;; leaf reached. what do bruh
                (leaf? body)

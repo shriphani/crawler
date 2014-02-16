@@ -9,7 +9,7 @@
 
 (defn stop?
   [{visited :visited}]
-  (<= 5 visited))
+  (<= 100 visited))
 
 (defn leaf?
   ([body example-leaf]

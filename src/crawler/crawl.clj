@@ -88,21 +88,21 @@
 
    Performs bfs traversal with 1 lookahead."
   ([entry-point leaf? extract stop?]
-     (build-sitemap entry-point 1 leaf? extract stop?))
+     (crawl entry-point 1 leaf? extract stop?))
   
   ([entry-point lookahead leaf? extract stop?]
      (let [body           (utils/download-with-cookie entry-point)
            body-queue-ele {:url  entry-point
                            :body body}]
-      (build-sitemap [body-queue-ele]
-                     [entry-point]
-                     lookahead
-                     leaf?
-                     extract
-                     stop?
-                     []
-                     50
-                     {})))
+       (crawl [body-queue-ele]
+              [entry-point]
+              lookahead
+              leaf?
+              extract
+              stop?
+              []
+              50
+              {})))
 
   ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit corpus]
      (do

@@ -5,13 +5,6 @@
            [net.cgrand.enlive-html :as html]
            [crawler.utils :as utils]))
 
-(defn leaf?
-  "Examples are used to to RTDM style stuff."
-  [src-num target-num]
-  (and
-   (-> src-num nil? not)
-   (>= 0.2 (/ target-num src-num))))
-
 (defn state-action
   "Args:
     page-src : the body

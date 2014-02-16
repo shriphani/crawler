@@ -25,31 +25,6 @@
   []
   coll))
 
-(defn prepare
-  [xpaths-and-urls src-path url]
-  (reduce
-   (fn [acc {xpath :xpath hrefs :hrefs texts :texts}]
-     (let [stuff  (distinct-by-key
-                   (filter
-                    identity
-                    (map
-                     (fn [a-link]
-                       (when-not (some #{a-link} (:visited acc))
-                         {:url  a-link
-                          :path (cons xpath src-path)
-                          :src-url url}))                   
-                     (take (Math/ceil
-                            (/ (count hrefs) 4))
-                           hrefs)))
-                   :url)]
-       (merge-with concat acc {:bodies  stuff
-                               :visited (take
-                                         (Math/ceil
-                                          (/ (count hrefs) 4))
-                                         hrefs)})))
-   {}
-   xpaths-and-urls))
-
 (defn dump-state-model-corpus
   "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
   ([state model corpus]
@@ -69,6 +44,30 @@
          (do (pprint state state-wrtr)
              (pprint model model-wrtr)
              (pprint corpus corpus-wrtr))))))
+
+(defn prepare
+  [xpaths-and-urls src-path url]
+  (reduce
+   (fn [acc {xpath :xpath hrefs :hrefs texts :texts}]
+     (let [stuff  (distinct-by-key
+                   (filter
+                    identity
+                    (map
+                     (fn [a-link]
+                       (when-not (some #{a-link} (:visited acc))
+                         {:url  a-link
+                          :path (cons xpath src-path)
+                          :src-url url}))                   
+                     hrefs))
+                   :url)]
+       (merge-with concat acc {:bodies  stuff
+                               :visited (take
+                                         (Math/ceil
+                                          (/ (count hrefs) 4))
+                                         hrefs)})))
+   {}
+   xpaths-and-urls))
+
 
 (defn crawl
   "The base crawler routine

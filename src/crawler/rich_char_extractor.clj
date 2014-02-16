@@ -94,18 +94,20 @@
         :xpath-nav-info (reverse
                          (sort-by :score xpath-nav-info))})))
 
-(defn filter-content
-  "Helper routine you can use to filter
-   content that the extractor mined.
-   Threshold determined by training"
-  [content]
-  (filter
-   (fn [x]
-     (->> x :score (<= 0.1)))
-   (map
-    (fn [{xpath :xpath score :score hrefs :hrefs texts :texts}]
-      {:xpath xpath
-       :score (/ score (:total-nav-info content))
-       :hrefs hrefs
-       :texts texts})
-    (:xpath-nav-info content))))
+(defn state-action-sampled
+  ([page-src url template-removed]
+     (state-action-sampled page-src url template-removed []))
+
+  ([page-src url template-removed blacklist]
+     (let [complete (state-action page-src
+                                  url
+                                  template-removed
+                                  blacklist)]
+       (merge
+        complete
+        {:xpath-nav-info
+         (map
+          (fn [x]
+            (merge x {:hrefs (take 10 (:hrefs x))
+                      :texts (take 10 (:texts x))}))
+          (:xpath-nav-info complete))}))))

@@ -9,7 +9,7 @@
 
 (defn stop?
   [{visited :visited}]
-  (<= 100 visited))
+  (<= 5 visited))
 
 (defn leaf?
   ([body example-leaf]
@@ -23,4 +23,4 @@
          (utils/sayln :similarity sim)
          (<= thresh sim)))))
 
-(def extractor rc-extractor/state-action)
+(def extractor rc-extractor/state-action-sampled)

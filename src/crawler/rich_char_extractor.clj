@@ -109,30 +109,3 @@
        :hrefs hrefs
        :texts texts})
     (:xpath-nav-info content))))
-
-(defn sample-quarter
-  [a-seq]
-  (let [size (count a-seq)]
-    (take (int (/ size 4)) a-seq)))
-
-(defn pagination?
-  "Even 1 pagination is good."
-  [{xpath :xpath hrefs :hrefs texts :texts} body]
-  (let [to-sample (sample-quarter hrefs)
-        page-sims (map
-                   #(similarity/tree-edit-distance-html
-                     body ())
-                   to-sample)]
-
-    (filter #(<= 0.8 %) page-sims)))
-
-(defn detect-pagination
-  "Pagination detection module.
-   First, we kick off from the least useful guys
-   and go to the most useful guys. Along the way,
-   bundle some shit up."
-  [normalized-decision-space body]
-  (let [tree1  (html/html-resource
-                (java.io.StringReader. body))
-        sorted (sort-by :score normalized-decision-space)]
-    (map #(pagination? % tree1) sorted)))

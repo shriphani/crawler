@@ -22,10 +22,10 @@
   (let [structure-driven-leaf? (fn [x]
                                  (structure-driven/leaf?
                                   x example-body leaf-sim-thresh))]
-    (crawl/build-sitemap start-url
-                         structure-driven-leaf?
-                         structure-driven/extractor
-                         structure-driven/stop?)))
+    (crawl/crawl start-url
+                 structure-driven-leaf?
+                 structure-driven/extractor
+                 structure-driven/stop?)))
 
 (defn -main
   [& args]

@@ -70,7 +70,7 @@
              (pprint model model-wrtr)
              (pprint corpus corpus-wrtr))))))
 
-(defn build-sitemap
+(defn crawl
   "The base crawler routine
    Decisions made based on specified lookahead.
    Default lookahead = 1 (I don't see the point of 2 but whatevs bro).

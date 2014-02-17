@@ -19,3 +19,7 @@ resources/*.edn
 logs/
 .DS_Store
 .nrepl-port
+*.state
+*.model
+*.corpus
+*.fuse*

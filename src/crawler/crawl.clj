@@ -144,7 +144,7 @@
                  (let [{new-bodies  :bodies
                         new-visited :visited}
                        (-> body
-                           (extract (-> url-queue first :url)
+                           (extract (-> url-queue first)
                                     {}
                                     (clojure.set/union (set visited)
                                                        (set [url])
@@ -185,7 +185,7 @@
                       new-visited :visited}
                      (try
                        (-> body
-                           (extract url
+                           (extract (first url-queue)
                                     {}
                                     (clojure.set/union
                                      (set visited)

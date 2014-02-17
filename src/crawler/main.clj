@@ -37,14 +37,25 @@
                  structure-driven/extractor
                  structure-driven/stop?)))
 
-(defn execute-model
+(defn execute-model-crawler
   [start-url model num-leaves]
   (let [stop-fn    (fn [{visited :visited}]
                      (<= num-leaves visited))
 
         leaf-fn    (fn [x] false) ;; FIX
+
+        model      (crawler-model/read-model model)
         
-        extract-fn (rc-extractor/state-action)]))
+        extract-fn (fn [page-src url-ds template-removed blacklist]
+                     (rc-extractor/state-action-model (first model)
+                                                      page-src
+                                                      url-ds
+                                                      template-removed
+                                                      blacklist))]
+    (crawl/crawl start-url
+                 leaf-fn
+                 extract-fn
+                 stop-fn)))
 
 (defn -main
   [& args]
@@ -65,9 +76,9 @@
 
                 start-url  (-> options :start)
                 num-leaves (-> options :num-docs)]
-            (execute-model start-url
-                           model
-                           num-leaves))
+            (execute-model-crawler start-url
+                                   model
+                                   num-leaves))
           
           :else
           (println "Pick one bruh"))))

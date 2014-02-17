@@ -26,26 +26,6 @@
   []
   coll))
 
-(defn dump-state-model-corpus
-  "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
-  ([state model corpus]
-     (dump-state-model-corpus state model corpus "crawler"))
-
-  ([state model corpus prefix]
-     (let [date-file-prefix (utils/dated-filename prefix "")
-
-           create #(str date-file-prefix %)
-           
-           state-file  (create ".state")
-           model-file  (create ".model")
-           corpus-file (create ".corpus")]
-       (with-open [state-wrtr  (io/writer state-file)
-                   model-wrtr  (io/writer model-file)
-                   corpus-wrtr (io/writer corpus-file)]
-         (do (pprint state state-wrtr)
-             (pprint model model-wrtr)
-             (pprint corpus corpus-wrtr))))))
-
 (defn prepare
   [xpaths-and-urls src-path url]
   (reduce
@@ -125,17 +105,17 @@
                            :body       body}))
                (do
                  (utils/sayln :crawl-done)
-                 (dump-state-model-corpus {:url-queue  url-queue
-                                           :visited    visited
-                                           :lookahead  lookahead
-                                           :leaf-paths leaf-paths
-                                           :leaf-limit leaf-limit}
+                 {:state  {:url-queue  url-queue
+                           :visited    visited
+                           :lookahead  lookahead
+                           :leaf-paths leaf-paths
+                           :leaf-limit leaf-limit}
 
-                                          (frequencies leaf-paths)
+                  :model  (frequencies leaf-paths)
 
-                                          corpus
+                  :corpus corpus
 
-                                          (uri/host (uri/uri url))))
+                  :prefix (uri/host (uri/uri url))})
 
                ;; leaf reached. what do bruh
                (leaf? body)

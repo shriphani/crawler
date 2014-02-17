@@ -2,6 +2,7 @@
   "Run from here"
   (:require [clojure.tools.cli :as cli]
             [crawler.crawl :as crawl]
+            [clojure.java.io :as io]
             [crawler.model :as crawler-model]
             [crawler.rich-char-extractor :as rc-extractor]
             [crawler.structure-driven :as structure-driven]
@@ -27,15 +28,41 @@
     :default 500
     :parse-fn #(Integer/parseInt %)]])
 
+(defn dump-state-model-corpus
+  "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
+  ([state model corpus]
+     (dump-state-model-corpus state model corpus "crawler"))
+
+  ([state model corpus prefix]
+     (let [date-file-prefix (utils/dated-filename prefix "")
+
+           create #(str date-file-prefix %)
+           
+           state-file  (create ".state")
+           model-file  (create ".model")
+           corpus-file (create ".corpus")]
+       (with-open [state-wrtr  (io/writer state-file)
+                   model-wrtr  (io/writer model-file)
+                   corpus-wrtr (io/writer corpus-file)]
+         (do (pprint state state-wrtr)
+             (pprint model model-wrtr)
+             (pprint corpus corpus-wrtr))))))
+
 (defn structure-driven-crawler
   [start-url example-body leaf-sim-thresh]
   (let [structure-driven-leaf? (fn [x]
                                  (structure-driven/leaf?
                                   x example-body leaf-sim-thresh))]
-    (crawl/crawl start-url
-                 structure-driven-leaf?
-                 structure-driven/extractor
-                 structure-driven/stop?)))
+    
+    (let [{state :state model :model corpus :corpus prefix :prefix}
+          (crawl/crawl start-url
+                       structure-driven-leaf?
+                       structure-driven/extractor
+                       structure-driven/stop?)]
+      (dump-state-model-corpus state
+                               model
+                               corpus
+                               prefix))))
 
 (defn execute-model-crawler
   [start-url model num-leaves]
@@ -52,10 +79,15 @@
                                                       url-ds
                                                       template-removed
                                                       blacklist))]
-    (crawl/crawl start-url
-                 leaf-fn
-                 extract-fn
-                 stop-fn)))
+    (let [{state :state model :model corpus :corpus prefix :prefix}
+          (crawl/crawl start-url
+                       leaf-fn
+                       extract-fn
+                       stop-fn)]
+      (dump-state-model-corpus state
+                               model
+                               corpus
+                               prefix))))
 
 (defn -main
   [& args]

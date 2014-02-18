@@ -511,6 +511,45 @@ id and class tag constraints are also added"
         {}
         xpaths-nodes-paths))))
 
+(defn refine-xpath-with-position
+  [processed-body url xpath num-clusters]
+  (let [nodes-paths (page-nodes-hrefs-text processed-body
+                                           url
+                                           [])
+
+        to-refine   (filter
+                     (fn [[p x]]
+                       (= (path->xpath-no-position p)
+                          xpath))
+                     nodes-paths)
+        
+        paths       (map first to-refine)
+
+        positions-list (map (fn [p]
+                              (map #(nth % 2) p))
+                            paths)
+        positions-hist (map
+                        #(-> % distinct count)
+                        (apply map vector positions-list))
+
+        candidates     (utils/positions-at-f
+                        (map
+                         #(if (or (= % 1)
+                                  (< 2 (Math/abs
+                                        (- num-clusters %))))
+                            nil
+                            (Math/abs
+                             (- num-clusters %)))
+                         positions-hist)
+                        identity)]
+    (map
+     (fn [c]
+       [c (map
+           (fn [[p n]]
+             [(path->xpath p [c]) n])
+           to-refine)])
+     candidates)))
+
 (defn xpaths-hrefs-tokens-with-position
   "Utilize an initial class-based grouping.
    Then add position information in the XPath to

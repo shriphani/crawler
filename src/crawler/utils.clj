@@ -213,6 +213,19 @@ escape characters. then call re-pattern on it"
      (range
       (count v-collection)))))
 
+(defn positions-at-f
+  ".indexOf variant that finds multiple instances"
+  [collection f]
+  (let [v-collection (into [] collection)]
+    (reduce
+     (fn [acc i]
+       (if (f (nth v-collection i))
+         (cons i acc)
+         acc))
+     []
+     (range
+      (count v-collection)))))
+
 (defn sayln
   "println that prints to stderr"
   [& stuff]

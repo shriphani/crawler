@@ -49,8 +49,14 @@
      action-sets)))
 
 (defn refine-xpath
-  [x urls infos]
-  '*)
+  [x urls infos url-clusters]
+  (let [num-clusters (count url-clusters)
+        proc-bodies  (map dom/html->xml-doc (map :body infos))]
+    (map
+     (fn [[u b]]
+       [x
+        (dom/refine-xpath-with-position b u x num-clusters)])
+     (map vector urls proc-bodies))))
 
 (defn cluster-results
   "Do we need to add position info
@@ -84,9 +90,7 @@
                       url-infos (map
                                  #(corpus %)
                                  urls)]
-                  [urls us]
-                  ;(refine-xpath action urls url-infos)
-                  ))
+                  (refine-xpath action urls url-infos us)))
               (filter
                #(= (first %) x)
                grouped))]

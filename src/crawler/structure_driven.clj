@@ -4,7 +4,7 @@
    The structure driven crawler fetches a navigation
    pattern = XPath seq"
   (:require [crawler.rich-char-extractor :as rc-extractor]
-            [crawler.similarity :as similarity]
+            [structural-similarity.xpath-text :as similarity]
             [crawler.utils :as utils]))
 
 (defn stop?
@@ -12,15 +12,7 @@
   (<= 100 visited))
 
 (defn leaf?
-  ([body example-leaf]
-     (leaf? body example-leaf 0.8))
-  
-  ([body example-leaf thresh]
-     (let [sim (similarity/tree-edit-distance-html
-                body
-                example-leaf)]
-       (do
-         (utils/sayln :similarity sim)
-         (<= thresh sim)))))
+  [body example-leaf]
+  (similarity/similar? body example-leaf))
 
 (def extractor rc-extractor/state-action-sampled)

@@ -22,6 +22,7 @@
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/tools.logging "0.2.6"]
-                 [org.bovinegenius/exploding-fish "0.3.3"]]
+                 [org.bovinegenius/exploding-fish "0.3.3"]
+                 [structural_similarity/structural_similarity "0.1.0-SNAPSHOT"]]
   :main crawler.main
   :jvm-opts ["-Xmx5g"])

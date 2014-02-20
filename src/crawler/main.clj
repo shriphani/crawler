@@ -14,13 +14,6 @@
    [nil "--execute" "Execute a site model"]
    [nil "--start START" "Entry point for the structure driven crawler"]
    [nil "--example EXAMPLE" "Example leaf page url for the structure driven crawler"]
-   [nil
-    "--leaf-sim-thresh LEAF_SIMILARITY_THRESHOLD"
-    "Specify the similarity threshold for the RTDM algorithm"
-    :default 0.8
-    :parse-fn #(Double/parseDouble %)
-    :validate [#(and (< 0 %) (>= 1 %)) "Must be between 0 and 1"]]
-
    [nil "--model MODEL" "Specify a model file (a model learned by the crawler)"]
    [nil
     "--num-docs N"
@@ -49,20 +42,17 @@
              (pprint corpus corpus-wrtr))))))
 
 (defn structure-driven-crawler
-  [start-url example-body leaf-sim-thresh]
-  (let [structure-driven-leaf? (fn [x]
-                                 (structure-driven/leaf?
-                                  x example-body leaf-sim-thresh))]
-    
-    (let [{state :state model :model corpus :corpus prefix :prefix}
-          (crawl/crawl start-url
-                       structure-driven-leaf?
-                       structure-driven/extractor
-                       structure-driven/stop?)]
-      (dump-state-model-corpus state
-                               model
-                               corpus
-                               prefix))))
+  [start-url example-body]
+  (let [structure-driven-leaf? #(structure-driven/leaf? example-body %)
+        {state :state model :model corpus :corpus prefix :prefix}
+        (crawl/crawl start-url
+                     structure-driven-leaf?
+                     structure-driven/extractor
+                     structure-driven/stop?)]
+    (dump-state-model-corpus state
+                             model
+                             corpus
+                             prefix)))
 
 (defn execute-model-crawler
   [start-url model num-leaves]
@@ -98,8 +88,7 @@
           (let [stuff (structure-driven-crawler (-> options :start)
                                                 (-> options
                                                     :example
-                                                    utils/download-with-cookie)
-                                                (-> options :leaf-sim-thresh))]
+                                                    utils/download-with-cookie))]
             (pprint stuff))
 
           (:execute options)

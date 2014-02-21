@@ -41,6 +41,16 @@
              (pprint model model-wrtr)
              (pprint corpus corpus-wrtr))))))
 
+(defn dump-corpus
+  ([corpus]
+     (dump-model a-model "crawler"))
+
+  ([corpus prefix]
+     (let [date-file-prefix (utils/dated-filename prefix "")
+           model-file  (create date-file-prefix ".corpus")]
+       (with-open [corpus-wrtr (io/writer)]
+         (pprint corpus corpus-wrtr)))))
+
 (defn structure-driven-crawler
   [start-url example-body]
   (let [structure-driven-leaf? #(structure-driven/leaf? example-body %)
@@ -74,10 +84,7 @@
                        leaf-fn
                        extract-fn
                        stop-fn)]
-      (dump-state-model-corpus state
-                               model
-                               corpus
-                               prefix))))
+      (dump-corpus corpus))))
 
 (defn -main
   [& args]

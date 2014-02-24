@@ -25,4 +25,5 @@
                  [org.bovinegenius/exploding-fish "0.3.3"]
                  [structural_similarity/structural_similarity "0.1.0-SNAPSHOT"]]
   :main crawler.main
-  :jvm-opts ["-Xmx5g"])
+  :jvm-opts ["-Xmx5g"]
+  :plugins [[lein-gorilla "0.1.2"]])

@@ -4,6 +4,7 @@
   (:require [clojure.java.io :as io]
             [crawler.dom :as dom]
             [structural-similarity.xpath-text :as similarity])
+  (:use [clojure.pprint :only [pprint]])
   (:import [java.io PushbackReader]))
 
 (defn read-model
@@ -215,3 +216,14 @@
 
     {:action-seq (into {} pruned)
      :pagination (into {} paging)}))
+
+(defn plan-dump-model
+  [a-model-file a-corpus-file]
+  (let [fixed-model (planned-model a-model-file
+                                   a-corpus-file)
+
+        filename    (first
+                     (clojure.string/split a-model-file #"\."))
+
+        wrtr (io/writer (str filename ".pruned-model"))]
+    (pprint fixed-model wrtr)))

@@ -182,16 +182,18 @@
   (let [model        (read-model a-model-file)
         init-planned (plan model)
         corpus       (read-corpus a-corpus-file)
+        actions      (distinct
+                      (map (fn [[u x]] (:src-xpath x)) corpus))
         {paging :paging
          remove :to-remove}
         (reduce
-         (fn [acc [action-seq n]]
+         (fn [acc action-seq]
            (merge-with
             clojure.set/union
             acc
             (find-pagination action-seq corpus)))
          {}
-         init-planned)
+         actions)
 
         prefix-match (fn [prefix x]
                        (let [rx (reverse x)]
@@ -203,16 +205,18 @@
                                (nth rx i)))
                           (range
                            (count prefix))))))
-        pruned (filter
-                (fn [[action-seq n]]
-                  (not
-                   (reduce
-                    #(or %1 %2)
-                    (map
-                     (fn [prefix]
-                       (prefix-match prefix action-seq))
-                     remove))))
-                init-planned)]
+        pruned (if-not remove
+                 model
+                 (filter
+                  (fn [[action-seq n]]
+                    (not
+                     (reduce
+                      #(or %1 %2)
+                      (map
+                       (fn [prefix]
+                         (prefix-match prefix action-seq))
+                       remove))))
+                  init-planned))]
 
     {:action-seq (into {} pruned)
      :pagination (into {} paging)}))

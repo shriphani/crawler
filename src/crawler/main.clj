@@ -114,7 +114,7 @@
           (:refine options)
           (let [model-file (:model options)
                 corpus     (:corpus options)]
-            (crawler-model/plan-dump-model model-file corpus-file))
+            (crawler-model/plan-dump-model model-file corpus))
           
           :else
           (println "Pick one bruh"))))

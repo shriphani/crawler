@@ -201,16 +201,17 @@
                             (= (nth prefix i)
                                (nth rx i)))
                           (range
-                           (count prefix))))))]
-    (into
-     {}
-     (filter
-      (fn [[action-seq n]]
-        (not
-         (reduce
-          #(or %1 %2)
-          (map
-           (fn [prefix]
-             (prefix-match prefix action-seq))
-           remove))))
-      init-planned))))
+                           (count prefix))))))
+        pruned (filter
+                (fn [[action-seq n]]
+                  (not
+                   (reduce
+                    #(or %1 %2)
+                    (map
+                     (fn [prefix]
+                       (prefix-match prefix action-seq))
+                     remove))))
+                init-planned)]
+
+    {:action-seq (into {} pruned)
+     :pagination (into {} paging)}))

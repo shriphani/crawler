@@ -19,7 +19,9 @@
     "--num-docs N"
     "Specify a number of documents you want"
     :default 500
-    :parse-fn #(Integer/parseInt %)]])
+    :parse-fn #(Integer/parseInt %)]
+   [nil "--refine" "Refine a model file"]
+   [nil "--corpus CORPUS" "Specify a corpus"]])
 
 (defn dump-state-model-corpus
   "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
@@ -108,6 +110,11 @@
             (execute-model-crawler start-url
                                    model
                                    num-leaves))
+
+          (:refine options)
+          (let [model-file (:model options)
+                corpus     (:corpus options)]
+            (crawler-model/plan-dump-model model-file corpus-file))
           
           :else
           (println "Pick one bruh"))))

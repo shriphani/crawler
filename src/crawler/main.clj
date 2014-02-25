@@ -43,10 +43,11 @@
 
 (defn dump-corpus
   ([corpus]
-     (dump-model a-model "crawler"))
+     (dump-corpus corpus "crawler"))
 
   ([corpus prefix]
      (let [date-file-prefix (utils/dated-filename prefix "")
+           create #(str date-file-prefix %)
            model-file  (create date-file-prefix ".corpus")]
        (with-open [corpus-wrtr (io/writer)]
          (pprint corpus corpus-wrtr)))))

@@ -2,7 +2,8 @@
   "Contains code to read and process a
    sampled model"
   (:require [clojure.java.io :as io]
-            [crawler.dom :as dom])
+            [crawler.dom :as dom]
+            [structural-similarity.xpath-text :as similarity])
   (:import [java.io PushbackReader]))
 
 (defn read-model
@@ -120,3 +121,96 @@
             consecs  (map vector reversed (rest reversed))]
         (some (fn [[x y]] (= x y)) consecs)))
     a-model)))
+
+(defn find-pagination
+  [action-seq corpus]
+  (let [paths (reductions
+               (fn [acc x]
+                 (cons x acc))
+               nil
+               (reverse action-seq))]
+    (reduce
+     (fn [acc a-path]
+       (merge-with
+        clojure.set/union
+        acc
+        (let [items (map
+                     first
+                     (filter
+                      (fn [[url stuff]]
+                        (= (:src-xpath stuff) a-path))
+                      corpus))
+
+              dests (filter
+                     (fn [[u x]]
+                       (some #{(:src-url x)} (set items)))
+                     corpus)
+
+              paging-candidates (filter
+                                 (fn [[u x]]
+                                   (let [b1 (:body x)
+                                         b2 (:body
+                                             (corpus
+                                              (:src-url x)))]
+                                     (similarity/similar? b1 b2)))
+                                 dests)]
+          (reduce
+           (fn [acc [u x]]
+             (merge-with
+              clojure.set/union
+              acc
+              {:to-remove
+               (set
+                [(cons
+                  (first
+                   (:src-xpath x))
+                  a-path)])
+
+               :paging
+               (set [[a-path (first (:src-xpath x))]])}))
+           {}
+           paging-candidates))))
+     {}
+     paths)))
+
+(defn planned-model
+  "First we plan it.
+   For each plan we find a pagination and a filter module
+   and remove them from the planned setup"
+  [a-model-file a-corpus-file]
+  (let [model        (read-model a-model-file)
+        init-planned (plan model)
+        corpus       (read-corpus a-corpus-file)
+        {paging :paging
+         remove :to-remove}
+        (reduce
+         (fn [acc [action-seq n]]
+           (merge-with
+            clojure.set/union
+            acc
+            (find-pagination action-seq corpus)))
+         {}
+         init-planned)
+
+        prefix-match (fn [prefix x]
+                       (let [rx (reverse x)]
+                        (reduce
+                         #(and %1 %2)
+                         (map
+                          (fn [i]
+                            (= (nth prefix i)
+                               (nth rx i)))
+                          (range
+                           (count prefix))))))]
+    (into
+     {}
+     (filter
+      (fn [[action-seq n]]
+        (not
+         (reduce
+          #(or %1 %2)
+          (map
+           (fn [prefix]
+             (prefix-match prefix action-seq))
+           remove))))
+      init-planned))))

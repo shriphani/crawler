@@ -189,15 +189,20 @@
         _ (println remove)
         
         prefix-match (fn [prefix x]
-                       (let [rx (reverse x)]
-                        (reduce
-                         #(and %1 %2)
-                         (map
-                          (fn [i]
-                            (= (nth prefix i)
-                               (nth rx i)))
-                          (range
-                           (count prefix))))))
+                       (and
+                        x
+                        (<=
+                         (count prefix)
+                         (count x))
+                        (let [rx (reverse x)]
+                          (reduce
+                           #(and %1 %2)
+                           (map
+                            (fn [i]
+                              (= (nth prefix i)
+                                 (nth rx i)))
+                            (range
+                             (count prefix)))))))
         pruned (if-not remove
                  model
                  (filter
@@ -219,8 +224,10 @@
   (let [fixed-model (planned-model a-model-file
                                    a-corpus-file)
 
-        filename    (first
-                     (clojure.string/split a-model-file #"\."))
+        filename    (clojure.string/join
+                     "."
+                     (drop-last
+                      (clojure.string/split a-model-file #"\.")))
 
         wrtr (io/writer (str filename ".pruned-model"))]
     (pprint fixed-model wrtr)))

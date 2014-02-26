@@ -125,54 +125,44 @@
 
 (defn find-pagination
   [action-seq corpus]
-  (let [paths (reductions
-               (fn [acc x]
-                 (cons x acc))
-               nil
-               (reverse action-seq))]
-    (reduce
-     (fn [acc a-path]
-       (merge-with
-        clojure.set/union
-        acc
-        (let [items (map
-                     first
-                     (filter
-                      (fn [[url stuff]]
-                        (= (:src-xpath stuff) a-path))
-                      corpus))
+  (let [items (map
+               first
+               (filter
+                (fn [[url info]]
+                  (= (:src-xpath info) action-seq))
+                corpus))
 
-              dests (filter
-                     (fn [[u x]]
-                       (some #{(:src-url x)} (set items)))
-                     corpus)
+        dests (reduce
+               (fn [acc a-link]
+                 (merge-with
+                  clojure.set/union
+                  acc
+                  (let [link-bd (:body
+                                 (corpus a-link))
 
-              paging-candidates (filter
-                                 (fn [[u x]]
-                                   (let [b1 (:body x)
-                                         b2 (:body
-                                             (corpus
-                                              (:src-url x)))]
-                                     (similarity/similar? b1 b2)))
-                                 dests)]
-          (reduce
-           (fn [acc [u x]]
-             (merge-with
-              clojure.set/union
-              acc
-              {:to-remove
-               (set
-                [(cons
-                  (first
-                   (:src-xpath x))
-                  a-path)])
-
-               :paging
-               (set [[a-path (first (:src-xpath x))]])}))
-           {}
-           paging-candidates))))
-     {}
-     paths)))
+                        hopped (filter
+                                (fn [[url info]]
+                                  (= (:src-url info) a-link))
+                                corpus)
+                       
+                        hopped-same-template (filter
+                                              (fn [[u h]]
+                                                (similarity/similar?
+                                                 (:body h)
+                                                 link-bd))
+                                              hopped)]
+                    (reduce
+                     (fn [acc [u info]]
+                       (merge-with
+                        clojure.set/union
+                        acc
+                        {:to-remove (set [(:src-xpath info)])
+                         :paging (set [[action-seq (first (:src-xpath info))]])}))
+                     {}
+                     hopped-same-template))))
+               {}
+               items)]
+    dests))
 
 (defn planned-model
   "First we plan it.
@@ -195,6 +185,9 @@
          {}
          actions)
 
+        _ (println paging)
+        _ (println remove)
+        
         prefix-match (fn [prefix x]
                        (let [rx (reverse x)]
                         (reduce

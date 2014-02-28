@@ -1,9 +1,26 @@
 (ns crawler.rich-char-extractor
   "Character based extraction as opposed to token based extraction"
-  (require [crawler.dom :as dom]
+  (require [clojure.set :as clj-set]
+           [crawler.dom :as dom]
            [crawler.similarity :as similarity]
            [net.cgrand.enlive-html :as html]
            [crawler.utils :as utils]))
+
+(defn remove-subsets
+  [xpaths-hrefs-texts]
+  (filter
+   (fn [x]
+     (let [x-hrefs (-> x :hrefs set)]
+       (not
+        (some
+         (fn [{xpath :xpath hrefs :hrefs}]
+           (and
+            (not= xpath (-> x :xpath))
+            (clj-set/subset? x-hrefs (set hrefs))))
+         xpaths-hrefs-texts))))
+   (sort-by
+    #(-> % :hrefs count)
+    xpaths-hrefs-texts)))
 
 (defn state-action
   "Args:
@@ -94,7 +111,7 @@
 
        {:total-nav-info page-wide-nav-chars
         :xpath-nav-info (reverse
-                         (sort-by :score xpath-nav-info))})))
+                         (sort-by :score (remove-subsets xpath-nav-info)))})))
 
 (defn state-action-model
   [actions page-src url-ds template-removed blacklist]

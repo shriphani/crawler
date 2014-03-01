@@ -8,8 +8,8 @@
             [crawler.utils :as utils]))
 
 (defn stop?
-  [{visited :visited}]
-  (<= 100 visited))
+  [{visited :visited} num-leaves]
+  (<= num-leaves visited))
 
 (defn leaf?
   [body example-leaf]

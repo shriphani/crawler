@@ -16,7 +16,7 @@
    [nil "--example EXAMPLE" "Example leaf page url for the structure driven crawler"]
    [nil "--model MODEL" "Specify a model file (a model learned by the crawler)"]
    [nil
-    "--num-docs N"
+    "--num-leaves N"
     "Specify a number of documents you want"
     :default 500
     :parse-fn #(Integer/parseInt %)]
@@ -55,13 +55,14 @@
          (pprint corpus corpus-wrtr)))))
 
 (defn structure-driven-crawler
-  [start-url example-body]
+  [start-url example-body num-leaves]
   (let [structure-driven-leaf? #(structure-driven/leaf? example-body %)
+        structure-driven-stop? #(structure-driven/stop? % num-leaves)
         {state :state model :model corpus :corpus prefix :prefix}
         (crawl/crawl start-url
                      structure-driven-leaf?
                      structure-driven/extractor
-                     structure-driven/stop?)]
+                     structure-driven-stop?)]
     (dump-state-model-corpus state
                              model
                              corpus
@@ -98,7 +99,8 @@
           (let [stuff (structure-driven-crawler (-> options :start)
                                                 (-> options
                                                     :example
-                                                    utils/download-with-cookie))]
+                                                    utils/download-with-cookie)
+                                                (-> options :num-leaves))]
             (pprint stuff))
 
           (:execute options)

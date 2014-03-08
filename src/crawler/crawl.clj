@@ -199,3 +199,56 @@
                             (merge corpus corpus-entry))))))))))
 
 
+(defn crawl-model
+  "Args:
+   entry-point: starting url
+   leaf? : is current URL a leaf
+   extract: extractor
+   stop? : should the crawler stop right now
+   action-model: which sequence of actions are we executing at the moment"
+  ([entry-point leaf? extract stop? action-seq pagination]
+     (crawl-model {:content-queue []
+                   :paging-queue []}
+                  (set [])
+                  0
+                  leaf?
+                  extract
+                  stop?
+                  action-seq
+                  pagination
+                  corpus))
+
+  ([{content-q :content-queue
+     paging-q :paging-queue}
+    visited
+    num-leaves
+    leaf?
+    extract
+    stop?
+    action-seq
+    pagination
+    corpus]
+     (let [url  (-> url-queue first :url)
+           body (utils/download-with-cookie url)]
+      (cond (or (stop? {:visited (count visited)
+                        :num-leaves num-leaves})
+                (and (empty? content-q)
+                     (empty? paging-q)))
+            (do (utils/sayln :crawl-done)
+                {:corpus corpus})
+
+            (leaf? body (first url-queue))
+            (recur {:content-queue content-queue
+                    :paging-queue paging-queue}
+                   (conj visited (-> url-queue first :url))
+                   (+ 1 num-leaves)
+                   leaf?
+                   extract
+                   stop?
+                   action-seq
+                   pagination
+                   (merge corpus {(-> url-queue first :url)
+                                  body}))
+
+            :else
+            '*))))

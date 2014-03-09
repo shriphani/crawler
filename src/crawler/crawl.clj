@@ -198,6 +198,9 @@
                                                                  :path)}}]
                             (merge corpus corpus-entry))))))))))
 
+(defn xpath-to-pick
+  [src-path action-seq]
+  (nth action-seq (count src-path)))
 
 (defn crawl-model
   "Args:
@@ -206,49 +209,81 @@
    extract: extractor
    stop? : should the crawler stop right now
    action-model: which sequence of actions are we executing at the moment"
-  ([entry-point leaf? extract stop? action-seq pagination]
-     (crawl-model {:content-queue []
+  ([entry-point leaf? stop? action-seq pagination]
+     (crawl-model {:content-queue [{:url entry-point}]
                    :paging-queue []}
                   (set [])
                   0
                   leaf?
-                  extract
                   stop?
                   action-seq
                   pagination
-                  corpus))
+                  {}))
 
   ([{content-q :content-queue
      paging-q :paging-queue}
     visited
     num-leaves
     leaf?
-    extract
     stop?
     action-seq
     pagination
     corpus]
-     (let [url  (-> url-queue first :url)
-           body (utils/download-with-cookie url)]
-      (cond (or (stop? {:visited (count visited)
-                        :num-leaves num-leaves})
-                (and (empty? content-q)
-                     (empty? paging-q)))
-            (do (utils/sayln :crawl-done)
-                {:corpus corpus})
+     (let [url  (-> content-q first :url)
+           body (utils/download-with-cookie url)
+           src-xpath (-> content-q first :src-xpath)]
+       (do
+         (utils/sayln :left (count content-q))
+         (cond (or (stop? {:visited (count visited)
+                           :num-leaves num-leaves})
+                   (and (empty? content-q)
+                        (empty? paging-q)))
+               (do (utils/sayln :crawl-done)
+                   {:corpus corpus
+                    :num-leaves num-leaves})
+               
+               (leaf? action-seq (first content-q))
+               (do
+                 (utils/sayln :reached-leaf)
+                 (recur {:content-queue (rest content-q)
+                         :paging-queue paging-q}
+                        (conj visited (-> content-q first :url))
+                        (+ 1 num-leaves)
+                        leaf?
+                        stop?
+                        action-seq
+                        pagination
+                        (merge corpus {(-> content-q first :url)
+                                       body})))
 
-            (leaf? body (first url-queue))
-            (recur {:content-queue content-queue
-                    :paging-queue paging-queue}
-                   (conj visited (-> url-queue first :url))
-                   (+ 1 num-leaves)
-                   leaf?
-                   extract
-                   stop?
-                   action-seq
-                   pagination
-                   (merge corpus {(-> url-queue first :url)
-                                  body}))
+               :else
+               (do
+                 (utils/sayln :here)
+                 (let [action (xpath-to-pick src-xpath action-seq)
+                       extracted (first
+                                  (vals
+                                   (dom/eval-anchor-xpath
+                                    action
+                                    (dom/html->xml-doc body)
+                                    (-> content-q first :url)
+                                    (clojure.set/union
+                                     visited
+                                     (map :url content-q)))))
+                       extracted-hrefs (map :href extracted)
 
-            :else
-            '*))))
+                       new-content-q (concat (rest content-q)
+                                             (map
+                                              (fn [x]
+                                                {:url x
+                                                 :src-xpath (cons action src-xpath)})
+                                              extracted-hrefs))]
+                   (utils/sayln :items (count extracted-hrefs))
+                   (recur {:content-queue new-content-q
+                           :paging-queue paging-q}
+                          (conj visited url)
+                          num-leaves
+                          leaf?
+                          stop?
+                          action-seq
+                          pagination
+                          (merge corpus {url body})))))))))

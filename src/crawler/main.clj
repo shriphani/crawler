@@ -1,6 +1,7 @@
 (ns crawler.main
   "Run from here"
   (:require [clojure.tools.cli :as cli]
+            [crawler.corpus :as corpus]
             [crawler.crawl :as crawl]
             [clojure.java.io :as io]
             [crawler.model :as crawler-model]
@@ -21,7 +22,8 @@
     :default 500
     :parse-fn #(Integer/parseInt %)]
    [nil "--refine" "Refine a model file"]
-   [nil "--corpus CORPUS" "Specify a corpus"]])
+   [nil "--corpus CORPUS" "Specify a corpus"]
+   [nil "--corpus-to-json CORPUS" "Convert corpus file to json file"]])
 
 (defn dump-state-model-corpus
   "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
@@ -117,6 +119,9 @@
           (let [model-file (:model options)
                 corpus     (:corpus options)]
             (crawler-model/plan-dump-model model-file corpus))
+
+          (:corpus-to-json options)
+          (corpus/corpus->json (:corpus-to-json options))
           
           :else
           (println "Pick one bruh"))))

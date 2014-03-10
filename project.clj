@@ -3,7 +3,8 @@
   :url "http://blog.shriphani.com"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[clj-http "0.7.6"]
+  :dependencies [[cheshire "5.3.1"]
+                 [clj-http "0.7.6"]
                  [clj-logging-config "1.9.7"]
                  [clj-robots "0.6.0"]
                  [clj-time "0.6.0"]

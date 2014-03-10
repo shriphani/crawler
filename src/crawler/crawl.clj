@@ -159,7 +159,7 @@
                                                                  first
                                                                  :path)}}]
                             (merge corpus corpus-entry)))))
-
+               
                :else
                (let [{new-bodies  :bodies
                       new-visited :visited}
@@ -245,17 +245,53 @@
                (leaf? action-seq (first content-q))
                (do
                  (utils/sayln :reached-leaf)
-                 (recur {:content-queue (rest content-q)
-                         :paging-queue paging-q}
-                        (conj visited (-> content-q first :url))
-                        (+ 1 num-leaves)
+                 (let [pagination-extracted (if (pagination src-xpath)
+                                              (dom/eval-anchor-xpath
+                                               (pagination src-xpath)
+                                               (dom/html->xml-doc body)
+                                               (-> content-q first :url)
+                                               (clojure.set/union
+                                                visited
+                                                (map :url content-q)))
+                                              [])]
+                   (recur {:content-queue (concat
+                                           (map
+                                            (fn [x]
+                                              {:url x
+                                               :src-xpath src-xpath})
+                                            pagination-extracted)
+                                           (rest content-q))
+                           :paging-queue  paging-q}
+                          (conj visited (-> content-q first :url))
+                          (+ 1 num-leaves)
+                          leaf?
+                          stop?
+                          action-seq
+                          pagination
+                          (merge corpus {(-> content-q first :url)
+                                         body}))))
+
+               (and (empty? content-q)
+                    (not
+                     (empty? paging-q)))
+               (let [sorted-pagination-entries (sort-by
+                                                #(-> :src-xpath count)
+                                                paging-q)
+                     chosen-entry (last sorted-pagination-entries)
+                     remaining-pagination (filter
+                                           (fn [x] (not= x chosen-entry))
+                                           paging-q)]
+                 (recur {:content-queue (concat [chosen-entry]
+                                                content-q)
+                         :paging-queue remaining-pagination}
+                        visited
+                        num-leaves
                         leaf?
                         stop?
                         action-seq
                         pagination
-                        (merge corpus {(-> content-q first :url)
-                                       body})))
-
+                        corpus))
+               
                :else
                (do
                  (utils/sayln :here)
@@ -269,6 +305,15 @@
                                     (clojure.set/union
                                      visited
                                      (map :url content-q)))))
+                       pagination-extracted (if (pagination src-xpath)
+                                              (dom/eval-anchor-xpath
+                                               (pagination src-xpath)
+                                               (dom/html->xml-doc body)
+                                               (-> content-q first :url)
+                                               (clojure.set/union
+                                                visited
+                                                (map :url content-q)))
+                                              [])
                        extracted-hrefs (map :href extracted)
 
                        new-content-q (concat (rest content-q)
@@ -276,14 +321,19 @@
                                               (fn [x]
                                                 {:url x
                                                  :src-xpath (cons action src-xpath)})
-                                              extracted-hrefs))]
+                                              extracted-hrefs))
+                       new-paging-q (concat paging-q (map
+                                                      (fn [x]
+                                                        {:url x
+                                                         :src-xpath src-xpath})
+                                                      pagination-extracted))]
                    (utils/sayln :items (count extracted-hrefs))
                    (recur {:content-queue new-content-q
-                           :paging-queue paging-q}
+                           :paging-queue new-paging-q}
                           (conj visited url)
                           num-leaves
                           leaf?
                           stop?
                           action-seq
                           pagination
-                          (merge corpus {url body})))))))))
+                          corpus))))))))

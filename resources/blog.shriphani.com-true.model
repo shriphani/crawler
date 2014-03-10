@@ -1,4 +1,4 @@
 {:action-seq
  {("//html/body/div[contains(@class, 'container')]/div[contains(@class, 'row')]/div[contains(@class, 'span')]/div/article/header/h2/a")
   5},
- :pagination {}}
+ :pagination {nil "//html/body/div[contains(@class, 'container')]/div[contains(@class, 'row')]/div[contains(@class, 'span')]/div/footer/ul[contains(@class, 'pagination')]/li/a"}}

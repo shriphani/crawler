@@ -10,7 +10,6 @@
              (io/reader a-corpus-file))
         wrtr (io/writer
               (clojure.string/replace a-corpus-file #".corpus" ".json"))]
-    (pprint
-     (json/generate-string
-      (read rdr))
-     wrtr)))
+     (json/generate-stream
+      (read rdr)
+      wrtr)))

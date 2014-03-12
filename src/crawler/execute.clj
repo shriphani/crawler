@@ -43,4 +43,7 @@
   
   ([start-url {action-seqs :action-seq pagination :pagination} limit]
      (let [planned-model (plan-model action-seqs)]
-       (execute-model start-url (reverse (first (first planned-model))) pagination limit))))
+       (map
+        (fn [[a-seq estimate]]
+          (execute-model start-url (reverse a-seq) pagination limit))
+        planned-model))))

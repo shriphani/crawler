@@ -2,6 +2,7 @@
   "Execute a provided model using an im-memory crawler"
   (:require [crawler.dom :as dom]
             [crawler.crawl :as crawl]
+            [crawler.utils :as utils]
             [clojure.java.io :as io]
             [crawler.rich-char-extractor :as extractor]
             (org.bovinegenius [exploding-fish :as uri])))
@@ -31,8 +32,11 @@
                                   action-seqs
                                   pagination)
         wrtr (io/writer (str (uri/host start-url)
-                             ".corpus"))]
-    (clojure.pprint/pprint (:corpus corpus) wrtr)))
+                             ".corpus")
+                        :append true)]
+    (do (clojure.pprint/pprint (:corpus corpus) wrtr)
+        {:num-leaves (:num-leaves corpus)
+         :visited (:visited corpus)})))
 
 (defn execute
   "A model contains keys like so:
@@ -43,7 +47,10 @@
   
   ([start-url {action-seqs :action-seq pagination :pagination} limit]
      (let [planned-model (plan-model action-seqs)]
-       (map
-        (fn [[a-seq estimate]]
-          (execute-model start-url (reverse a-seq) pagination limit))
+       (reduce
+        (fn [acc [a-seq estimate]]
+          (do
+            (utils/sayln :executing a-seq)
+            (+ acc (execute-model start-url (reverse a-seq) pagination limit))))
+        0
         planned-model))))

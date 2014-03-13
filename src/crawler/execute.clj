@@ -25,12 +25,13 @@
   (<= 1000000 num-leaves))
 
 (defn execute-model
-  [start-url action-seqs pagination limit]
+  [start-url action-seqs pagination blacklist limit]
   (let [corpus (crawl/crawl-model start-url
                                   leaf?
                                   stop?
                                   action-seqs
-                                  pagination)
+                                  pagination
+                                  blacklist)
         wrtr (io/writer (str (uri/host start-url)
                              ".corpus")
                         :append true)]
@@ -51,6 +52,15 @@
         (fn [acc [a-seq estimate]]
           (do
             (utils/sayln :executing a-seq)
-            (+ acc (execute-model start-url (reverse a-seq) pagination limit))))
-        0
+            (let [{num-leaves :num-leaves
+                   visited :visited}
+                  (execute-model start-url
+                                 (reverse a-seq)
+                                 pagination
+                                 (:visited acc)
+                                 limit)]
+              {:num-leaves (+ (:num-leaves acc) num-leaves)
+               :visited (clojure.set/union visited (:visited acc))})))
+        {:num-leaves 0
+         :visited []}
         planned-model))))

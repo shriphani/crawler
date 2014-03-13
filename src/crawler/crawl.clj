@@ -208,8 +208,16 @@
    leaf? : is current URL a leaf
    extract: extractor
    stop? : should the crawler stop right now
-   action-model: which sequence of actions are we executing at the moment"
+   action-seq: which sequence of actions are we executing at the moment"
   ([entry-point leaf? stop? action-seq pagination]
+     (crawl-model entry-point
+                  leaf?
+                  stop?
+                  action-seq
+                  pagination
+                  []))
+  
+  ([entry-point leaf? stop? action-seq pagination blacklist]
      (crawl-model {:content-queue [{:url entry-point}]
                    :paging-queue []}
                   (set [])
@@ -218,6 +226,7 @@
                   stop?
                   action-seq
                   pagination
+                  blacklist
                   {}))
 
   ([{content-q :content-queue
@@ -228,6 +237,7 @@
     stop?
     action-seq
     pagination
+    blacklist
     corpus]
      (let [url  (-> content-q first :url)
            body (utils/download-with-cookie url)
@@ -244,7 +254,8 @@
                         (empty? paging-q)))
                (do (utils/sayln :crawl-done)
                    {:corpus corpus
-                    :num-leaves num-leaves})
+                    :num-leaves num-leaves
+                    :visited visited})
                
                (leaf? action-seq (first content-q))
                (do
@@ -260,7 +271,8 @@
                                                    (clojure.set/union
                                                     visited
                                                     (set (map :url content-q))
-                                                    (set (map :url paging-q))))))
+                                                    (set (map :url paging-q))
+                                                    (set blacklist)))))
                                                 (catch Exception e []))
                                               [])
                        pagination-extracted-hrefs (map :href pagination-extracted)]
@@ -278,6 +290,7 @@
                           stop?
                           action-seq
                           pagination
+                          blacklist
                           (merge corpus {(-> content-q first :url)
                                          body}))))
                
@@ -300,6 +313,7 @@
                         stop?
                         action-seq
                         pagination
+                        blacklist
                         corpus))
                
                :else
@@ -314,7 +328,8 @@
                                    (clojure.set/union
                                     visited
                                     (set (map :url content-q))
-                                    (set (map :url paging-q))))))
+                                    (set (map :url paging-q))
+                                    (set blacklist)))))
                                 (catch Exception e []))
                      pagination-extracted (if (pagination src-xpath)
                                             (try
@@ -327,7 +342,8 @@
                                                 (clojure.set/union
                                                  visited
                                                  (set (map :url content-q))
-                                                 (set (map :url paging-q))))))
+                                                 (set (map :url paging-q))
+                                                 (set blacklist)))))
                                              (catch Exception e nil))
                                             [])
                      pagination-extracted-hrefs (map :href pagination-extracted)
@@ -353,4 +369,5 @@
                         stop?
                         action-seq
                         pagination
+                        blacklist
                         corpus)))))))

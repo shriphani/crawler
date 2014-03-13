@@ -200,6 +200,21 @@ escape characters. then call re-pattern on it"
   (try (-> a-link (client/get {:cookie-store my-cs}) :body)
        (catch Exception e nil)))
 
+(def *document-cache* (atom {}))
+
+(defn download-cache-with-cookie
+  [a-link]
+  (if-not (@*document-cache* a-link)
+    (do (let [document (download-with-cookie a-link)]
+          (sayln :cache-miss)
+          (swap! *document-cache*
+                 merge
+                 {a-link document})
+          document))
+
+    (do (sayln :cache-hit)
+        (@*document-cache* a-link))))
+
 (defn positions-at
   ".indexOf variant that finds multiple instances"
   [collection item]

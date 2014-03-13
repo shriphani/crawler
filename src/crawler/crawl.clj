@@ -240,7 +240,7 @@
     blacklist
     corpus]
      (let [url  (-> content-q first :url)
-           body (utils/download-with-cookie url)
+           body (utils/download-cache-with-cookie url)
            src-xpath (-> content-q first :src-xpath)]
        (do
          (Thread/sleep 1000)

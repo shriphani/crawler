@@ -195,6 +195,12 @@ escape characters. then call re-pattern on it"
 
 (def my-cs (cookies/cookie-store)) ; for removing that SID nonsense
 
+(defn sayln
+  "println that prints to stderr"
+  [& stuff]
+  (binding [*out* *err*]
+    (apply println stuff)))
+
 (defn download-with-cookie
   [a-link]
   (try (-> a-link (client/get {:cookie-store my-cs}) :body)
@@ -240,12 +246,6 @@ escape characters. then call re-pattern on it"
      []
      (range
       (count v-collection)))))
-
-(defn sayln
-  "println that prints to stderr"
-  [& stuff]
-  (binding [*out* *err*]
-    (apply println stuff)))
 
 (defn dated-filename
   ([] (dated-filename "" ""))

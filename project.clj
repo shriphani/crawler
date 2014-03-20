@@ -6,6 +6,7 @@
   :dependencies [[cheshire "5.3.1"]
                  [clj-http "0.7.6"]
                  [clj-logging-config "1.9.7"]
+                 [clj-ml "0.0.3-SNAPSHOT"]
                  [clj-robots "0.6.0"]
                  [clj-time "0.6.0"]
                  [com.rubiconproject.oss/jchronic "0.2.6"]

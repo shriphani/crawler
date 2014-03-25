@@ -284,7 +284,9 @@
                                            (map
                                             (fn [x]
                                               {:url x
-                                               :src-xpath src-xpath})
+                                               :src-xpath src-xpath
+                                               :src-url url
+                                               :pagination true})
                                             pagination-extracted-hrefs)
                                            (rest content-q))
                            :paging-queue  paging-q}

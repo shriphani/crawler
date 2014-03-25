@@ -42,9 +42,8 @@
                      hrefs))
                    :url)]
        (merge-with concat acc {:bodies  stuff
-                               :visited (take
-                                         (Math/ceil
-                                          (/ (count hrefs) 4))
+                               :visited (utils/random-take
+                                         10
                                          hrefs)})))
    {}
    xpaths-and-urls))

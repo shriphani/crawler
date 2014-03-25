@@ -269,3 +269,24 @@ escape characters. then call re-pattern on it"
             "-"
             min
             suffix))))
+
+(defn random-take
+  "Take n items from collection at random
+   (as opposed to the first n)"
+  [n coll]
+  (cond (<= (count coll) n)
+        coll
+
+        (zero? n)
+        []
+        
+        :else
+        (let [picked (rand-int (count coll))
+              remaining (map
+                         (fn [x] (nth coll x))
+                         (filter
+                          #(not= % picked)
+                          (range (count coll))))]
+          (cons (nth coll picked)
+                (random-take (dec n)
+                             remaining)))))

@@ -259,21 +259,26 @@
                (leaf? action-seq (first content-q))
                (do
                  (utils/sayln :reached-leaf)
-                 (let [pagination-extracted (if (pagination src-xpath)
-                                              (try
-                                                (first
-                                                 (vals
-                                                  (dom/eval-anchor-xpath
-                                                   (pagination src-xpath)
-                                                   (dom/html->xml-doc body)
-                                                   (-> content-q first :url)
-                                                   (clojure.set/union
-                                                    visited
-                                                    (set (map :url content-q))
-                                                    (set (map :url paging-q))
-                                                    (set blacklist)))))
-                                                (catch Exception e []))
-                                              [])
+                 (let [pagination-extracted (if-not (pagination src-xpath)
+                                              []
+                                              (reduce
+                                               concat
+                                               (map
+                                                (fn [p]
+                                                  (try
+                                                    (first
+                                                     (vals
+                                                      (dom/eval-anchor-xpath
+                                                       p
+                                                       (dom/html->xml-doc body)
+                                                       (-> content-q first :url)
+                                                       (clojure.set/union
+                                                        visited
+                                                        (set (map :url content-q))
+                                                        (set (map :url paging-q))
+                                                        (set blacklist)))))
+                                                    (catch Exception e [])))
+                                                (pagination src-xpath))))
                        pagination-extracted-hrefs (map :href pagination-extracted)]
                    (recur {:content-queue (concat
                                            (map
@@ -331,19 +336,24 @@
                                     (set blacklist)))))
                                 (catch Exception e []))
                      pagination-extracted (if (pagination src-xpath)
-                                            (try
-                                             (first
-                                              (vals
-                                               (dom/eval-anchor-xpath
-                                                (pagination src-xpath)
-                                                (dom/html->xml-doc body)
-                                                (-> content-q first :url)
-                                                (clojure.set/union
-                                                 visited
-                                                 (set (map :url content-q))
-                                                 (set (map :url paging-q))
-                                                 (set blacklist)))))
-                                             (catch Exception e nil))
+                                            (reduce
+                                             concat
+                                             (map
+                                              (fn [p]
+                                                (try
+                                                  (first
+                                                   (vals
+                                                    (dom/eval-anchor-xpath
+                                                     p
+                                                     (dom/html->xml-doc body)
+                                                     (-> content-q first :url)
+                                                     (clojure.set/union
+                                                      visited
+                                                      (set (map :url content-q))
+                                                      (set (map :url paging-q))
+                                                      (set blacklist)))))
+                                                  (catch Exception e [])))
+                                              (pagination src-xpath)))
                                             [])
                      pagination-extracted-hrefs (map :href pagination-extracted)
                      extracted-hrefs (map :href extracted)

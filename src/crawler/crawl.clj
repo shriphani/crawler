@@ -16,21 +16,11 @@
   [content filename]
   (spit filename (with-out-str (prn content)) :append true))
 
-(defn distinct-by-key
- [coll k]
- (reduce
-  (fn [acc v]
-    (if (some #{(v k)} (set (map #(k %) acc)))
-      acc
-      (cons v acc)))
-  []
-  coll))
-
 (defn prepare
   [xpaths-and-urls src-path url]
   (reduce
    (fn [acc {xpath :xpath hrefs :hrefs texts :texts}]
-     (let [stuff  (distinct-by-key
+     (let [stuff  (utils/distinct-by-key
                    (filter
                     identity
                     (map

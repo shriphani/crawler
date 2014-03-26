@@ -112,7 +112,8 @@
 
        {:total-nav-info page-wide-nav-chars
         :xpath-nav-info (reverse
-                         (sort-by :score (remove-subsets xpath-nav-info)))})))
+                         (sort-by :score (remove-subsets
+                                          (utils/distinct-by-key xpath-nav-info :hrefs))))})))
 
 (defn state-action-model
   [actions page-src url-ds template-removed blacklist]

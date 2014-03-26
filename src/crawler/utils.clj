@@ -290,3 +290,13 @@ escape characters. then call re-pattern on it"
           (cons (nth coll picked)
                 (random-take (dec n)
                              remaining)))))
+
+(defn distinct-by-key
+ [coll k]
+ (reduce
+  (fn [acc v]
+    (if (some #{(v k)} (set (map #(k %) acc)))
+      acc
+      (cons v acc)))
+  []
+  coll))

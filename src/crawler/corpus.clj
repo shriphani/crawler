@@ -2,7 +2,8 @@
   "Tools for processing a downloaded corpus"
   (:require [cheshire.core :as json]
             [clojure.java.io :as io])
-  (:use [clojure.pprint :only [pprint]])
+  (:use [clojure.pprint :only [pprint]]
+        [structural-similarity.xpath-text :only [similar?]])
   (:import [java.io PushbackReader]))
 
 (defn read-corpus-file
@@ -10,6 +11,56 @@
   (let [rdr (PushbackReader.
              (io/reader a-corpus-file))]
     (read rdr)))
+
+(defn pagination-candidate?
+  "Source page and target page bodies"
+  [src-body target-body]
+  (similar? src-body target-body))
+
+(defn pagination-candidates
+  [corpus]
+  (map
+   #(dissoc % :candidate?)
+   (filter
+    :candidate?
+    (map
+     (fn [[item-url item-details]]
+       (let [src-body (-> item-details :src-url corpus :body)
+             tgt-body (-> item-details :body)
+             
+             src-pg-xpath (-> item-details :src-url corpus :src-xpath)
+             tgt-pg-xpath (-> item-details :src-xpath first)
+             
+             src-url (-> item-details :src-url)
+             tgt-url item-url]
+         {:src-xpath  src-pg-xpath
+          :action     tgt-pg-xpath
+          :candidate? (pagination-candidate? src-body tgt-body)}))
+     corpus))))
+
+(defn pagination-in-corpus
+  [corpus]
+  (let [candidates (-> corpus pagination-candidates frequencies)
+        sorted-candidates (sort-by #(-> % first :src-xpath count) candidates)
+
+        ;; removes spurious leads with pagination.
+        spurious-candidates-removed
+        (filter
+         (fn [[item freq]]
+           (not
+            (some (fn [[c freq]]
+                    (= (:src-xpath item)
+                       (cons (:action c)
+                             (:src-xpath c))))
+                  sorted-candidates)))
+         sorted-candidates)]
+    (sort-by
+     pagination-candidate-score)))
+
+(defn pagination-in-corpus-file
+  [a-corpus-file]
+  (let [corpus (read-corpus-file a-corpus-file)]
+    (pagination-in-corpus corpus)))
 
 (defn corpus->json
   "Converts a corpus file which is essentially a pprinted map

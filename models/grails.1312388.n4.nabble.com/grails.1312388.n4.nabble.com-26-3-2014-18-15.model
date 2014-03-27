@@ -1,0 +1,32 @@
+{("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/a")
+ 1,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a")
+ 3,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/a")
+ 4,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a")
+ 2,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]")
+ 2,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/a")
+ 1,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a")
+ 3,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/a")
+ 1,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a"
+  "//HTML/body/div[contains(@class, 'nabble')]/span[contains(@class, 'pages')]/span[contains(@class, 'page')]/a")
+ 2,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]")
+ 1}

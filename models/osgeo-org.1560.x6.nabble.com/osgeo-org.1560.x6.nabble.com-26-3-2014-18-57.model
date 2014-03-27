@@ -1,0 +1,18 @@
+{("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/div[contains(@class, 'action')]/a")
+ 1,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/div[contains(@class, 'action')]/a")
+ 3,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'weak')]/span[contains(@class, 'weak')]/div[contains(@class, 'sub')]/a[contains(@class, 'nowrap')]")
+ 11,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'weak')]/span[contains(@class, 'weak')]/div[contains(@class, 'sub')]/a[contains(@class, 'nowrap')]")
+ 9,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'weak')]/div/a")
+ 29,
+ ("//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'light')]/td[contains(@class, 'medium')]/table/tbody/tr/td[contains(@class, 'adbayes')]/a[contains(@class, 'post')]"
+  "//HTML/body/div[contains(@class, 'nabble')]/table[contains(@class, 'main')]/tbody/tr[contains(@class, 'main')]/td[contains(@class, 'weak')]/div/a")
+ 27}

@@ -1,8 +1,10 @@
 (ns crawler.corpus
   "Tools for processing a downloaded corpus"
   (:require [cheshire.core :as json]
-            [clojure.java.io :as io])
-  (:use [clojure.pprint :only [pprint]]
+            [clojure.java.io :as io]
+            [crawler.dom :as dom])
+  (:use [clj-xpath.core :only [$x:node+]]
+        [clojure.pprint :only [pprint]]
         [structural-similarity.xpath-text :only [similar?]])
   (:import [java.io PushbackReader]))
 
@@ -38,6 +40,52 @@
           :candidate? (pagination-candidate? src-body tgt-body)}))
      corpus))))
 
+(defn body-links
+  [body]
+  (let [processed (dom/html->xml-doc body)
+        anchors   ($x:node+ ".//a" processed)]
+    (set
+     (map
+      #(dom/node-attribute % "href")
+      anchors))))
+
+(defn scored-pagination
+  [candidates-ns corpus]
+  (map
+   (fn [[candidate freq]]
+     (let [candidate-action (cons
+                             (:action candidate)
+                             (:src-xpath candidate))
+
+           items-at-action  (map
+                             (fn [[u x]]
+                               [u (:src-url x) (:body x)])
+                             (filter
+                              (fn [[u x]]
+                                (= (:src-xpath x)
+                                   candidate-action))
+                              corpus))
+
+           grouped-by-url   (group-by second items-at-action)
+
+           per-url-ratio    (map
+                             (fn [[url items]]
+                               (let [item-links (map
+                                                 (fn [[_ _ body]]
+                                                   (body-links body))
+                                                 items)
+                                     
+                                     union (reduce clojure.set/union item-links)
+                                     int   (reduce clojure.set/intersection item-links)]
+                                 (count int)))
+                             grouped-by-url)
+
+           candidate-avg (double
+                          (/ (reduce + per-url-ratio)
+                             (count per-url-ratio)))]
+       [candidate candidate-avg]))
+   candidates-ns))
+
 (defn pagination-in-corpus
   [corpus]
   (let [candidates (-> corpus pagination-candidates frequencies)
@@ -54,8 +102,7 @@
                              (:src-xpath c))))
                   sorted-candidates)))
          sorted-candidates)]
-    (sort-by
-     pagination-candidate-score)))
+    (scored-pagination spurious-candidates-removed corpus)))
 
 (defn pagination-in-corpus-file
   [a-corpus-file]

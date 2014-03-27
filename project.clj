@@ -19,6 +19,7 @@
                    com.sun.jdmk/jmxtools
                    com.sun.jmx/jmxri]]
                  [misc "0.1.0-SNAPSHOT"]
+                 [me.raynes/fs "1.4.4"]
                  [net.sourceforge.htmlcleaner/htmlcleaner "2.6"]
                  [org.apache.commons/commons-lang3 "3.1"]
                  [org.clojure/clojure "1.5.1"]
@@ -27,5 +28,5 @@
                  [org.bovinegenius/exploding-fish "0.3.3"]
                  [structural_similarity/structural_similarity "0.1.0-SNAPSHOT"]]
   :main crawler.main
-  :jvm-opts ["-Xmx10g"]
+  :jvm-opts ["-Xmx8g"]
   :plugins [[lein-gorilla "0.1.2"]])

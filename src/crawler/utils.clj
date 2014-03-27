@@ -5,6 +5,7 @@
   (:require [clj-http.client :as client]
             [clj-http.cookies :as cookies]
             [clj-time.core :as time]
+            [me.raynes.fs :as fs]
             [org.bovinegenius [exploding-fish :as uri]])
   (:use [clojure.tools.logging :only (info error)]
         [clj-logging-config.log4j]))
@@ -257,8 +258,9 @@ escape characters. then call re-pattern on it"
            yr  (time/year cur-time)
            hr  (time/hour cur-time)
            min (time/minute cur-time)]
-       (str prefix
-            "-"
+       (str (if-not (= "" prefix)
+              (str prefix "-")
+              "")
             day
             "-"
             mon
@@ -300,3 +302,8 @@ escape characters. then call re-pattern on it"
       (cons v acc)))
   []
   coll))
+
+(defn safe-mkdir
+  [path]
+  (when-not (fs/exists? path)
+    (fs/mkdir path)))

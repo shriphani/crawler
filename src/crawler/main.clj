@@ -7,7 +7,8 @@
             [crawler.model :as crawler-model]
             [crawler.rich-char-extractor :as rc-extractor]
             [crawler.structure-driven :as structure-driven]
-            [crawler.utils :as utils])
+            [crawler.utils :as utils]
+            [me.raynes.fs :as fs])
   (:use [clojure.pprint :only [pprint]]))
 
 (def crawler-options
@@ -28,22 +29,24 @@
 (defn dump-state-model-corpus
   "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
   ([state model corpus]
-     (dump-state-model-corpus state model corpus "crawler"))
+     (dump-state-model-corpus state model corpus "nameless-model"))
 
   ([state model corpus prefix]
-     (let [date-file-prefix (utils/dated-filename prefix "")
+     (let [date-file-prefix (utils/dated-filename "" "")
 
-           create #(str date-file-prefix %)
+           create #(str prefix "/" date-file-prefix %)
            
            state-file  (create ".state")
            model-file  (create ".model")
            corpus-file (create ".corpus")]
-       (with-open [state-wrtr  (io/writer state-file)
-                   model-wrtr  (io/writer model-file)
-                   corpus-wrtr (io/writer corpus-file)]
-         (do (pprint state state-wrtr)
-             (pprint model model-wrtr)
-             (pprint corpus corpus-wrtr))))))
+       (do
+         (utils/safe-mkdir prefix)
+         (with-open [state-wrtr  (io/writer state-file)
+                     model-wrtr  (io/writer model-file)
+                     corpus-wrtr (io/writer corpus-file)]
+           (do (pprint state state-wrtr)
+               (pprint model model-wrtr)
+               (pprint corpus corpus-wrtr)))))))
 
 (defn dump-corpus
   ([corpus]

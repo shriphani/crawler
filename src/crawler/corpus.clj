@@ -49,43 +49,6 @@
       #(dom/node-attribute % "href")
       anchors))))
 
-(defn scored-pagination
-  [candidates-ns corpus]
-  (map
-   (fn [[candidate freq]]
-     (let [candidate-action (cons
-                             (:action candidate)
-                             (:src-xpath candidate))
-
-           items-at-action  (map
-                             (fn [[u x]]
-                               [u (:src-url x) (:body x)])
-                             (filter
-                              (fn [[u x]]
-                                (= (:src-xpath x)
-                                   candidate-action))
-                              corpus))
-
-           grouped-by-url   (group-by second items-at-action)
-
-           per-url-ratio    (map
-                             (fn [[url items]]
-                               (let [item-links (map
-                                                 (fn [[_ _ body]]
-                                                   (body-links body))
-                                                 items)
-                                     
-                                     union (reduce clojure.set/union item-links)
-                                     int   (reduce clojure.set/intersection item-links)]
-                                 (count int)))
-                             grouped-by-url)
-
-           candidate-avg (double
-                          (/ (reduce + per-url-ratio)
-                             (count per-url-ratio)))]
-       [candidate candidate-avg]))
-   candidates-ns))
-
 (defn pagination-in-corpus
   [corpus]
   (let [candidates (-> corpus pagination-candidates frequencies)
@@ -102,7 +65,11 @@
                              (:src-xpath c))))
                   sorted-candidates)))
          sorted-candidates)]
-    (scored-pagination spurious-candidates-removed corpus)))
+    (reduce
+     (fn [acc [{src-xpath :src-xpath action :action} n]]
+       (merge-with concat acc {src-xpath [action]}))
+     {}
+     spurious-candidates-removed)))
 
 (defn pagination-in-corpus-file
   [a-corpus-file]

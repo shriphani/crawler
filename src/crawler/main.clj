@@ -24,7 +24,8 @@
     :parse-fn #(Integer/parseInt %)]
    [nil "--refine" "Refine a model file"]
    [nil "--corpus CORPUS" "Specify a corpus"]
-   [nil "--corpus-to-json CORPUS" "Convert corpus file to json file"]])
+   [nil "--corpus-to-json CORPUS" "Convert corpus file to json file"]
+   [nil "--fix-model D" "Fix a model with pagination info"]])
 
 (defn dump-state-model-corpus
   "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
@@ -118,13 +119,27 @@
                                    model
                                    num-leaves))
 
-          (:refine options)
-          (let [model-file (:model options)
-                corpus     (:corpus options)]
-            (crawler-model/plan-dump-model model-file corpus))
-
           (:corpus-to-json options)
           (corpus/corpus->json (:corpus-to-json options))
+
+          (:fix-model options)
+          (let [directory (:fix-model options)
+                model-file (.getAbsolutePath
+                            (first
+                             (filter
+                              #(re-find #"\.model$" (.getAbsolutePath %))
+                              (file-seq (io/file directory)))))
+                corpus-file (.getAbsolutePath
+                             (first
+                              (filter
+                               #(re-find #"\.corpus$" (.getAbsolutePath %))
+                               (file-seq (io/file directory)))))
+
+                fixed-model
+                (crawler-model/fix-model model-file
+                                         corpus-file)]
+            (pprint fixed-model (io/writer (str (:fix-model options)
+                                                "pruned-model"))))
           
           :else
           (println "Pick one bruh"))))

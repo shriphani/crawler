@@ -1,0 +1,9 @@
+{("//html/body[contains(@class, 'mobile')]/div[contains(@class, 'grid')]/div[contains(@class, 'break')]/div[contains(@class, 'entry')]/p/a"
+  "//html/body[contains(@class, 'desktop')]/div/header[contains(@class, 'm')]/div[contains(@class, 'm')]/div[contains(@class, 'clearfix')]/div[contains(@class, 'm')]/div[contains(@class, 'm')]/div[contains(@class, 'm')]/ul/li/a")
+ 1,
+ ("//html/body[contains(@class, 'desktop')]/div/div/div/div/div[contains(@class, 'grid')]/div[contains(@class, 'list')]/table/tbody/tr[contains(@class, 'even')]/td/a")
+ 4,
+ ("//html/body[contains(@class, 'desktop')]/div/div/div/div/div[contains(@class, 'grid')]/div[contains(@class, 'list')]/table/tbody/tr[contains(@class, 'odd')]/td/a")
+ 3,
+ ("//html/body[contains(@class, 'desktop')]/div/header[contains(@class, 'm')]/div[contains(@class, 'm')]/div[contains(@class, 'clearfix')]/div[contains(@class, 'm')]/div[contains(@class, 'm')]/div[contains(@class, 'm')]/ul/li/a")
+ 6}

@@ -2,7 +2,8 @@
   "Tools for processing a downloaded corpus"
   (:require [cheshire.core :as json]
             [clojure.java.io :as io]
-            [crawler.dom :as dom])
+            [crawler.dom :as dom]
+            [crawler.rich-char-extractor :as extractor])
   (:use [clj-xpath.core :only [$x:node+]]
         [clojure.pprint :only [pprint]]
         [structural-similarity.xpath-text :only [similar?]])
@@ -85,3 +86,4 @@
      (json/generate-stream
       (read-corpus-file a-corpus-file)
       wrtr)))
+

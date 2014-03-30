@@ -46,7 +46,7 @@
   [model-file corpus-file]
   (let [model       (read-model model-file)
         corpus-data (corpus/read-corpus-file corpus-file)
-
+        
         pagination (corpus/pagination-in-corpus corpus-data)
         pagination-trimmed (trim-pagination model pagination)]
     {:action     pagination-trimmed

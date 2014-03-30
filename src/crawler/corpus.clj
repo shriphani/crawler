@@ -87,3 +87,49 @@
       (read-corpus-file a-corpus-file)
       wrtr)))
 
+(defn refine-segment
+  [action-segment corpus]
+  (let [action-to-prev (if (= [] (rest action-segment))
+                         nil
+                         (rest action-segment))
+        action-taken   (first action-segment)
+
+        prev-nodes     (filter
+                        (fn [[u item]]
+                          (= (:src-xpath item)
+                             action-to-prev))
+                        corpus)
+
+        yield-nodes    (filter
+                        (fn [[u item]]
+                          (let [item-state-action (:xpath-nav-info
+                                                   (extractor/state-action
+                                                    (:body item)
+                                                    {:url u}
+                                                    {}))
+
+                                possible-actions (map :xpath item-state-action)]
+                            (some (fn [x] (= x action-taken)) possible-actions)))
+                        prev-nodes)]
+    [action-segment (count yield-nodes) (count prev-nodes)]))
+
+(defn refine-action-seq
+  [action-seq corpus]
+  (let [action-segments (reductions
+                         (fn [acc x]
+                           (cons x acc))
+                         nil
+                         (reverse action-seq))]
+    (map
+     (fn [segment] (refine-segment segment corpus))
+     action-segments)))
+
+(defn refine-model-with-positions
+  "Try to maximize the model yield with position info"
+  [model corpus]
+  (map
+   (fn [[action-seq count]]
+     [action-seq
+      (refine-action-seq action-seq
+                         corpus)])
+   model))

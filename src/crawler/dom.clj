@@ -637,14 +637,17 @@ id and class tag constraints are also added"
         xpath-nodes))))
 
 (defn refine-xpath
-  [body url xpath size]
+  "Xpath refined to maximize yield on
+   a per-page basis"
+  [action body url-ds muscle fat]
   (let [processed-body (html->xml-doc body)
+        
         nodes-paths    (page-nodes-hrefs-text processed-body
                                               url
                                               [])
         nodes-paths-x  (filter
                         (fn [[path an-info]]
-                          (= xpath (path->xpath-no-position path)))
+                          (= action (path->xpath-no-position path)))
                         nodes-paths)
         
         paths          (map
@@ -660,4 +663,5 @@ id and class tag constraints are also added"
                               (count (distinct x)))
                             (apply map vector counts))
         pos            [(.indexOf histogram size)]]
-    (map #(path->xpath (first %) pos) nodes-paths-x)))
+
+    action))

@@ -87,7 +87,7 @@
       (read-corpus-file a-corpus-file)
       wrtr)))
 
-(defn refine-segment
+(defn refine-segment?
   [action-segment corpus]
   (let [action-to-prev (if (= [] (rest action-segment))
                          nil
@@ -111,7 +111,9 @@
                                 possible-actions (map :xpath item-state-action)]
                             (some (fn [x] (= x action-taken)) possible-actions)))
                         prev-nodes)]
-    [action-segment (count yield-nodes) (count prev-nodes)]))
+    (and action-taken
+         (< (count yield-nodes)
+            (count prev-nodes)))))
 
 (defn refine-action-seq
   [action-seq corpus]
@@ -120,9 +122,26 @@
                            (cons x acc))
                          nil
                          (reverse action-seq))]
-    (map
-     (fn [segment] (refine-segment segment corpus))
+    ;; the first one is a nil action at a nil
+    ;; point
+    (filter
+     (fn [segment] (refine-segment? segment corpus))
      action-segments)))
+
+(defn leaf-fix?
+  [action-seq corpus]
+  (let [documents (filter
+                   (fn [[u x]]
+                     (= (:src-xpath x)
+                        action-seq))
+                   corpus)
+
+        leaves (filter
+                (fn [[u x]]
+                  (:leaf? x))
+                documents)]
+    [(count leaves)
+     (count documents)]))
 
 (defn refine-model-with-positions
   "Try to maximize the model yield with position info"
@@ -130,6 +149,21 @@
   (map
    (fn [[action-seq count]]
      [action-seq
+
+      :segments-to-fix
       (refine-action-seq action-seq
-                         corpus)])
+                         corpus)
+
+      :leaf-fix?
+      (leaf-fix? action-seq corpus)
+
+      :leaf-urls
+      (map
+       first
+       (filter
+        (fn [[u x]]
+          (and (:leaf? x)
+               (= (:src-xpath x)
+                  action-seq)))
+        corpus))])
    model))

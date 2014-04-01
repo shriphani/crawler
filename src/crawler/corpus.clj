@@ -115,7 +115,7 @@
          (< (count yield-nodes)
             (count prev-nodes)))))
 
-(defn refine-action-seq
+(defn seqs-to-refine
   [action-seq corpus]
   (let [action-segments (reductions
                          (fn [acc x]
@@ -125,8 +125,14 @@
     ;; the first one is a nil action at a nil
     ;; point
     (filter
-     (fn [segment] (refine-segment? segment corpus))
-     action-segments)))
+     second
+     (map
+      (fn [segment]
+        [segment (try (nth action-seq (count segment))
+                      (catch IndexOutOfBoundsException e nil))])
+      (filter
+       (fn [segment] (refine-segment? segment corpus))
+       action-segments)))))
 
 (defn leaf-fix?
   [action-seq corpus]
@@ -140,8 +146,8 @@
                 (fn [[u x]]
                   (:leaf? x))
                 documents)]
-    [(count leaves)
-     (count documents)]))
+    (< (count leaves)
+       (count documents))))
 
 (defn repair-leaf-fuck-up
   "Try to repair the leaf node yield
@@ -176,6 +182,72 @@
        muscle
        fat))
      src-docs)))
+
+(defn refine-segment
+  [segment action-to-take corpus]
+  (let [muscle (map
+                first
+                (filter
+                 (fn [[u x]]
+                   (and
+                    (if (:body x)
+                      (let [action-space (map
+                                          first
+                                          (:xpath-nav-info
+                                           (extractor/state-action
+                                            (:body x)
+                                            {:url u}
+                                            {})))]
+                        (some
+                         (fn [x]
+                           (= x action-to-take))
+                         action-space))
+                      false)
+                    (= (:src-xpath x)
+                       segment)))
+                 corpus))
+        fat     (filter
+                 (fn [[u x]]
+                   (and
+                    (if (:body x)
+                      (let [action-space (map
+                                          first
+                                          (:xpath-nav-info
+                                           (extractor/state-action
+                                            (:body x)
+                                            {:url u}
+                                            {})))]
+                        (not
+                         (some
+                          (fn [x]
+                            (= x action-to-take))
+                          action-space)))
+                      true)
+                    (= (:src-xpath x)
+                       segment)))
+                 corpus)
+        
+        docs    (map
+                 (fn [[u x]]
+                   [u (:body x)])
+                 (filter
+                  (fn [[u x]]
+                    (= (:src-xpath x)
+                       segment))
+                  corpus))]
+    (first
+     (first
+      (max-key
+       second
+       (frequencies
+        (map
+         (fn [[u  b]]
+           (dom/refine-xpath-accuracy segment
+                                      b
+                                      u
+                                      muscle
+                                      fat))
+         docs)))))))
 
 (defn refine-model-with-positions
   "Try to maximize the model yield with position info"
@@ -214,27 +286,30 @@
            leaf-src-docs (map
                           (fn [u]
                             (:body (corpus u)))
-                          leaf-src-urls)]
+                          leaf-src-urls)
+
+           leaf-fix (first
+                     (first
+                      (max-key
+                       second
+                       (frequencies
+                        (map
+                         (fn [[u b]]
+                           (if leaf-fix-decision
+                             (dom/refine-xpath-accuracy (first action-seq)
+                                                        b
+                                                        u
+                                                        leaf-muscle
+                                                        leaf-fat)
+                             {}))
+                         (map vector leaf-src-urls leaf-src-docs))))))]
       [action-seq
-
        :segments-to-fix
-       (refine-action-seq action-seq
-                          corpus)
-
-       :leaf-fix
-       (first
-        (first
-         (max-key
-          second
-          (frequencies
-           (map
-            (fn [[u b]]
-              (if leaf-fix-decision
-                (dom/refine-xpath-accuracy (first action-seq)
-                                           b
-                                           u
-                                           leaf-muscle
-                                           leaf-fat)
-                {}))
-            (map vector leaf-src-urls leaf-src-docs))))))]))
+       (cons
+        [action-seq leaf-fix]
+        (map
+         (fn [[segment action]]
+           (refine-segment segment action corpus))
+         (seqs-to-refine action-seq
+                         corpus)))]))
    model))

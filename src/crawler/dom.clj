@@ -683,10 +683,12 @@ id and class tag constraints are also added"
 
         muscle-paths-list (map first muscle-nodes)
 
-        muscle-histogram (map
-                          #(-> % distinct count)
-                          (apply map vector muscle-paths-list))
-
+        muscle-histogram (if (empty? muscle-paths-list)
+                           []
+                           (map
+                            #(-> % distinct count)
+                            (apply map vector muscle-paths-list)))
+        
         muscle-positions (filter
                           (fn [x]
                             (not=

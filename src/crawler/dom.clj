@@ -723,6 +723,7 @@ id and class tag constraints are also added"
                         (= mp p))
                       muscle-positions)))
              positions))
+
      :avoid (map
              (fn [p]
                [p (nth

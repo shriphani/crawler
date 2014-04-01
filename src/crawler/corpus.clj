@@ -182,32 +182,59 @@
   [model corpus]
   (map
    (fn [[action-seq count]]
-     [action-seq
+     (let [leaf-fix-decision (leaf-fix? action-seq corpus)
 
-      :segments-to-fix
-      (refine-action-seq action-seq
-                         corpus)
+           leaf-muscle (map
+                        first
+                        (filter
+                         (fn [[u x]]
+                           (and (:leaf? x)
+                                (= (:src-xpath x)
+                                   action-seq)))
+                         corpus))
 
-      :leaf-fix?
-      (leaf-fix? action-seq corpus)
+           leaf-fat    (map
+                        first
+                        (filter
+                         (fn [[u x]]
+                           (and (not (:leaf? x))
+                                (= (:src-xpath x)
+                                   action-seq)))
+                         corpus))
 
-      :leaf-urls
-      (map
-       first
-       (filter
-        (fn [[u x]]
-          (and (:leaf? x)
-               (= (:src-xpath x)
-                  action-seq)))
-        corpus))
+           leaf-src-urls (map
+                          (fn [[u x]]
+                            (:src-url x))
+                          (filter
+                           (fn [[u x]]
+                             (= (:src-xpath x)
+                                action-seq))
+                           corpus))
 
-      :fat
-      (map
-       first
-       (filter
-        (fn [[u x]]
-          (and (not (:leaf? x))
-               (= (:src-xpath x)
-                  action-seq)))
-        corpus))])
+           leaf-src-docs (map
+                          (fn [u]
+                            (:body (corpus u)))
+                          leaf-src-urls)]
+      [action-seq
+
+       :segments-to-fix
+       (refine-action-seq action-seq
+                          corpus)
+
+       :leaf-fix
+       (first
+        (first
+         (max-key
+          second
+          (frequencies
+           (map
+            (fn [[u b]]
+              (if leaf-fix-decision
+                (dom/refine-xpath-accuracy (first action-seq)
+                                           b
+                                           u
+                                           leaf-muscle
+                                           leaf-fat)
+                {}))
+            (map vector leaf-src-urls leaf-src-docs))))))]))
    model))

@@ -636,10 +636,10 @@ id and class tag constraints are also added"
         {}
         xpath-nodes))))
 
-(defn refine-xpath
+(defn refine-xpath-accuracy
   "Xpath refined to maximize yield on
    a per-page basis"
-  [action body url-ds muscle fat]
+  [action body url muscle fat]
   (let [processed-body (html->xml-doc body)
         
         nodes-paths    (page-nodes-hrefs-text processed-body
@@ -649,19 +649,93 @@ id and class tag constraints are also added"
                         (fn [[path an-info]]
                           (= action (path->xpath-no-position path)))
                         nodes-paths)
-        
-        paths          (map
-                        first
+
+        muscle-nodes   (filter
+                        (fn [[path an-info]]
+                          (some
+                           (fn [x] (= (:href an-info)
+                                     x))
+                           muscle))
                         nodes-paths-x)
 
-        counts         (map
-                        (fn [a-path]
-                          (map #(nth % 2) a-path))
-                        paths)
+        fat-nodes      (filter
+                        (fn [[path an-info]]
+                          (some
+                           (fn [x] (= (:href an-info)
+                                     x))
+                           fat))
+                        nodes-paths-x)
+        
+        paths-list     (map first nodes-paths-x)
 
-        histogram      (map (fn [x]
-                              (count (distinct x)))
-                            (apply map vector counts))
-        pos            [(.indexOf histogram size)]]
+        histogram      (map
+                        #(-> % distinct count)
+                        (apply map vector paths-list))
 
-    action))
+        positions      (filter
+                        (fn [x]
+                          (not=
+                           (nth histogram x)
+                           1))
+                        (range (count histogram)))
+
+        stuff (map #(nth histogram %) positions)
+
+        muscle-paths-list (map first muscle-nodes)
+
+        muscle-histogram (map
+                          #(-> % distinct count)
+                          (apply map vector muscle-paths-list))
+
+        muscle-positions (filter
+                          (fn [x]
+                            (not=
+                             (nth muscle-histogram x)
+                             1))
+                          (range (count muscle-histogram)))
+        
+        fat-paths-list (map first fat-nodes)
+
+        fat-histogram (map
+                       #(-> % distinct count)
+                       (apply map vector fat-paths-list))
+
+        fat-positions (filter
+                       (fn [x]
+                         (not=
+                          (nth fat-histogram x)
+                          1))
+                       (range (count fat-histogram)))]
+    
+    {:only (map
+            (fn [p]
+              [p (nth 
+                  (map
+                   #(map
+                     last
+                     (distinct %))
+                   (apply map vector muscle-paths-list))
+                  p)])
+            (filter
+             (fn [p]
+               (not
+                (some (fn [mp]
+                        (= mp p))
+                      muscle-positions)))
+             positions))
+     :avoid (map
+             (fn [p]
+               [p (nth
+                   (map
+                    #(map
+                      last
+                      (distinct %))
+                    (apply map vector fat-paths-list))
+                   p)])
+             (filter
+              (fn [p]
+                (not
+                 (some (fn [mp]
+                         (= mp p))
+                       fat-positions)))
+              positions))}))

@@ -698,9 +698,11 @@ id and class tag constraints are also added"
         
         fat-paths-list (map first fat-nodes)
 
-        fat-histogram (map
-                       #(-> % distinct count)
-                       (apply map vector fat-paths-list))
+        fat-histogram (if (empty? fat-paths-list)
+                        []
+                        (map
+                         #(-> % distinct count)
+                         (apply map vector fat-paths-list)))
 
         fat-positions (filter
                        (fn [x]
@@ -716,7 +718,9 @@ id and class tag constraints are also added"
                    #(map
                      last
                      (distinct %))
-                   (apply map vector muscle-paths-list))
+                   (if (empty? muscle-paths-list)
+                     []
+                     (apply map vector muscle-paths-list)))
                   p)])
             (filter
              (fn [p]
@@ -726,19 +730,25 @@ id and class tag constraints are also added"
                       muscle-positions)))
              positions))
 
-     :avoid (map
-             (fn [p]
-               [p (nth
-                   (map
-                    #(map
-                      last
-                      (distinct %))
-                    (apply map vector fat-paths-list))
-                   p)])
-             (filter
+     :avoid (filter
+             second
+             (map
               (fn [p]
-                (not
-                 (some (fn [mp]
-                         (= mp p))
-                       fat-positions)))
-              positions))}))
+                [p (try
+                     (nth
+                      (map
+                       #(map
+                         last
+                         (distinct %))
+                       (if (empty? fat-paths-list)
+                         []
+                         (apply map vector fat-paths-list)))
+                      p)
+                     (catch Exception e nil))])
+              (filter
+               (fn [p]
+                 (not
+                  (some (fn [mp]
+                          (= mp p))
+                        fat-positions)))
+               positions)))}))

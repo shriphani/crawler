@@ -303,13 +303,14 @@
                                                         leaf-fat)
                              {}))
                          (map vector leaf-src-urls leaf-src-docs))))))]
-      [action-seq
-       :segments-to-fix
-       (cons
-        [action-seq leaf-fix]
-        (map
-         (fn [[segment action]]
-           (refine-segment segment action corpus))
-         (seqs-to-refine action-seq
-                         corpus)))]))
+       {:actions action-seq
+        :segments-to-fix
+        (cons
+         [action-seq leaf-fix]
+         (map
+          (fn [[segment action]]
+            (refine-segment segment action corpus))
+          (seqs-to-refine action-seq
+                          corpus)))
+        :count count}))
    model))

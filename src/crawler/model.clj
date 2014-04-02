@@ -52,3 +52,12 @@
     {:action     pagination-trimmed
      :pagination pagination}))
 
+(defn inspect-action-seq
+  [action-seq corpus]
+  (map
+   first
+   (filter
+    (fn [[u x]]
+      (= (:src-xpath x)
+         action-seq))
+    corpus)))

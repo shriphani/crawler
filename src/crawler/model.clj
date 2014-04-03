@@ -46,11 +46,23 @@
   [model-file corpus-file]
   (let [model       (read-model model-file)
         corpus-data (corpus/read-corpus-file corpus-file)
+
+        model-trimmed (corpus/refine-model-with-positions model
+                                                          corpus-data)
         
         pagination (corpus/pagination-in-corpus corpus-data)
-        pagination-trimmed (trim-pagination model pagination)]
-    {:action     pagination-trimmed
-     :pagination pagination}))
+        pagination-trimmed (map
+                            (fn [[action-seq paging-actions]]
+                              (map
+                               (fn [paging-action]
+                                 (corpus/refine-pagination-with-positions action-seq
+                                                                          paging-action
+                                                                          corpus-data))
+                               paging-actions))
+                            pagination)]
+    {;:actions    model-trimmed
+     :pagination pagination
+     :pagination-trimmed pagination-trimmed}))
 
 (defn inspect-action-seq
   [action-seq corpus]

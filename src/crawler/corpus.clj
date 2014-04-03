@@ -3,7 +3,8 @@
   (:require [cheshire.core :as json]
             [clojure.java.io :as io]
             [crawler.dom :as dom]
-            [crawler.rich-char-extractor :as extractor])
+            [crawler.rich-char-extractor :as extractor]
+            [structural-similarity.xpath-text :as xpath-text])
   (:use [clj-xpath.core :only [$x:node+]]
         [clojure.pprint :only [pprint]]
         [structural-similarity.xpath-text :only [similar?]])
@@ -303,7 +304,7 @@
                                                         leaf-fat)
                              {}))
                          (map vector leaf-src-urls leaf-src-docs))))))]
-       {:actions action-seq
+       {:action action-seq
         :segments-to-fix
         (cons
          [action-seq leaf-fix]
@@ -314,3 +315,58 @@
                           corpus)))
         :count count}))
    model))
+
+(defn refine-pagination-with-positions
+  "Pagination is a 2-tuple from an action seq
+   to a pagination action you take at that point
+
+   as a result the muscle is the portions marked by
+   the crawler as pagination from a source link.
+
+   the fat is the stuff that didn't make the cut"
+  [action-seq paging-action corpus]
+  (let [src-docs (filter
+                  (fn [[u x]]
+                    (= (:src-xpath x)
+                       action-seq))
+                  corpus)
+
+        paging-docs (map
+                     (fn [[u x]]
+                       (let [actions (:xpath-nav-info
+                                      (extractor/state-action (:body x)
+                                                              {:url u}
+                                                              {}))
+                             links   (map
+                                      (fn [l]
+                                        [l (corpus l)])
+                                      (first
+                                       (map
+                                        :hrefs
+                                        (filter
+                                         #(= (:xpath %)
+                                             paging-action)
+                                         actions))))
+
+                             muscle  (map
+                                      first
+                                      (filter
+                                       (fn [[u x2]]
+                                         (and (:body x2) (xpath-text/similar? (:body x2)
+                                                                              (:body x))))
+                                       links))
+
+                             fat     (map
+                                      first
+                                      (filter
+                                       (fn [[u x2]]
+                                         (or (nil? x2)
+                                             (not (xpath-text/similar? (:body x2)
+                                                                       (:body x)))))
+                                       links))]
+                         (dom/refine-xpath-accuracy paging-action (:body x) u muscle fat)))
+                     src-docs)]
+    (first
+     (max-key
+      second
+      (frequencies paging-docs)))))

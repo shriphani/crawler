@@ -668,9 +668,11 @@ id and class tag constraints are also added"
         
         paths-list     (map first nodes-paths-x)
 
-        histogram      (map
-                        #(-> % distinct count)
-                        (apply map vector paths-list))
+        histogram      (if paths-list
+                        (map
+                         #(-> % distinct count)
+                         (apply map vector paths-list))
+                        [])
 
         positions      (filter
                         (fn [x]

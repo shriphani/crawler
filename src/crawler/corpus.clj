@@ -364,9 +364,14 @@
                                              (not (xpath-text/similar? (:body x2)
                                                                        (:body x)))))
                                        links))]
-                         (dom/refine-xpath-accuracy paging-action (:body x) u muscle fat)))
+                         (do
+                           (println :muscle muscle)
+                           (println :fat fat)
+                           (dom/refine-xpath-accuracy paging-action (:body x) u muscle fat))))
                      src-docs)]
-    (first
-     (max-key
-      second
-      (frequencies paging-docs)))))
+    [paging-action
+     (first
+      (first
+       (max-key
+        second
+        (frequencies paging-docs))))]))

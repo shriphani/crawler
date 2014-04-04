@@ -668,11 +668,11 @@ id and class tag constraints are also added"
         
         paths-list     (map first nodes-paths-x)
 
-        histogram      (if paths-list
-                        (map
-                         #(-> % distinct count)
-                         (apply map vector paths-list))
-                        [])
+        histogram      (if-not (empty? paths-list)
+                         (map
+                          #(-> % distinct count)
+                          (apply map vector paths-list))
+                         [])
 
         positions      (filter
                         (fn [x]
@@ -712,45 +712,47 @@ id and class tag constraints are also added"
                           (nth fat-histogram x)
                           1))
                        (range (count fat-histogram)))]
-    
-    {:only (map
-            (fn [p]
-              [p (nth 
-                  (map
-                   #(map
-                     last
-                     (distinct %))
-                   (if (empty? muscle-paths-list)
-                     []
-                     (apply map vector muscle-paths-list)))
-                  p)])
-            (filter
+    (do
+      (println :debug :muscle muscle-positions)
+      (println :debug :general positions)
+     {:only (map
              (fn [p]
-               (not
-                (some (fn [mp]
-                        (= mp p))
-                      muscle-positions)))
-             positions))
-
-     :avoid (filter
-             second
-             (map
+               [p (nth 
+                   (map
+                    #(map
+                      last
+                      (distinct %))
+                    (if (empty? muscle-paths-list)
+                      []
+                      (apply map vector muscle-paths-list)))
+                   p)])
+             (filter
               (fn [p]
-                [p (try
-                     (nth
-                      (map
-                       #(map
-                         last
-                         (distinct %))
-                       (if (empty? fat-paths-list)
-                         []
-                         (apply map vector fat-paths-list)))
-                      p)
-                     (catch Exception e nil))])
-              (filter
+                (not
+                 (some (fn [mp]
+                         (= mp p))
+                       muscle-positions)))
+              positions))
+
+      :avoid (filter
+              second
+              (map
                (fn [p]
-                 (not
-                  (some (fn [mp]
-                          (= mp p))
-                        fat-positions)))
-               positions)))}))
+                 [p (try
+                      (nth
+                       (map
+                        #(map
+                          last
+                          (distinct %))
+                        (if (empty? fat-paths-list)
+                          []
+                          (apply map vector fat-paths-list)))
+                       p)
+                      (catch Exception e nil))])
+               (filter
+                (fn [p]
+                  (not
+                   (some (fn [mp]
+                           (= mp p))
+                         fat-positions)))
+                positions)))})))

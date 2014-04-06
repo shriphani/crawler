@@ -51,17 +51,19 @@
                                                           corpus-data)
         
         pagination (corpus/pagination-in-corpus corpus-data)
-        pagination-trimmed (map
-                            (fn [[action-seq paging-actions]]
-                              (map
-                               (fn [paging-action]
-                                 (corpus/refine-pagination-with-positions action-seq
-                                                                          paging-action
-                                                                          corpus-data))
-                               paging-actions))
-                            pagination)]
-    {;:actions    model-trimmed
-     :pagination pagination
+        pagination-trimmed (into
+                            {}
+                            (map
+                             (fn [[action-seq paging-actions]]
+                               [action-seq
+                                (map
+                                 (fn [paging-action]
+                                   (corpus/refine-pagination-with-positions action-seq
+                                                                            paging-action
+                                                                            corpus-data))
+                                 paging-actions)])
+                             pagination))]
+    {:action-seqs model-trimmed
      :pagination-trimmed pagination-trimmed}))
 
 (defn inspect-action-seq

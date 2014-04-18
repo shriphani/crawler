@@ -15,4 +15,4 @@
   [body example-leaf]
   (similarity/similar? body example-leaf))
 
-(def extractor rc-extractor/state-action-sampled)
+(def extractor rc-extractor/state-action)

@@ -150,39 +150,39 @@
     (< (count leaves)
        (count documents))))
 
-(defn repair-leaf-fuck-up
-  "Try to repair the leaf node yield
-   rate along the current action seq
+;; (defn repair-leaf-fuck-up
+;;   "Try to repair the leaf node yield
+;;    rate along the current action seq
 
-   muscle URLs we want
-   fat URLs we don't"
-  [action-seq corpus muscle fat]
-  (let [documents (filter
-                   (fn [[u x]]
-                     (and (:leaf? x)
-                          (= (:src-xpath x)
-                             action-seq)))
-                   corpus)
+;;    muscle URLs we want
+;;    fat URLs we don't"
+;;   [action-seq corpus muscle fat]
+;;   (let [documents (filter
+;;                    (fn [[u x]]
+;;                      (and (:leaf? x)
+;;                           (= (:src-xpath x)
+;;                              action-seq)))
+;;                    corpus)
 
-        src-urls (map
-                  (fn [[u x]]
-                    (:src-url x))
-                  documents)
+;;         src-urls (map
+;;                   (fn [[u x]]
+;;                     (:src-url x))
+;;                   documents)
 
-        src-docs (map
-                  #(corpus %)
-                  src-urls)
+;;         src-docs (map
+;;                   #(corpus %)
+;;                   src-urls)
 
-        action-taken (first action-seq)]
-    (map
-     (fn [[u x]]
-      (dom/refine-xpath
-       action-taken
-       (:body x)
-       u
-       muscle
-       fat))
-     src-docs)))
+;;         action-taken (first action-seq)]
+;;     (map
+;;      (fn [[u x]]
+;;       (dom/refine-xpath
+;;        action-taken
+;;        (:body x)
+;;        u
+;;        muscle
+;;        fat))
+;;      src-docs)))
 
 (defn refine-segment
   [segment action-to-take corpus]

@@ -27,7 +27,8 @@
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/tools.logging "0.2.6"]
                  [org.bovinegenius/exploding-fish "0.3.3"]
-                 [structural_similarity/structural_similarity "0.1.0-SNAPSHOT"]]
+                 [structural_similarity/structural_similarity "0.1.0-SNAPSHOT"]
+                 [svm-clj "0.1.3"]]
   :main crawler.main
   :jvm-opts ["-Xmx8g"]
   :plugins [[lein-gorilla "0.1.2"]])

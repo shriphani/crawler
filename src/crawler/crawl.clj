@@ -107,7 +107,7 @@
                   :prefix (uri/host (uri/uri url))})
 
                ;; leaf reached. what do bruh
-               (leaf? body)
+               (leaf? (first url-queue))
                (do
                  (utils/sayln :leaf-reached)
                  (let [{new-bodies  :bodies

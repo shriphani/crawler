@@ -3,6 +3,7 @@
   (:require [clojure.tools.cli :as cli]
             [crawler.corpus :as corpus]
             [crawler.crawl :as crawl]
+            [crawler.discussion-forum :as discussion]
             [clojure.java.io :as io]
             [crawler.model :as crawler-model]
             [crawler.rich-char-extractor :as rc-extractor]
@@ -25,7 +26,8 @@
    [nil "--refine" "Refine a model file"]
    [nil "--corpus CORPUS" "Specify a corpus"]
    [nil "--corpus-to-json CORPUS" "Convert corpus file to json file"]
-   [nil "--fix-model D" "Fix a model with pagination info"]])
+   [nil "--fix-model D" "Fix a model with pagination info"]
+   [nil "--discussion-forum E" "Execute a discussion forum crawl at entry point E"]])
 
 (defn dump-state-model-corpus
   "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
@@ -73,6 +75,18 @@
                              model
                              corpus
                              prefix)))
+
+(defn discussion-forum-crawler
+  [start-url]
+  (let [discussion-forum-classifier (discussion/load-classifier)
+        discussion-forum-leaf? (fn [url-ds]
+                                 (discussion/leaf? discussion-forum-classifier
+                                                   url-ds))
+        discussion-forum-stop? #(discussion/stop? % 100)]
+    (crawl/crawl start-url
+                 discussion-forum-leaf?
+                 discussion/extractor
+                 discussion-forum-stop?)))
 
 (defn execute-model-crawler
   [start-url model num-leaves]
@@ -122,6 +136,9 @@
           (:corpus-to-json options)
           (corpus/corpus->json (:corpus-to-json options))
 
+          (:discussion-forum options)
+          '*
+          
           (:fix-model options)
           (let [directory (:fix-model options)
                 model-file (.getAbsolutePath

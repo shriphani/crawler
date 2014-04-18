@@ -11,6 +11,7 @@
                  [clj-time "0.6.0"]
                  [com.rubiconproject.oss/jchronic "0.2.6"]
                  [com.github.kyleburton/clj-xpath "1.4.2"]
+                 [detect_leaf/detect_leaf "0.1.0-SNAPSHOT"]
                  [enlive "1.1.4"]
                  [log4j/log4j "1.2.16"
                   :exclusions

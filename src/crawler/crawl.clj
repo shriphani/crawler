@@ -11,7 +11,6 @@
             (org.bovinegenius [exploding-fish :as uri]))
   (:use [clojure.pprint :only [pprint]]))
 
-
 (defn write
   [content filename]
   (spit filename (with-out-str (prn content)) :append true))

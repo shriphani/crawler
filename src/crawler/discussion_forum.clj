@@ -17,7 +17,7 @@
 
 (defn leaf?
   [model url-ds]
-  (let [anchor (:src-text url-ds)
+  (let [anchor (:anchor-text url-ds)
         url    (:src-url url-ds)
         body   (:body url-ds)
         label  nil

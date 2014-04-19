@@ -350,7 +350,9 @@ id and class tag constraints are also added"
                              [(-> x :node ds-to-node) x])
                            (filter
                             (fn [x]
-                              (= (uri/host url) (-> x :href uri/host)))
+                              (and (= (uri/host url) (-> x :href uri/host))
+                                   (not
+                                    (some #{(:href x)} (set blacklist)))))
                             (map
                              (fn [x]
                                (let [link (-> x

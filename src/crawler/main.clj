@@ -77,12 +77,12 @@
                              prefix)))
 
 (defn discussion-forum-crawler
-  [start-url]
+  [start-url num-leaves]
   (let [discussion-forum-classifier (discussion/load-classifier)
         discussion-forum-leaf? (fn [url-ds]
                                  (discussion/leaf? discussion-forum-classifier
                                                    url-ds))
-        discussion-forum-stop? #(discussion/stop? % 100)]
+        discussion-forum-stop? #(discussion/stop? % num-leaves)]
     (:state
      (crawl/crawl start-url
                   discussion-forum-leaf?

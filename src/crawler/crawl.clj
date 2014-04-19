@@ -32,7 +32,9 @@
                           :src-text text}))                   
                      hrefs-and-texts))
                    :url)]
-       (merge-with concat acc {:bodies  stuff
+       (merge-with concat acc {:bodies  (utils/random-take
+                                         10
+                                         stuff)
                                :visited (utils/random-take
                                          10
                                          hrefs-and-texts)})))

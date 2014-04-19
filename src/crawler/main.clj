@@ -83,10 +83,11 @@
                                  (discussion/leaf? discussion-forum-classifier
                                                    url-ds))
         discussion-forum-stop? #(discussion/stop? % 100)]
-    (crawl/crawl start-url
-                 discussion-forum-leaf?
-                 discussion/extractor
-                 discussion-forum-stop?)))
+    (:state
+     (crawl/crawl start-url
+                  discussion-forum-leaf?
+                  discussion/extractor
+                  discussion-forum-stop?))))
 
 (defn execute-model-crawler
   [start-url model num-leaves]

@@ -19,22 +19,23 @@
 (defn prepare
   [xpaths-and-urls src-path url]
   (reduce
-   (fn [acc {xpath :xpath hrefs :hrefs texts :texts}]
+   (fn [acc {xpath :xpath hrefs-and-texts :hrefs-and-texts}]
      (let [stuff  (utils/distinct-by-key
                    (filter
                     identity
                     (map
-                     (fn [a-link]
+                     (fn [{a-link :href text :text}]
                        (when-not (some #{a-link} (:visited acc))
                          {:url  a-link
                           :path (cons xpath src-path)
-                          :src-url url}))                   
-                     hrefs))
+                          :src-url url
+                          :src-text text}))                   
+                     hrefs-and-texts))
                    :url)]
        (merge-with concat acc {:bodies  stuff
                                :visited (utils/random-take
                                          10
-                                         hrefs)})))
+                                         hrefs-and-texts)})))
    {}
    xpaths-and-urls))
 
@@ -107,7 +108,9 @@
                   :prefix (uri/host (uri/uri url))})
 
                ;; leaf reached. what do bruh
-               (leaf? (first url-queue))
+               (leaf? {:anchor-text (-> url-queue first :src-text)
+                       :src-url     (-> url-queue first :src-url)
+                       :body        body})
                (do
                  (utils/sayln :leaf-reached)
                  (let [{new-bodies  :bodies

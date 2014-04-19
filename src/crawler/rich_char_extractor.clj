@@ -82,7 +82,7 @@
                                  #(not
                                    (or
                                     (-> % :score zero?)
-                                    (-> % :hrefs count zero?)))
+                                    (-> % :hrefs-and-texts count zero?)))
                                  (map
                                   (fn [[xpath info]]
                                     (let [potential-xpath xpath
@@ -93,27 +93,21 @@
                                                               (:num-chars an-info)))
                                                            0
                                                            info)
-                                          potential-hrefs (reduce
-                                                           (fn [acc an-info]
-                                                             (cons (:href an-info) acc))
-                                                           '()
-                                                           info)
-                                          potential-texts (reduce
-                                                           (fn [acc an-info]
-                                                             (cons (:text an-info) acc))
-                                                           '()
-                                                           info)]
+                                          potential-hrefs-texts (reduce
+                                                                 (fn [acc an-info]
+                                                                   (cons {:href (:href an-info)
+                                                                          :text (:text an-info)}
+                                                                         acc))
+                                                                 '()
+                                                                 info)]
                                       {:xpath potential-xpath
                                        :score (/ potential-score
-                                                 (count potential-hrefs))
-                                       :hrefs potential-hrefs
-                                       :texts potential-texts}))
+                                                 (count potential-hrefs-texts))
+                                       :hrefs-and-texts potential-hrefs-texts}))
                                   xpaths-anchors-chars))]
 
        {:total-nav-info page-wide-nav-chars
-        :xpath-nav-info (reverse
-                         (sort-by :score (remove-subsets
-                                          (utils/distinct-by-key xpath-nav-info :hrefs))))})))
+        :xpath-nav-info xpath-nav-info})))
 
 (defn state-action-model
   [actions page-src url-ds template-removed blacklist]

@@ -39,7 +39,6 @@
    {}
    xpaths-and-urls))
 
-
 (defn crawl
   "The base crawler routine
    Decisions made based on specified lookahead.

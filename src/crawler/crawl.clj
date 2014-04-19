@@ -408,3 +408,129 @@
                         pagination
                         blacklist
                         corpus)))))))
+
+(defn prepare-example
+  "Given a state action, this routine
+   pares it down to as few examples as
+   possible per XPath.
+
+   The clustering is done using single
+   linkage and XPath-text structural
+   similarity"
+  [xpaths-and-urls src-path url]
+  (reduce
+   (fn [acc {xpath :xpath hrefs-and-texts :hrefs-and-texts}]
+     (let [stuff  (utils/distinct-by-key
+                   (filter
+                    identity
+                    (map
+                     (fn [{a-link :href text :text}]
+                       (when-not (some #{a-link} (:visited acc))
+                         {:url  a-link
+                          :path (cons xpath src-path)
+                          :src-url url
+                          :src-text text}))                   
+                     hrefs-and-texts))
+                   :url)
+
+           ;; sample 10 or 25% of the links (whichever is bigger)
+           links-and-texts (utils/random-take
+                            (max 10 (int (/ (count stuff)
+                                            4)))
+                            stuff)]
+
+       (map
+        (fn [x]
+          (do
+            (Thread/sleep 2000)
+            (utils/sayln :downloading (:url x))
+            (merge x {:body (-> x :url utils/download-cache-with-cookie)})))
+        links-and-texts)))
+   {}
+   xpaths-and-urls))
+
+(defn crawl-example
+  "Implementation of the example based scheduler
+   that I thought of. The example based scheduler
+   operates in the following way:
+
+   1. first, look out from this page
+   2. cluster by structural similarity
+   3. pick 1 example (for now) from each
+      cluster
+   4. continue
+
+   This prevents us from wasting time with a BFS
+   and allows our crawl to not waste too much time
+   beating about the exact same paths"
+
+  ([entry-point leaf? extract stop?]
+     (crawl-example entry-point 1 leaf? extract stop?))
+  
+  ([entry-point lookahead leaf? extract stop?]
+     (let [body           (utils/download-with-cookie entry-point)
+           body-queue-ele {:url  entry-point
+                           :body body}]
+       (crawl-example [body-queue-ele]
+                      [entry-point]
+                      lookahead
+                      leaf?
+                      extract
+                      stop?
+                      []
+                      50
+                      {})))
+  
+  ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit corpus]
+     (do
+       (Thread/sleep 1000)
+       (utils/sayln :queue-size (count url-queue))
+       (utils/sayln :visited (count visited))
+       (utils/sayln :leaves-left leaf-limit)
+       (utils/sayln :url (-> url-queue first :url))
+       (utils/sayln :src-url (-> url-queue first :src-url))
+       (utils/sayln :src-path (-> url-queue first :path))
+       (let [url  (-> url-queue first :url)
+             body (-> url-queue first :body)
+             
+             unaltered-state-action (try (extract body url {} [])
+                                         (catch Exception e nil))
+             
+             blacklist (clojure.set/union (set (map :url url-queue))
+                                          (set visited)
+                                          (set [url]))]
+         
+         (cond (or (empty? url-queue)
+                   (stop? {:visited    (count visited)
+                           :leaf-left  leaf-limit
+                           :body       body}))
+               (do
+                 (utils/sayln :crawl-done)
+                 ;; {:state  {:url-queue  url-queue
+                 ;;           :visited    visited
+                 ;;           :lookahead  lookahead
+                 ;;           :leaf-paths leaf-paths
+                 ;;           :leaf-limit leaf-limit}
+                  
+                 ;;  :model  (frequencies leaf-paths)
+                  
+                 ;;  :corpus corpus
+                  
+                 ;;  :prefix (uri/host (uri/uri url))}
+                 
+                 )
+               
+               ;; this is an initial test.
+               ;; I personally prefer performing the
+               ;; leaf test right at the beginning
+               :else
+               (do (utils/sayln :continuing-crawl)
+                   (let [state-action (extract body
+                                               (first url-queue)
+                                               {}
+                                               blacklist)
+                         prepared (prepare-example (:xpath-nav-info state-action)
+                                                   (-> url-queue first :path)
+                                                   url)]
+                     prepared)))))))
+

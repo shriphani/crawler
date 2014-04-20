@@ -2,13 +2,15 @@
   "Initial crawl setup"
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
+            [crawler.cluster :as cluster]
             [crawler.dom :as dom]
             [crawler.rich-extractor :as rich-extractor]
             [crawler.rich-char-extractor :as rich-char-extractor]
             [crawler.template-removal :as template-removal]
             [crawler.utils :as utils]
             [clj-http.cookies :as cookies]
-            (org.bovinegenius [exploding-fish :as uri]))
+            (org.bovinegenius [exploding-fish :as uri])
+            [structural-similarity.xpath-text :as similarity])
   (:use [clojure.pprint :only [pprint]]))
 
 (defn write
@@ -437,16 +439,24 @@
            links-and-texts (utils/random-take
                             (max 10 (int (/ (count stuff)
                                             4)))
-                            stuff)]
+                            stuff)
 
-       (map
-        (fn [x]
-          (do
-            (Thread/sleep 2000)
-            (utils/sayln :downloading (:url x))
-            (merge x {:body (-> x :url utils/download-cache-with-cookie)})))
-        links-and-texts)))
-   {}
+           clusters        (doall
+                            (cluster/cluster
+                             (doall
+                              (map
+                               (fn [x]
+                                 (do
+                                   (Thread/sleep 2000)
+                                   (utils/sayln :downloading (:url x))
+                                   (merge x {:body (-> x :url utils/download-cache-with-cookie)})))
+                               links-and-texts))
+                             (fn [x y] (similarity/similar?
+                                       (:body x)
+                                       (:body y)))))
+           examples        (map rand-nth clusters)]
+       (concat acc examples)))
+   []
    xpaths-and-urls))
 
 (defn crawl-example
@@ -511,11 +521,11 @@
                  ;;           :lookahead  lookahead
                  ;;           :leaf-paths leaf-paths
                  ;;           :leaf-limit leaf-limit}
-                  
+                 
                  ;;  :model  (frequencies leaf-paths)
-                  
+                 
                  ;;  :corpus corpus
-                  
+                 
                  ;;  :prefix (uri/host (uri/uri url))}
                  
                  )

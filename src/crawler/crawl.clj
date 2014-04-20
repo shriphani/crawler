@@ -419,7 +419,7 @@
    The clustering is done using single
    linkage and XPath-text structural
    similarity"
-  [xpaths-and-urls src-path url]
+  [xpaths-and-urls src-path url leaf?]
   (reduce
    (fn [acc {xpath :xpath hrefs-and-texts :hrefs-and-texts}]
      (let [stuff  (utils/distinct-by-key
@@ -441,22 +441,36 @@
                                             4)))
                             stuff)
 
+           sampled-corpus  (doall
+                            (map
+                             (fn [x]
+                               (do
+                                 (Thread/sleep 2000)
+                                 (utils/sayln :downloading (:url x))
+                                 (merge x {:body (-> x :url utils/download-cache-with-cookie)})))
+                             links-and-texts))
+           
            clusters        (doall
                             (cluster/cluster
-                             (doall
-                              (map
-                               (fn [x]
-                                 (do
-                                   (Thread/sleep 2000)
-                                   (utils/sayln :downloading (:url x))
-                                   (merge x {:body (-> x :url utils/download-cache-with-cookie)})))
-                               links-and-texts))
+                             sampled-corpus
                              (fn [x y] (similarity/similar?
                                        (:body x)
                                        (:body y)))))
-           examples        (map rand-nth clusters)]
-       (concat acc examples)))
-   []
+           examples        (map rand-nth clusters)
+
+           leaf-paths      (frequencies
+                            (map
+                             :path
+                             (filter
+                              (fn [x]
+                                (leaf? {:anchor-text (:src-text x)
+                                        :src-url     (:url x)
+                                        :body        (:body x)}))
+                              sampled-corpus)))]
+       (merge-with concat acc {:leaf-paths leaf-paths
+                               :examples examples
+                               :corpus   sampled-corpus})))
+   {}
    xpaths-and-urls))
 
 (defn crawl-example
@@ -541,6 +555,7 @@
                                                blacklist)
                          prepared (prepare-example (:xpath-nav-info state-action)
                                                    (-> url-queue first :path)
-                                                   url)]
+                                                   url
+                                                   leaf?)]
                      prepared)))))))
 

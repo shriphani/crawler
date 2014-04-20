@@ -458,15 +458,14 @@
                                        (:body y)))))
            examples        (map rand-nth clusters)
 
-           leaf-paths      (frequencies
-                            (map
-                             :path
-                             (filter
-                              (fn [x]
-                                (leaf? {:anchor-text (:src-text x)
-                                        :src-url     (:url x)
-                                        :body        (:body x)}))
-                              sampled-corpus)))]
+           leaf-paths      (map
+                            :path
+                            (filter
+                             (fn [x]
+                               (leaf? {:anchor-text (:src-text x)
+                                       :src-url     (:url x)
+                                       :body        (:body x)}))
+                             sampled-corpus))]
        (merge-with concat acc {:leaf-paths leaf-paths
                                :examples examples
                                :corpus   sampled-corpus})))
@@ -530,19 +529,17 @@
                            :body       body}))
                (do
                  (utils/sayln :crawl-done)
-                 ;; {:state  {:url-queue  url-queue
-                 ;;           :visited    visited
-                 ;;           :lookahead  lookahead
-                 ;;           :leaf-paths leaf-paths
-                 ;;           :leaf-limit leaf-limit}
+                 {:state  {:url-queue  url-queue
+                           :visited    visited
+                           :lookahead  lookahead
+                           :leaf-paths leaf-paths
+                           :leaf-limit leaf-limit}
                  
-                 ;;  :model  (frequencies leaf-paths)
+                  :model  (frequencies leaf-paths)
                  
-                 ;;  :corpus corpus
+                  :corpus corpus
                  
-                 ;;  :prefix (uri/host (uri/uri url))}
-                 
-                 )
+                  :prefix (uri/host (uri/uri url))})
                
                ;; this is an initial test.
                ;; I personally prefer performing the
@@ -553,9 +550,32 @@
                                                (first url-queue)
                                                {}
                                                blacklist)
-                         prepared (prepare-example (:xpath-nav-info state-action)
-                                                   (-> url-queue first :path)
-                                                   url
-                                                   leaf?)]
-                     prepared)))))))
+                         {items :examples
+                          leaf-paths-obs :leaf-paths
+                          sampled-corpus :corpus}
+                         (prepare-example (:xpath-nav-info state-action)
+                                          (-> url-queue first :path)
+                                          url
+                                          leaf?)
+
+                         new-queue (concat (rest url-queue) items)
+                         new-corpus (merge corpus
+                                           (reduce
+                                            (fn [acc x]
+                                              (merge
+                                               acc
+                                               {(:url x)
+                                                x}))
+                                            {}
+                                            sampled-corpus))]
+                     (recur new-queue
+                            (clojure.set/union visited
+                                               (map :url sampled-corpus))
+                            lookahead
+                            leaf?
+                            extract
+                            stop?
+                            (concat leaf-paths-obs leaf-paths)
+                            leaf-limit
+                            new-corpus))))))))
 

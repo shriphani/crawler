@@ -437,8 +437,9 @@
 
            ;; sample 10 or 25% of the links (whichever is bigger)
            links-and-texts (utils/random-take
-                            (max 10 (int (/ (count stuff)
-                                            4)))
+                            ;; (max 10 (int (/ (count stuff)
+                            ;;                 4)))
+                            10
                             stuff)
 
            sampled-corpus  (doall
@@ -447,6 +448,9 @@
                                (do
                                  (Thread/sleep 2000)
                                  (utils/sayln :downloading (:url x))
+                                 (utils/sayln :source-url url)
+                                 (utils/sayln :text (:src-text x))
+                                 (utils/sayln :at-xpath (:path x))
                                  (merge x {:body (-> x :url utils/download-cache-with-cookie)})))
                              links-and-texts))
            

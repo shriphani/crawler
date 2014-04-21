@@ -303,6 +303,17 @@ escape characters. then call re-pattern on it"
   []
   coll))
 
+(defn distinct-by-fn
+  [coll f]
+  (reduce
+   (fn [acc v]
+     (if (some (fn [x] (= (f x)
+                         (f v)))
+               acc)
+       acc
+       (cons v acc)))
+   coll))
+
 (defn safe-mkdir
   [path]
   (when-not (fs/exists? path)

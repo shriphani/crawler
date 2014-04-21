@@ -10,13 +10,17 @@
   [xpaths-hrefs-texts]
   (filter
    (fn [x]
-     (let [x-hrefs (-> x :hrefs set)]
+     (let [x-hrefs (set
+                    (map
+                     :href
+                     (:hrefs-and-texts x)))]
        (not
         (some
-         (fn [{xpath :xpath hrefs :hrefs}]
-           (and
-            (not= xpath (-> x :xpath))
-            (clj-set/subset? x-hrefs (set hrefs))))
+         (fn [{xpath :xpath hrefs-and-texts :hrefs-and-texts}]
+           (let [hrefs (set (map :href hrefs-and-texts))]
+            (and
+             (not= xpath (-> x :xpath))
+             (clj-set/subset? x-hrefs (set hrefs)))))
          xpaths-hrefs-texts))))
    (sort-by
     #(-> % :hrefs count)
@@ -107,7 +111,16 @@
                                   xpaths-anchors-chars))]
 
        {:total-nav-info page-wide-nav-chars
-        :xpath-nav-info xpath-nav-info})))
+        :xpath-nav-info (reverse
+                         (sort-by
+                          :score
+                          (remove-subsets
+                           (utils/distinct-by-fn
+                            xpath-nav-info
+                            (fn [x] (set
+                                    (map
+                                     :href
+                                     (:hrefs-and-texts x))))))))})))
 
 (defn state-action-model
   [actions page-src url-ds template-removed blacklist]

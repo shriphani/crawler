@@ -204,7 +204,7 @@ escape characters. then call re-pattern on it"
 
 (defn download-with-cookie
   [a-link]
-  (try (-> a-link (client/get {:cookie-store my-cs}) :body)
+  (try (-> a-link (client/get {:cookie-store my-cs}))
        (catch Exception e nil)))
 
 (def *document-cache* (atom {}))

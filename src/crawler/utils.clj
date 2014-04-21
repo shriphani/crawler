@@ -216,7 +216,11 @@ escape characters. then call re-pattern on it"
           (sayln :cache-miss)
           (swap! *document-cache*
                  merge
-                 {a-link document})
+                 (reduce
+                  (fn [acc x]
+                    (merge acc {x document}))
+                  {}
+                  (:trace-redirects document)))
           document))
 
     (do (sayln :cache-hit)

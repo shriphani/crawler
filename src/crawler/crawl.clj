@@ -419,62 +419,70 @@
    The clustering is done using single
    linkage and XPath-text structural
    similarity"
-  [xpaths-and-urls src-path url leaf?]
-  (reduce
-   (fn [acc {xpath :xpath hrefs-and-texts :hrefs-and-texts}]
-     (let [stuff  (utils/distinct-by-key
-                   (filter
-                    identity
-                    (map
-                     (fn [{a-link :href text :text}]
-                       (when-not (some #{a-link} (:visited acc))
-                         {:url  a-link
-                          :path (cons xpath src-path)
-                          :src-url url
-                          :src-text text}))                   
-                     hrefs-and-texts))
-                   :url)
+  ([xpaths-and-urls src-path url leaf?]
+     (prepare-example xpaths-and-urls src-path url leaf? (set [])))
 
-           ;; sample 10 or 25% of the links (whichever is bigger)
-           links-and-texts (utils/random-take
-                            ;; (max 10 (int (/ (count stuff)
-                            ;;                 4)))
-                            10
-                            stuff)
+  ([xpaths-and-urls src-path url leaf? blacklist]
+     (reduce
+      (fn [acc {xpath :xpath hrefs-and-texts :hrefs-and-texts}]
+        (let [stuff  (utils/distinct-by-key
+                      (filter
+                       identity
+                       (map
+                        (fn [{a-link :href text :text}]
+                          (when-not (some #{a-link} (:visited acc))
+                            {:url  a-link
+                             :path (cons xpath src-path)
+                             :src-url url
+                             :src-text text}))                   
+                        hrefs-and-texts))
+                      :url)
 
-           sampled-corpus  (doall
-                            (map
-                             (fn [x]
-                               (do
-                                 (Thread/sleep 2000)
-                                 (utils/sayln :downloading (:url x))
-                                 (utils/sayln :source-url url)
-                                 (utils/sayln :text (:src-text x))
-                                 (utils/sayln :at-xpath (:path x))
-                                 (merge x {:body (-> x :url utils/download-cache-with-cookie)})))
-                             links-and-texts))
-           
-           clusters        (doall
-                            (cluster/cluster
-                             sampled-corpus
-                             (fn [x y] (similarity/similar?
-                                       (:body x)
-                                       (:body y)))))
-           examples        (map rand-nth clusters)
+              ;; sample 10 or 25% of the links (whichever is bigger)
+              links-and-texts (utils/random-take
+                               ;; (max 10 (int (/ (count stuff)
+                               ;;                 4)))
+                               10
+                               stuff)
 
-           leaf-paths      (map
-                            :path
-                            (filter
-                             (fn [x]
-                               (leaf? {:anchor-text (:src-text x)
-                                       :src-url     (:url x)
-                                       :body        (:body x)}))
-                             sampled-corpus))]
-       (merge-with concat acc {:leaf-paths leaf-paths
-                               :examples examples
-                               :corpus   sampled-corpus})))
-   {}
-   xpaths-and-urls))
+              sampled-corpus  (filter
+                               identity
+                               (doall
+                                (map
+                                 (fn [x]
+                                   (do
+                                     (Thread/sleep 2000)
+                                     (utils/sayln :downloading (:url x))
+                                     (utils/sayln :source-url url)
+                                     (utils/sayln :text (:src-text x))
+                                     (utils/sayln :at-xpath (:path x))
+                                     (let [response (-> x :url utils/download-cache-with-cookie)]
+                                       (when (not (some (fn [x] (some #{x} blacklist)) (:trace-redirects response)))
+                                         (merge x {:body (:body response)
+                                                   :redirects (set (:trace-redirects response))})))))
+                                 links-and-texts)))
+              
+              clusters        (doall
+                               (cluster/cluster
+                                sampled-corpus
+                                (fn [x y] (similarity/similar?
+                                          (:body x)
+                                          (:body y)))))
+              examples        (map rand-nth clusters)
+
+              leaf-paths      (map
+                               :path
+                               (filter
+                                (fn [x]
+                                  (leaf? {:anchor-text (:src-text x)
+                                          :src-url     (:url x)
+                                          :body        (:body x)}))
+                                sampled-corpus))]
+          (merge-with concat acc {:leaf-paths leaf-paths
+                                  :examples examples
+                                  :corpus   sampled-corpus})))
+      {}
+      xpaths-and-urls)))
 
 (defn crawl-example
   "Implementation of the example based scheduler
@@ -497,7 +505,7 @@
   ([entry-point lookahead leaf? extract stop?]
      (let [body           (utils/download-with-cookie entry-point)
            body-queue-ele {:url  entry-point
-                           :body body}]
+                           :body (:body body)}]
        (crawl-example [body-queue-ele]
                       [entry-point]
                       lookahead
@@ -573,8 +581,12 @@
                                             {}
                                             sampled-corpus))]
                      (recur new-queue
-                            (clojure.set/union visited
-                                               (map :url sampled-corpus))
+                            (clojure.set/union (set visited)
+                                               (set
+                                                (map :url sampled-corpus))
+                                               (set
+                                                (flatten
+                                                 (map :redirects sampled-corpus))))
                             lookahead
                             leaf?
                             extract

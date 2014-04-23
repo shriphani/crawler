@@ -27,7 +27,7 @@
    [nil "--corpus CORPUS" "Specify a corpus"]
    [nil "--corpus-to-json CORPUS" "Convert corpus file to json file"]
    [nil "--fix-model D" "Fix a model with pagination info"]
-   [nil "--discussion-forum E" "Execute a discussion forum crawl at entry point E"]])
+   [nil "--discussion-forum" "Execute a discussion forum crawl at entry point"]])
 
 (defn dump-state-model-corpus
   "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
@@ -82,12 +82,20 @@
         discussion-forum-leaf? (fn [url-ds]
                                  (discussion/leaf? discussion-forum-classifier
                                                    url-ds))
-        discussion-forum-stop? #(discussion/stop? % num-leaves)]
-    (:state
-     (crawl/crawl start-url
-                  discussion-forum-leaf?
-                  discussion/extractor
-                  discussion-forum-stop?))))
+        
+        discussion-forum-stop? #(discussion/stop? % num-leaves)
+        {state :state
+         model :model
+         corpus :corpus
+         prefix :prefix}
+        (crawl/crawl-example start-url
+                             discussion-forum-leaf?
+                             discussion/extractor
+                             discussion-forum-stop?)]
+    (dump-state-model-corpus state
+                             model
+                             corpus
+                             (str "example-scheduler-" prefix))))
 
 (defn execute-model-crawler
   [start-url model num-leaves]
@@ -138,7 +146,8 @@
           (corpus/corpus->json (:corpus-to-json options))
 
           (:discussion-forum options)
-          '*
+          (discussion-forum-crawler (:start options)
+                                    (:num-docs options))
           
           (:fix-model options)
           (let [directory (:fix-model options)

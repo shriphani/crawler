@@ -474,9 +474,14 @@
                                :path
                                (filter
                                 (fn [x]
-                                  (leaf? {:anchor-text (:src-text x)
-                                          :src-url     (:url x)
-                                          :body        (:body x)}))
+                                  (try
+                                   (and
+                                    (:src-text x)
+                                    (:body x)
+                                    (leaf? {:anchor-text (:src-text x)
+                                            :src-url     (:url x)
+                                            :body        (:body x)}))
+                                   (catch Exception e nil)))
                                 sampled-corpus))]
           (merge-with concat acc {:leaf-paths leaf-paths
                                   :examples examples

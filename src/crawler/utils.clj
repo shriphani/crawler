@@ -316,6 +316,7 @@ escape characters. then call re-pattern on it"
                acc)
        acc
        (cons v acc)))
+   []
    coll))
 
 (defn safe-mkdir

@@ -35,92 +35,94 @@
      (state-action page-src url-ds template-removed []))
 
   ([page-src url-ds template-removed blacklist]
-     (let [url                  (-> url-ds :url)
-           
-           proc-pg              (dom/html->xml-doc page-src)
+     (if (nil? page-src)
+       []
+       (let [url                  (-> url-ds :url)
+             
+             proc-pg              (dom/html->xml-doc page-src)
 
-           ; xpaths nodes and associated anchor-text
-           xpaths-hrefs-text    (dom/xpaths-hrefs-tokens-no-position proc-pg
-                                                                     url
-                                                                     blacklist)
+                                        ; xpaths nodes and associated anchor-text
+             xpaths-hrefs-text    (dom/xpaths-hrefs-tokens-no-position proc-pg
+                                                                       url
+                                                                       blacklist)
 
-           template-removed     (map
-                                 (fn [[xpath infos]]
-                                   (let [template-links (-> xpath
-                                                            template-removed
-                                                            set)]
-                                     [xpath (filter
-                                             (fn [{_ :node href :href _1 :text}]
-                                               (not
-                                                (some #{href} template-links)))
-                                             infos)]))
-                                 xpaths-hrefs-text)
+             template-removed     (map
+                                   (fn [[xpath infos]]
+                                     (let [template-links (-> xpath
+                                                              template-removed
+                                                              set)]
+                                       [xpath (filter
+                                               (fn [{_ :node href :href _1 :text}]
+                                                 (not
+                                                  (some #{href} template-links)))
+                                               infos)]))
+                                   xpaths-hrefs-text)
 
-           xpaths-anchors-chars (map
-                                 (fn [[xpath nodes]]
-                                   [xpath (distinct
-                                           (map
-                                            (fn [a-node]
-                                              {:href (:href a-node)
-                                               :num-chars (-> a-node
-                                                              :text
-                                                              count)
-                                               :text (:text a-node)})
-                                            nodes))])
-                                 template-removed)
+             xpaths-anchors-chars (map
+                                   (fn [[xpath nodes]]
+                                     [xpath (distinct
+                                             (map
+                                              (fn [a-node]
+                                                {:href (:href a-node)
+                                                 :num-chars (-> a-node
+                                                                :text
+                                                                count)
+                                                 :text (:text a-node)})
+                                              nodes))])
+                                   template-removed)
 
-           page-wide-nav-chars  (reduce
-                                 (fn [acc [xpath nodes]]
-                                   (+ acc
-                                      (reduce
-                                       (fn [acc a-node]
-                                         (+ acc (-> a-node
-                                                    :text
-                                                    count)))
-                                       0
-                                       nodes)))
-                                 0
-                                 template-removed)
+             page-wide-nav-chars  (reduce
+                                   (fn [acc [xpath nodes]]
+                                     (+ acc
+                                        (reduce
+                                         (fn [acc a-node]
+                                           (+ acc (-> a-node
+                                                      :text
+                                                      count)))
+                                         0
+                                         nodes)))
+                                   0
+                                   template-removed)
 
-           xpath-nav-info       (filter
-                                 #(not
-                                   (or
-                                    (-> % :score zero?)
-                                    (-> % :hrefs-and-texts count zero?)))
-                                 (map
-                                  (fn [[xpath info]]
-                                    (let [potential-xpath xpath
-                                          potential-score (reduce
-                                                           (fn [acc an-info]
-                                                             (+
-                                                              acc
-                                                              (:num-chars an-info)))
-                                                           0
-                                                           info)
-                                          potential-hrefs-texts (reduce
-                                                                 (fn [acc an-info]
-                                                                   (cons {:href (:href an-info)
-                                                                          :text (:text an-info)}
-                                                                         acc))
-                                                                 '()
-                                                                 info)]
-                                      {:xpath potential-xpath
-                                       :score (/ potential-score
-                                                 (count potential-hrefs-texts))
-                                       :hrefs-and-texts potential-hrefs-texts}))
-                                  xpaths-anchors-chars))]
+             xpath-nav-info       (filter
+                                   #(not
+                                     (or
+                                      (-> % :score zero?)
+                                      (-> % :hrefs-and-texts count zero?)))
+                                   (map
+                                    (fn [[xpath info]]
+                                      (let [potential-xpath xpath
+                                            potential-score (reduce
+                                                             (fn [acc an-info]
+                                                               (+
+                                                                acc
+                                                                (:num-chars an-info)))
+                                                             0
+                                                             info)
+                                            potential-hrefs-texts (reduce
+                                                                   (fn [acc an-info]
+                                                                     (cons {:href (:href an-info)
+                                                                            :text (:text an-info)}
+                                                                           acc))
+                                                                   '()
+                                                                   info)]
+                                        {:xpath potential-xpath
+                                         :score (/ potential-score
+                                                   (count potential-hrefs-texts))
+                                         :hrefs-and-texts potential-hrefs-texts}))
+                                    xpaths-anchors-chars))]
 
-       {:total-nav-info page-wide-nav-chars
-        :xpath-nav-info (reverse
-                         (sort-by
-                          :score
-                          (remove-subsets
-                           (utils/distinct-by-fn
-                            xpath-nav-info
-                            (fn [x] (set
-                                    (map
-                                     :href
-                                     (:hrefs-and-texts x))))))))})))
+         {:total-nav-info page-wide-nav-chars
+          :xpath-nav-info (reverse
+                           (sort-by
+                            :score
+                            (remove-subsets
+                             (utils/distinct-by-fn
+                              xpath-nav-info
+                              (fn [x] (set
+                                      (map
+                                       :href
+                                       (:hrefs-and-texts x))))))))}))))
 
 (defn state-action-model
   [actions page-src url-ds template-removed blacklist]

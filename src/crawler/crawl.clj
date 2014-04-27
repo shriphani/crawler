@@ -600,3 +600,154 @@
                             leaf-limit
                             new-corpus))))))))
 
+(defn crawl-random
+    ([entry-point leaf? extract stop?]
+     (crawl-random entry-point 1 leaf? extract stop?))
+  
+  ([entry-point lookahead leaf? extract stop?]
+     (let [body           (:body (utils/download-with-cookie entry-point))
+           body-queue-ele {:url  entry-point
+                           :body body}]
+       (crawl-random [body-queue-ele]
+                     [entry-point]
+                     lookahead
+                     leaf?
+                     extract
+                     stop?
+                     []
+                     50
+                     {})))
+
+  
+  ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit corpus]
+     (do
+       (Thread/sleep 1000)
+       (utils/sayln :queue-size (count url-queue))
+       (utils/sayln :visited (count visited))
+       (utils/sayln :leaves-left leaf-limit)
+       (let [pick-from (if (zero? (rand-int 2)) :first :last)
+             _ (utils/sayln pick-from)
+             url  (if (= pick-from :first)
+                    (-> url-queue first :url)
+                    (-> url-queue last :url))
+             body (:body (utils/download-with-cookie url))
+
+             unaltered-state-action (try (extract body url {} [])
+                                         (catch Exception e nil))
+
+             anchor-text (if (= pick-from :first)
+                           (-> url-queue first :src-text)
+                           (-> url-queue last :src-text))
+
+             src-url (if (= pick-from :first)
+                       (-> url-queue first :src-url)
+                       (-> url-queue last :src-url))
+
+             url-ds (if (= pick-from :first)
+                      (-> url-queue first)
+                      (-> url-queue last))]
+
+         (utils/sayln :url url)
+         (utils/sayln :src-url src-url)
+         (utils/sayln :src-path (:path url-ds))
+         (cond (or (empty? url-queue)
+                   (stop? {:visited    (count visited)
+                           :leaf-left  leaf-limit
+                           :body       body}))
+               (do
+                 (utils/sayln :crawl-done)
+                 {:state  {:url-queue  url-queue
+                           :visited    visited
+                           :lookahead  lookahead
+                           :leaf-paths leaf-paths
+                           :leaf-limit leaf-limit}
+
+                  :model  (frequencies leaf-paths)
+
+                  :corpus corpus
+
+                  :prefix (uri/host (uri/uri url))})
+
+               ;; leaf reached. what do bruh
+               (leaf? {:anchor-text anchor-text
+                       :src-url     src-url
+                       :body        body})
+               (do
+                 (utils/sayln :leaf-reached)
+                 (let [{new-bodies  :bodies
+                        new-visited :visited}
+                       (-> body
+                           (extract url-ds
+                                    {}
+                                    (clojure.set/union (set visited)
+                                                       (set [url])
+                                                       (map
+                                                        #(-> % :url)
+                                                        url-queue)))
+                           :xpath-nav-info
+                           (prepare (-> url-ds :path)
+                                    url))
+                       rest-q (if (= pick-from :first)
+                                (rest url-queue)
+                                (drop-last url-queue))]
+                   
+                   (recur (concat rest-q
+                                  new-bodies)
+                          (clojure.set/union
+                           (set visited)
+                           (set [url]))
+                          lookahead
+                          leaf?
+                          extract
+                          stop?
+                          (cons
+                           (-> url-ds :path)
+                           leaf-paths)
+                          (dec leaf-limit)
+                          (let [corpus-entry {url
+                                              {:body         body
+                                               :state-action unaltered-state-action
+                                               :leaf?        true
+                                               :src-url      src-url
+                                               :src-xpath    (-> url-ds
+                                                                 :path)}}]
+                            (merge corpus corpus-entry)))))
+               
+               :else
+               (let [{new-bodies  :bodies
+                      new-visited :visited}
+                     (try
+                       (-> body
+                           (extract url-ds 
+                                    {}
+                                    (clojure.set/union
+                                     (set visited)
+                                     (set [url])
+                                     (set (map
+                                           #(-> % :url)
+                                           url-queue))))
+                           :xpath-nav-info
+                           (prepare (url-ds :path)
+                                    url))
+                       (catch NullPointerException e nil))
+
+                     rest-q (if (= pick-from :first)
+                              (rest url-queue)
+                              (drop-last url-queue))]
+                 (do
+                   (recur (concat rest-q new-bodies)
+                          (clojure.set/union visited (set [url]))
+                          lookahead
+                          leaf?
+                          extract
+                          stop?
+                          leaf-paths
+                          leaf-limit
+                          (let [corpus-entry {url
+                                              {:body         body
+                                               :state-action unaltered-state-action
+                                               :leaf?        false
+                                               :src-url      src-url
+                                               :src-xpath    (-> url-ds
+                                                                 :path)}}]
+                            (merge corpus corpus-entry))))))))))

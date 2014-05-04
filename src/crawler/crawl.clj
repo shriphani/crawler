@@ -63,7 +63,8 @@
      (crawl entry-point 1 leaf? extract stop?))
   
   ([entry-point lookahead leaf? extract stop?]
-     (let [body           (utils/download-with-cookie entry-point)
+     (let [body           (do (utils/download-with-cookie entry-point)
+                              (utils/download-with-cookie entry-point))
            body-queue-ele {:url  entry-point
                            :body body}]
        (crawl [body-queue-ele]
@@ -508,7 +509,8 @@
      (crawl-example entry-point 1 leaf? extract stop?))
   
   ([entry-point lookahead leaf? extract stop?]
-     (let [body           (utils/download-with-cookie entry-point)
+     (let [body           (do (utils/download-with-cookie entry-point)
+                              (utils/download-with-cookie entry-point))
            body-queue-ele {:url  entry-point
                            :body (:body body)}]
        (crawl-example [body-queue-ele]
@@ -605,7 +607,8 @@
      (crawl-random entry-point 1 leaf? extract stop?))
   
   ([entry-point lookahead leaf? extract stop?]
-     (let [body           (:body (utils/download-with-cookie entry-point))
+     (let [body           (:body (do (utils/download-with-cookie entry-point)
+                                     (utils/download-with-cookie entry-point)))
            body-queue-ele {:url  entry-point
                            :body body}]
        (crawl-random [body-queue-ele]

@@ -36,8 +36,8 @@
        (merge-with concat acc {:bodies  (utils/random-take
                                          10
                                          stuff)
-                               :visited (utils/random-take
-                                         10
+                               :visited (map
+                                         :href
                                          hrefs-and-texts)})))
    {}
    xpaths-and-urls))
@@ -134,7 +134,8 @@
                                   new-bodies)
                           (clojure.set/union
                            (set visited)
-                           (set [url]))
+                           (set [url])
+                           (set new-visited))
                           lookahead
                           leaf?
                           extract
@@ -174,7 +175,9 @@
                        (catch NullPointerException e nil))]
                  (do
                    (recur (concat (rest url-queue) new-bodies)
-                          (clojure.set/union visited (set [url]))
+                          (clojure.set/union visited
+                                             (set [url])
+                                             (set new-visited))
                           lookahead
                           leaf?
                           extract
@@ -558,12 +561,12 @@
                  
                   :corpus corpus
                  
-                  :prefix (uri/host (uri/uri url))})
-               
-               ;; this is an initial test.
-               ;; I personally prefer performing the
-               ;; leaf test right at the beginning
-               :else
+                  :prefix (uri/host (uri/uri url))}
+                 
+                 ;; this is an initial test.
+                 ;; I personally prefer performing the
+                 ;; leaf test right at the beginning
+                 :else)
                (do (utils/sayln :continuing-crawl)
                    (let [state-action (extract body
                                                (first url-queue)
@@ -603,7 +606,7 @@
                             new-corpus))))))))
 
 (defn crawl-random
-    ([entry-point leaf? extract stop?]
+  ([entry-point leaf? extract stop?]
      (crawl-random entry-point 1 leaf? extract stop?))
   
   ([entry-point lookahead leaf? extract stop?]
@@ -666,11 +669,11 @@
                            :leaf-limit leaf-limit}
 
                   :model  (frequencies leaf-paths)
-
+                  
                   :corpus corpus
-
+                  
                   :prefix (uri/host (uri/uri url))})
-
+               
                ;; leaf reached. what do bruh
                (leaf? {:anchor-text anchor-text
                        :src-url     src-url

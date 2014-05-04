@@ -442,6 +442,8 @@
                         hrefs-and-texts))
                       :url)
 
+              links-list (map :href hrefs-and-texts)
+              
               ;; sample 10 or 25% of the links (whichever is bigger)
               links-and-texts (utils/random-take
                                ;; (max 10 (int (/ (count stuff)
@@ -489,7 +491,8 @@
                                 sampled-corpus))]
           (merge-with concat acc {:leaf-paths leaf-paths
                                   :examples examples
-                                  :corpus   sampled-corpus})))
+                                  :corpus   sampled-corpus
+                                  :new-visited links-list})))
       {}
       xpaths-and-urls)))
 
@@ -566,7 +569,8 @@
                  ;; this is an initial test.
                  ;; I personally prefer performing the
                  ;; leaf test right at the beginning
-                 :else)
+                  )
+               :else
                (do (utils/sayln :continuing-crawl)
                    (let [state-action (extract body
                                                (first url-queue)
@@ -574,7 +578,8 @@
                                                blacklist)
                          {items :examples
                           leaf-paths-obs :leaf-paths
-                          sampled-corpus :corpus}
+                          sampled-corpus :corpus
+                          new-visited :new-visited}
                          (prepare-example (:xpath-nav-info state-action)
                                           (-> url-queue first :path)
                                           url
@@ -596,7 +601,8 @@
                                                 (map :url sampled-corpus))
                                                (set
                                                 (flatten
-                                                 (map :redirects sampled-corpus))))
+                                                 (map :redirects sampled-corpus)))
+                                               (set new-visited))
                             lookahead
                             leaf?
                             extract

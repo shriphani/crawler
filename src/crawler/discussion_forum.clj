@@ -3,7 +3,8 @@
   (:require [crawler.rich-char-extractor :as rc-extractor]
             [crawler.utils :as utils]
             [detect-leaf.features :as features])
-  (:use [svm.core]))
+  (:use [svm.core]
+        [clojure.pprint :only [pprint]]))
 
 (def path-to-classifier "gaps_between_links.train.libsvm.model")
 
@@ -12,8 +13,8 @@
   (read-model path-to-classifier))
 
 (defn stop?
-  [{visited :visited} num-leaves]
-  (<= num-leaves visited))
+  [x num-leaves]
+  (pprint x))
 
 (defn leaf?
   [model url-ds]

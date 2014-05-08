@@ -119,6 +119,28 @@
                              corpus
                              (str "example-scheduler-" prefix))))
 
+(defn discussion-forum-crawler-3
+  [start-url num-leaves]
+  (let [discussion-forum-classifier (discussion/load-classifier)
+        discussion-forum-leaf? (fn [url-ds]
+                                 (try (discussion/leaf? discussion-forum-classifier
+                                                        url-ds)
+                                      (catch Exception e nil)))
+        
+        discussion-forum-stop? #(discussion/stop? % num-leaves)
+        {state :state
+         model :model
+         corpus :corpus
+         prefix :prefix}
+        (crawl/crawl-with-estimation-example start-url
+                                             discussion-forum-leaf?
+                                             discussion/extractor
+                                             discussion-forum-stop?)]
+    (dump-state-model-corpus state
+                             model
+                             corpus
+                             (str "example-scheduler-estimate-stopper-" prefix))))
+
 (defn execute-model-crawler
   [start-url model num-leaves]
   (let [stop-fn    (fn [{visited :visited}]

@@ -775,7 +775,6 @@
                            :body (:body body)}]
        (crawl-with-estimation-example [body-queue-ele]
                                       [entry-point]
-                                      lookahead
                                       leaf?
                                       extract
                                       stop?
@@ -787,7 +786,6 @@
        (Thread/sleep 1000)
        (utils/sayln :queue-size (count url-queue))
        (utils/sayln :visited (count visited))
-       (utils/sayln :leaves-left leaf-limit)
        (utils/sayln :url (-> url-queue first :url))
        (utils/sayln :src-url (-> url-queue first :src-url))
        (utils/sayln :src-path (-> url-queue first :path))
@@ -803,27 +801,20 @@
          
          (cond (or (empty? url-queue)
                    (stop? {:visited    (count visited)
-                           :leaf-left  leaf-limit
                            :body       body
                            :corpus     corpus}))
                (do
                  (utils/sayln :crawl-done)
                  {:state  {:url-queue  url-queue
                            :visited    visited
-                           :lookahead  lookahead
-                           :leaf-paths leaf-paths
-                           :leaf-limit leaf-limit}
+                           :leaf-paths leaf-paths}
                  
                   :model  (frequencies leaf-paths)
                  
                   :corpus corpus
                  
-                  :prefix (uri/host (uri/uri url))}
-                 
-                 ;; this is an initial test.
-                 ;; I personally prefer performing the
-                 ;; leaf test right at the beginning
-                  )
+                  :prefix (uri/host (uri/uri url))})
+               
                :else
                (do (utils/sayln :continuing-crawl)
                    (let [state-action (extract body
@@ -859,7 +850,6 @@
                                                 (flatten
                                                  (map :redirects sampled-corpus)))
                                                (set new-visited))
-                            lookahead
                             leaf?
                             extract
                             stop?

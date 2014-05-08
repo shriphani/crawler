@@ -763,3 +763,105 @@
                                                :src-xpath    (-> url-ds
                                                                  :path)}}]
                             (merge corpus corpus-entry))))))))))
+
+(defn crawl-with-estimation-example
+  "Crawler routine with an estimator for
+   a stopping routine."
+
+  ([entry-point leaf? extract stop?]
+     (let [body           (do (utils/download-with-cookie entry-point)
+                              (utils/download-with-cookie entry-point))
+           body-queue-ele {:url  entry-point
+                           :body (:body body)}]
+       (crawl-with-estimation-example [body-queue-ele]
+                                      [entry-point]
+                                      lookahead
+                                      leaf?
+                                      extract
+                                      stop?
+                                      []
+                                      {})))
+
+  ([url-queue visited leaf? extract stop? leaf-paths corpus]
+     (do
+       (Thread/sleep 1000)
+       (utils/sayln :queue-size (count url-queue))
+       (utils/sayln :visited (count visited))
+       (utils/sayln :leaves-left leaf-limit)
+       (utils/sayln :url (-> url-queue first :url))
+       (utils/sayln :src-url (-> url-queue first :src-url))
+       (utils/sayln :src-path (-> url-queue first :path))
+       (let [url  (-> url-queue first :url)
+             body (-> url-queue first :body)
+             
+             unaltered-state-action (try (extract body url {} [])
+                                         (catch Exception e nil))
+             
+             blacklist (clojure.set/union (set (map :url url-queue))
+                                          (set visited)
+                                          (set [url]))]
+         
+         (cond (or (empty? url-queue)
+                   (stop? {:visited    (count visited)
+                           :leaf-left  leaf-limit
+                           :body       body
+                           :corpus     corpus}))
+               (do
+                 (utils/sayln :crawl-done)
+                 {:state  {:url-queue  url-queue
+                           :visited    visited
+                           :lookahead  lookahead
+                           :leaf-paths leaf-paths
+                           :leaf-limit leaf-limit}
+                 
+                  :model  (frequencies leaf-paths)
+                 
+                  :corpus corpus
+                 
+                  :prefix (uri/host (uri/uri url))}
+                 
+                 ;; this is an initial test.
+                 ;; I personally prefer performing the
+                 ;; leaf test right at the beginning
+                  )
+               :else
+               (do (utils/sayln :continuing-crawl)
+                   (let [state-action (extract body
+                                               (first url-queue)
+                                               {}
+                                               blacklist)
+                         {items :examples
+                          leaf-paths-obs :leaf-paths
+                          sampled-corpus :corpus
+                          new-visited :new-visited}
+                         (prepare-example (:xpath-nav-info state-action)
+                                          (-> url-queue first :path)
+                                          url
+                                          leaf?)
+
+                         new-queue (concat (rest url-queue) items)
+                         new-corpus (merge corpus
+                                           (reduce
+                                            (fn [acc x]
+                                              (merge
+                                               acc
+                                               {(:url x)
+                                                x}))
+                                            {}
+                                            sampled-corpus))]
+                     (recur new-queue
+
+                            ;; new visited list
+                            (clojure.set/union (set visited)
+                                               (set
+                                                (map :url sampled-corpus))
+                                               (set
+                                                (flatten
+                                                 (map :redirects sampled-corpus)))
+                                               (set new-visited))
+                            lookahead
+                            leaf?
+                            extract
+                            stop?
+                            (concat leaf-paths-obs leaf-paths)
+                            new-corpus))))))))

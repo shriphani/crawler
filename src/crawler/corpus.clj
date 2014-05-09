@@ -7,7 +7,7 @@
             [structural-similarity.xpath-text :as xpath-text])
   (:use [clj-xpath.core :only [$x:node+]]
         [clojure.pprint :only [pprint]]
-        [structural-similarity.xpath-text :only [similar?]])
+        [structural-similarity.xpath-text :only [similar? similarity-cosine-char-freq]])
   (:import [java.io PushbackReader]))
 
 (defn read-corpus-file
@@ -116,259 +116,91 @@
          (< (count yield-nodes)
             (count prev-nodes)))))
 
-(defn seqs-to-refine
-  [action-seq corpus]
-  (let [action-segments (reductions
-                         (fn [acc x]
-                           (cons x acc))
-                         nil
-                         (reverse action-seq))]
-    ;; the first one is a nil action at a nil
-    ;; point
-    (filter
-     second
-     (map
-      (fn [segment]
-        [segment (try (nth action-seq (count segment))
-                      (catch IndexOutOfBoundsException e nil))])
-      (filter
-       (fn [segment] (refine-segment? segment corpus))
-       action-segments)))))
+(defn refine-action
+  "Args:
+    src-page: The body of the source web-page
+    dest-pages: A set of destination pages from the src-page at
+                the specified action (plz don't supply more)
+    action: The actiont taken (not the SRC-action!!!!)
+    dest-page-test: A routine that accepts the source page
+                    [url info] and the dest page [url info] data
+                    structures
 
-(defn leaf-fix?
-  [action-seq corpus]
-  (let [documents (filter
-                   (fn [[u x]]
-                     (= (:src-xpath x)
-                        action-seq))
-                   corpus)
-
-        leaves (filter
-                (fn [[u x]]
-                  (:leaf? x))
-                documents)]
-    (< (count leaves)
-       (count documents))))
-
-;; (defn repair-leaf-fuck-up
-;;   "Try to repair the leaf node yield
-;;    rate along the current action seq
-
-;;    muscle URLs we want
-;;    fat URLs we don't"
-;;   [action-seq corpus muscle fat]
-;;   (let [documents (filter
-;;                    (fn [[u x]]
-;;                      (and (:leaf? x)
-;;                           (= (:src-xpath x)
-;;                              action-seq)))
-;;                    corpus)
-
-;;         src-urls (map
-;;                   (fn [[u x]]
-;;                     (:src-url x))
-;;                   documents)
-
-;;         src-docs (map
-;;                   #(corpus %)
-;;                   src-urls)
-
-;;         action-taken (first action-seq)]
-;;     (map
-;;      (fn [[u x]]
-;;       (dom/refine-xpath
-;;        action-taken
-;;        (:body x)
-;;        u
-;;        muscle
-;;        fat))
-;;      src-docs)))
-
-(defn refine-segment
-  [segment action-to-take corpus]
+  Returns:
+    An {:only :avoid} data structure to augment the XPath"
+  [src-data dest-datas action src-url dest-page-test]
   (let [muscle (map
                 first
                 (filter
-                 (fn [[u x]]
-                   (and
-                    (if (:body x)
-                      (let [action-space (map
-                                          first
-                                          (:xpath-nav-info
-                                           (extractor/state-action
-                                            (:body x)
-                                            {:url u}
-                                            {})))]
-                        (some
-                         (fn [x]
-                           (= x action-to-take))
-                         action-space))
-                      false)
-                    (= (:src-xpath x)
-                       segment)))
-                 corpus))
-        fat     (filter
-                 (fn [[u x]]
-                   (and
-                    (if (:body x)
-                      (let [action-space (map
-                                          first
-                                          (:xpath-nav-info
-                                           (extractor/state-action
-                                            (:body x)
-                                            {:url u}
-                                            {})))]
-                        (not
-                         (some
-                          (fn [x]
-                            (= x action-to-take))
-                          action-space)))
-                      true)
-                    (= (:src-xpath x)
-                       segment)))
-                 corpus)
-        
-        docs    (map
-                 (fn [[u x]]
-                   [u (:body x)])
-                 (filter
-                  (fn [[u x]]
-                    (= (:src-xpath x)
-                       segment))
-                  corpus))]
-    (first
-     (first
-      (max-key
-       second
-       (frequencies
-        (map
-         (fn [[u  b]]
-           (dom/refine-xpath-accuracy segment
-                                      b
-                                      u
-                                      muscle
-                                      fat))
-         docs)))))))
+                 #(dest-page-test src-data %)
+                 dest-datas))
 
-(defn refine-model-with-positions
-  "Try to maximize the model yield with position info"
-  [model corpus]
-  (map
-   (fn [[action-seq count]]
-     (let [leaf-fix-decision (leaf-fix? action-seq corpus)
+        fat (map
+             first
+             (filter
+              #(not
+                (dest-page-test src-data %))
+              dest-datas))]
+    (dom/refine-xpath-accuracy action
+                               (-> src-data second :body)
+                               src-url
+                               muscle
+                               fat)))
 
-           leaf-muscle (map
-                        first
-                        (filter
-                         (fn [[u x]]
-                           (and (:leaf? x)
-                                (= (:src-xpath x)
-                                   action-seq)))
-                         corpus))
-
-           leaf-fat    (map
-                        first
-                        (filter
-                         (fn [[u x]]
-                           (and (not (:leaf? x))
-                                (= (:src-xpath x)
-                                   action-seq)))
-                         corpus))
-
-           leaf-src-urls (map
-                          (fn [[u x]]
-                            (:src-url x))
-                          (filter
+(defn detect-pagination
+  "Employs the simpler digit-based algorithm.
+   Also refines the XPaths"
+  [a-corpus]
+  (let [digit-anchor-text (filter
                            (fn [[u x]]
-                             (= (:src-xpath x)
-                                action-seq))
-                           corpus))
+                             (re-find #"^\d+$" (:src-text x)))
+                           a-corpus)
 
-           leaf-src-docs (map
-                          (fn [u]
-                            (:body (corpus u)))
-                          leaf-src-urls)
+        pagination-candidates (filter
+                               (fn [[u x]]
+                                 (let [src-url  (:src-url x)
+                                       src-body (:body (a-corpus src-url))]
+                                   (similar? src-body (:body x))))
+                               digit-anchor-text)
+        
+        action-and-pagination (distinct
+                               (map
+                                (fn [[u x]]
+                                  [(-> x :path rest) (-> x :path first)])
+                                pagination-candidates))
 
-           leaf-fix (first
+        dest-page-test (fn [src-data dest-data]
+                         (similar? (-> src-data second :body)
+                                   (-> dest-data second :body)))]
+    {:actions (into {} action-and-pagination)
+     
+     :refine  (into
+               {}
+               (map
+                (fn [[action-seq paging-action]]
+                  (let [full-action-seq   (cons paging-action action-seq)
+                        
+                        docs-at-xpath     (filter
+                                           (fn [[u x]]
+                                             (= (:path x) full-action-seq))
+                                           a-corpus)
+                        
+                        grouped-by-source (group-by
+                                           (fn [[u x]]
+                                             (:src-url x))
+                                           docs-at-xpath)]
+                    [[action-seq paging-action]
                      (first
-                      (max-key
-                       second
-                       (frequencies
-                        (map
-                         (fn [[u b]]
-                           (if leaf-fix-decision
-                             (dom/refine-xpath-accuracy (first action-seq)
-                                                        b
-                                                        u
-                                                        leaf-muscle
-                                                        leaf-fat)
-                             {}))
-                         (map vector leaf-src-urls leaf-src-docs))))))]
-       {:action action-seq
-        :segments-to-fix
-        (cons
-         [action-seq leaf-fix]
-         (map
-          (fn [[segment action]]
-            (refine-segment segment action corpus))
-          (seqs-to-refine action-seq
-                          corpus)))
-        :count count}))
-   model))
-
-(defn refine-pagination-with-positions
-  "Pagination is a 2-tuple from an action seq
-   to a pagination action you take at that point
-
-   as a result the muscle is the portions marked by
-   the crawler as pagination from a source link.
-
-   the fat is the stuff that didn't make the cut"
-  [action-seq paging-action corpus]
-  (let [src-docs (filter
-                  (fn [[u x]]
-                    (= (:src-xpath x)
-                       action-seq))
-                  corpus)
-
-        paging-docs (map
-                     (fn [[u x]]
-                       (let [actions (:xpath-nav-info
-                                      (extractor/state-action (:body x)
-                                                              {:url u}
-                                                              {}))
-                             links   (map
-                                      (fn [l]
-                                        [l (corpus l)])
-                                      (first
-                                       (map
-                                        :hrefs
-                                        (filter
-                                         #(= (:xpath %)
-                                             paging-action)
-                                         actions))))
-
-                             muscle  (map
-                                      first
-                                      (filter
-                                       (fn [[u x2]]
-                                         (and (:body x2) (xpath-text/similar? (:body x2)
-                                                                              (:body x))))
-                                       links))
-
-                             fat     (map
-                                      first
-                                      (filter
-                                       (fn [[u x2]]
-                                         (or (nil? x2)
-                                             (not (xpath-text/similar? (:body x2)
-                                                                       (:body x)))))
-                                       links))]
-                         (dom/refine-xpath-accuracy paging-action (:body x) u muscle fat)))
-                     src-docs)]
-    [paging-action
-     (first
-      (first
-       (max-key
-        second
-        (frequencies paging-docs))))]))
+                      (last
+                       (sort-by
+                        second
+                        (frequencies
+                         (map
+                          (fn [[src-url xs]]
+                            (refine-action [src-url (a-corpus src-url)]
+                                           xs
+                                           paging-action
+                                           src-url
+                                           dest-page-test))
+                          grouped-by-source)))))]))
+                action-and-pagination))}))

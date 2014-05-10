@@ -55,3 +55,33 @@
         :else
         (recur (set (map (fn [x] [x]) points))
                similar?)))
+
+(defn cluster-n-iters
+  "Args:
+    points: a set of points
+    similar? : are x and y similar?"
+  [points similar? iters]
+  (cond (zero? iters)
+        points
+        
+        (-> points first vector?)
+        (let [merged (set
+                      (reduce
+                       (fn [acc x]
+                         (let [assign-to (assign acc x similar?)]
+                           (if (neg? assign-to)
+                             (into [] (cons x acc))
+                             (assoc (into [] acc) assign-to (into
+                                                             []
+                                                             (concat (nth acc assign-to)
+                                                                     x))))))
+                       []
+                       points))]
+          (if (= merged points)
+            merged
+            (recur merged similar? (dec iters))))
+
+        :else
+        (recur (set (map (fn [x] [x]) points))
+               similar?
+               iters)))

@@ -3,6 +3,7 @@
   (:require [cheshire.core :as json]
             [clojure.java.io :as io]
             [crawler.dom :as dom]
+            [crawler.cluster :as cluster]
             [crawler.rich-char-extractor :as extractor]
             [structural-similarity.xpath-text :as xpath-text])
   (:use [clj-xpath.core :only [$x:node+]]
@@ -204,3 +205,15 @@
                                            dest-page-test))
                           grouped-by-source)))))]))
                 action-and-pagination))}))
+
+(defn retrieve-leaf-paths
+  "Expects a set of clusters (maintain a running list during crawl)
+   Use these to produce stuff"
+  [doc-clusters corpus]
+  (let [largest-cluster  (last
+                          (sort-by count doc-clusters))]
+    (map
+     (fn [u]
+       (-> u corpus :path))
+     largest-cluster)))
+ 

@@ -491,7 +491,17 @@
                                 sampled-corpus))]
           (merge-with concat acc {:leaf-paths leaf-paths
                                   :examples examples
-                                  :corpus   sampled-corpus
+                                  :corpus   (map
+                                             (fn [x]
+                                               (merge x {:leaf (try
+                                                                 (and
+                                                                  (:src-text x)
+                                                                  (:body x)
+                                                                  (leaf? {:anchor-text (:src-text x)
+                                                                          :src-url     (:url x)
+                                                                          :body        (:body x)}))
+                                                                 (catch Exception e nil))}))
+                                             sampled-corpus)
                                   :new-visited links-list})))
       {}
       xpaths-and-urls)))

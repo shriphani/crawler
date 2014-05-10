@@ -789,9 +789,14 @@
                                       extract
                                       stop?
                                       []
-                                      {})))
-
-  ([url-queue visited leaf? extract stop? leaf-paths corpus]
+                                      {}
+                                      (if (leaf? {:anchor-text nil
+                                                  :src-url     nil
+                                                  :body        (:body body)})
+                                        [[entry-point]]
+                                        []))))
+  
+  ([url-queue visited leaf? extract stop? leaf-paths corpus leaf-clusters]
      (do
        (Thread/sleep 1000)
        (utils/sayln :queue-size (count url-queue))
@@ -812,7 +817,8 @@
          (cond (or (empty? url-queue)
                    (stop? {:visited    (count visited)
                            :body       body
-                           :corpus     corpus}))
+                           :corpus     corpus
+                           :leaf-clusters leaf-clusters}))
                (do
                  (utils/sayln :crawl-done)
                  {:state  {:url-queue  url-queue
@@ -823,7 +829,9 @@
                  
                   :corpus corpus
                  
-                  :prefix (uri/host (uri/uri url))})
+                  :prefix (uri/host (uri/uri url))
+
+                  :leaf-clusters leaf-clusters})
                
                :else
                (do (utils/sayln :continuing-crawl)
@@ -849,7 +857,32 @@
                                                {(:url x)
                                                 x}))
                                             {}
-                                            sampled-corpus))]
+                                            sampled-corpus))
+                         new-leaf-clusters (reduce
+                                            (fn [clusters-so-far x]
+                                              (let [to-assign (.indexOf
+                                                               (map
+                                                                (fn [a-cluster]
+                                                                  (some
+                                                                   (fn [c]
+                                                                     (similarity/similar?
+                                                                      (-> c new-corpus :body)
+                                                                      (:body x)))
+                                                                   a-cluster))
+                                                                clusters-so-far)
+                                                               true)]
+                                                (if (neg? to-assign)
+                                                  (into [] (cons [(:url x)] clusters-so-far))
+                                                  (assoc clusters-so-far
+                                                    to-assign
+                                                    (concat
+                                                     [(:url x)]
+                                                     (get clusters-so-far
+                                                          to-assign))))))
+                                            leaf-clusters
+                                            (filter
+                                             :leaf
+                                             sampled-corpus))]
                      (recur new-queue
 
                             ;; new visited list
@@ -864,4 +897,5 @@
                             extract
                             stop?
                             (concat leaf-paths-obs leaf-paths)
-                            new-corpus))))))))
+                            new-corpus
+                            new-leaf-clusters))))))))

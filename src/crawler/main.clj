@@ -51,6 +51,31 @@
                (pprint model model-wrtr)
                (pprint corpus corpus-wrtr)))))))
 
+(defn dump-state-model-corpus-leaves
+  "Creates a dated file _prefix_-yr-month-day-hr-min.corpus/state/model"
+  ([state model corpus leaves]
+     (dump-state-model-corpus state model corpus leaves "nameless-model"))
+
+  ([state model corpus leaves prefix]
+     (let [date-file-prefix (utils/dated-filename "" "")
+
+           create #(str prefix "/" date-file-prefix %)
+           
+           state-file  (create ".state")
+           model-file  (create ".model")
+           corpus-file (create ".corpus")
+           leaves-file (create ".leaves")]
+       (do
+         (utils/safe-mkdir prefix)
+         (with-open [state-wrtr  (io/writer state-file)
+                     model-wrtr  (io/writer model-file)
+                     corpus-wrtr (io/writer corpus-file)
+                     leaves-wrtr (io/writer leaves-file)]
+           (do (pprint state state-wrtr)
+               (pprint model model-wrtr)
+               (pprint corpus corpus-wrtr)
+               (pprint leaves leaves-wrtr)))))))
+
 (defn dump-corpus
   ([corpus]
      (dump-corpus corpus "crawler"))
@@ -131,15 +156,17 @@
         {state :state
          model :model
          corpus :corpus
-         prefix :prefix}
+         prefix :prefix
+         leaf-clusters :leaf-clusters}
         (crawl/crawl-with-estimation-example start-url
                                              discussion-forum-leaf?
                                              discussion/extractor
                                              discussion-forum-stop?)]
-    (dump-state-model-corpus state
-                             model
-                             corpus
-                             (str "example-scheduler-estimate-stopper-" prefix))))
+    (dump-state-model-corpus-leaves state
+                                    model
+                                    corpus
+                                    leaf-clusters
+                                    (str "example-scheduler-estimate-stopper-" prefix))))
 
 (defn execute-model-crawler
   [start-url model num-leaves]

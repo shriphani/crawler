@@ -792,7 +792,10 @@
                                       extract
                                       stop?
                                       []
-                                      {}
+                                      {entry-point {:body (:body body)
+                                                    :url entry-point
+                                                    :src-url nil
+                                                    :src-text nil}}
                                       (if (leaf? {:anchor-text nil
                                                   :src-url     nil
                                                   :body        (:body body)})

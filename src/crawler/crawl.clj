@@ -537,7 +537,10 @@
                       stop?
                       []
                       50
-                      {})))
+                      {entry-point {:body (:body body)
+                                    :url entry-point
+                                    :src-url nil
+                                    :src-text nil}})))
   
   ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit corpus]
      (do
@@ -858,31 +861,33 @@
                                                 x}))
                                             {}
                                             sampled-corpus))
-                         new-leaf-clusters (reduce
-                                            (fn [clusters-so-far x]
-                                              (let [to-assign (.indexOf
-                                                               (map
-                                                                (fn [a-cluster]
-                                                                  (some
-                                                                   (fn [c]
-                                                                     (similarity/similar?
-                                                                      (-> c new-corpus :body)
-                                                                      (:body x)))
-                                                                   a-cluster))
-                                                                clusters-so-far)
-                                                               true)]
-                                                (if (neg? to-assign)
-                                                  (into [] (cons [(:url x)] clusters-so-far))
-                                                  (assoc clusters-so-far
-                                                    to-assign
-                                                    (concat
-                                                     [(:url x)]
-                                                     (get clusters-so-far
-                                                          to-assign))))))
-                                            leaf-clusters
-                                            (filter
-                                             :leaf
-                                             sampled-corpus))]
+                         new-leaf-clusters (into
+                                            []
+                                            (reduce
+                                             (fn [clusters-so-far x]
+                                               (let [to-assign (.indexOf
+                                                                (map
+                                                                 (fn [a-cluster]
+                                                                   (some
+                                                                    (fn [c]
+                                                                      (similarity/similar?
+                                                                       (-> c new-corpus :body)
+                                                                       (:body x)))
+                                                                    a-cluster))
+                                                                 clusters-so-far)
+                                                                true)]
+                                                 (if (neg? to-assign)
+                                                   (into [] (cons [(:url x)] clusters-so-far))
+                                                   (assoc clusters-so-far
+                                                     to-assign
+                                                     (concat
+                                                      [(:url x)]
+                                                      (get clusters-so-far
+                                                           to-assign))))))
+                                             leaf-clusters
+                                             (filter
+                                              :leaf
+                                              sampled-corpus)))]
                      (recur new-queue
 
                             ;; new visited list

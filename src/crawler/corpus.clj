@@ -204,16 +204,94 @@
                                            src-url
                                            dest-page-test))
                           grouped-by-source)))))]))
-                action-and-pagination))}))
+                action-and-pagination))})) 
 
-(defn retrieve-leaf-paths
-  "Expects a set of clusters (maintain a running list during crawl)
-   Use these to produce stuff"
-  [doc-clusters corpus]
-  (let [largest-cluster  (last
-                          (sort-by count doc-clusters))]
+(defn estimate-yield
+  "Estimates the yield of a path from root to leaf"
+  [an-action-seq corpus leaf?]
+  (let [;; a list of steps from entry to discussion
+        action-steps
+        (rest
+         (map
+          reverse
+          (reductions (fn [acc x]
+                        (cons x acc))
+                      []
+                      (reverse an-action-seq))))]
+
     (map
-     (fn [u]
-       (-> u corpus :path))
-     largest-cluster)))
- 
+     (fn [as]
+       (let [docs-at-path (filter
+                           (fn [[u x]]
+                             (= (:path x)
+                                as))
+                           corpus)
+
+             action-taken-at-doc (try (nth (reverse an-action-seq) (count as))
+                                      (catch Exception e nil))
+
+             sources (distinct
+                      (map
+                       #(-> % second :src-url)
+                       docs-at-path))
+
+             restrictions 
+             (map
+              (fn [a-source]
+                (let [associated-docs (filter
+                                       (fn [[u x]]
+                                         (= (:src-url x)
+                                            a-source))
+                                       docs-at-path)
+                      muscle (map
+                              first
+                              (filter
+                               (fn [[u x]]
+                                 (if action-taken-at-doc
+                                   (let [state-action (:xpath-nav-info
+                                                       (extractor/state-action (:body x)
+                                                                               {:url u}
+                                                                               {}
+                                                                               []))
+                                         record (filter
+                                                 (fn [x]
+                                                   (= action-taken-at-doc
+                                                      (:xpath x)))
+                                                 state-action)]
+                                     (not (empty? record)))
+                                   (:leaf x)))
+                               associated-docs))
+
+                      fat (map
+                           first
+                           (filter
+                            (fn [[u x]]
+                              (if action-taken-at-doc
+                                (let [state-action (:xpath-nav-info
+                                                    (extractor/state-action (:body x)
+                                                                            {:url u}
+                                                                            {}
+                                                                            []))
+                                      record (filter
+                                              (fn [x]
+                                                (= action-taken-at-doc
+                                                   (:xpath x)))
+                                              state-action)]
+                                  (empty? record))
+                                (not (:leaf x))))
+                            associated-docs))]
+                  (dom/refine-xpath-accuracy (last as)
+                                             (:body (corpus a-source))
+                                             a-source
+                                             muscle
+                                             fat)))
+              sources)
+
+             chosen-restriction (first
+                                 (last
+                                  (sort-by second (frequencies restrictions))))]
+         [[(if (empty? (rest as))
+             nil
+             (rest as))
+           (first as)] chosen-restriction]))
+     action-steps)))

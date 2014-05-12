@@ -40,31 +40,31 @@
      (not-paginated action-seq pagination))
    model))
 
-(defn fix-model
-  "Code that takes a sampled model and
-   fixes up the crawled model"
-  [model-file corpus-file]
-  (let [model       (read-model model-file)
-        corpus-data (corpus/read-corpus-file corpus-file)
+;; (defn fix-model
+;;   "Code that takes a sampled model and
+;;    fixes up the crawled model"
+;;   [model-file corpus-file]
+;;   (let [model       (read-model model-file)
+;;         corpus-data (corpus/read-corpus-file corpus-file)
 
-        model-trimmed (corpus/refine-model-with-positions model
-                                                          corpus-data)
+;;         model-trimmed (corpus/refine-model-with-positions model
+;;                                                           corpus-data)
         
-        pagination (corpus/pagination-in-corpus corpus-data)
-        pagination-trimmed (into
-                            {}
-                            (map
-                             (fn [[action-seq paging-actions]]
-                               [action-seq
-                                (map
-                                 (fn [paging-action]
-                                   (corpus/refine-pagination-with-positions action-seq
-                                                                            paging-action
-                                                                            corpus-data))
-                                 paging-actions)])
-                             pagination))]
-    {:action-seqs model-trimmed
-     :pagination-trimmed pagination-trimmed}))
+;;         pagination (corpus/pagination-in-corpus corpus-data)
+;;         pagination-trimmed (into
+;;                             {}
+;;                             (map
+;;                              (fn [[action-seq paging-actions]]
+;;                                [action-seq
+;;                                 (map
+;;                                  (fn [paging-action]
+;;                                    (corpus/refine-pagination-with-positions action-seq
+;;                                                                             paging-action
+;;                                                                             corpus-data))
+;;                                  paging-actions)])
+;;                              pagination))]
+;;     {:action-seqs model-trimmed
+;;      :pagination-trimmed pagination-trimmed}))
 
 (defn inspect-action-seq
   [action-seq corpus]

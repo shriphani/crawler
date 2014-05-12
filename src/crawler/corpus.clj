@@ -89,72 +89,14 @@
       (read-corpus-file a-corpus-file)
       wrtr)))
 
-(defn refine-segment?
-  [action-segment corpus]
-  (let [action-to-prev (if (= [] (rest action-segment))
-                         nil
-                         (rest action-segment))
-        action-taken   (first action-segment)
-
-        prev-nodes     (filter
-                        (fn [[u item]]
-                          (= (:src-xpath item)
-                             action-to-prev))
-                        corpus)
-
-        yield-nodes    (filter
-                        (fn [[u item]]
-                          (let [item-state-action (:xpath-nav-info
-                                                   (extractor/state-action
-                                                    (:body item)
-                                                    {:url u}
-                                                    {}))
-
-                                possible-actions (map :xpath item-state-action)]
-                            (some (fn [x] (= x action-taken)) possible-actions)))
-                        prev-nodes)]
-    (and action-taken
-         (< (count yield-nodes)
-            (count prev-nodes)))))
-
-(defn refine-action
-  "Args:
-    src-page: The body of the source web-page
-    dest-pages: A set of destination pages from the src-page at
-                the specified action (plz don't supply more)
-    action: The actiont taken (not the SRC-action!!!!)
-    dest-page-test: A routine that accepts the source page
-                    [url info] and the dest page [url info] data
-                    structures
-
-  Returns:
-    An {:only :avoid} data structure to augment the XPath"
-  [src-data dest-datas action src-url dest-page-test]
-  (let [muscle (map
-                first
-                (filter
-                 #(dest-page-test src-data %)
-                 dest-datas))
-
-        fat (map
-             first
-             (filter
-              #(not
-                (dest-page-test src-data %))
-              dest-datas))]
-    (dom/refine-xpath-accuracy action
-                               (-> src-data second :body)
-                               src-url
-                               muscle
-                               fat)))
-
 (defn detect-pagination
   "Employs the simpler digit-based algorithm.
    Also refines the XPaths"
   [a-corpus]
   (let [digit-anchor-text (filter
                            (fn [[u x]]
-                             (re-find #"^\d+$" (:src-text x)))
+                             (try (re-find #"^\d+$" (:src-text x))
+                                  (catch Exception e nil)))
                            a-corpus)
 
         pagination-candidates (filter
@@ -173,7 +115,7 @@
         dest-page-test (fn [src-data dest-data]
                          (similar? (-> src-data second :body)
                                    (-> dest-data second :body)))]
-    {:actions (into {} action-and-pagination)
+    {:paging-actions (into {} action-and-pagination)
      
      :refine  (into
                {}
@@ -204,11 +146,11 @@
                                            src-url
                                            dest-page-test))
                           grouped-by-source)))))]))
-                action-and-pagination))})) 
+                action-and-pagination))}))
 
-(defn estimate-yield
+(defn refine-action-seq
   "Estimates the yield of a path from root to leaf"
-  [an-action-seq corpus leaf?]
+  [an-action-seq corpus]
   (let [;; a list of steps from entry to discussion
         action-steps
         (rest
@@ -290,8 +232,8 @@
              chosen-restriction (first
                                  (last
                                   (sort-by second (frequencies restrictions))))]
-         [[(if (empty? (rest as))
+         {[(if (empty? (rest as))
              nil
              (rest as))
-           (first as)] chosen-restriction]))
+           (first as)] chosen-restriction}))
      action-steps)))

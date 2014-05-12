@@ -35,20 +35,15 @@
 
         pagination-and-refinements (corpus/detect-pagination sampled-corpus)
 
-        refined-actions (reduce
-                         (fn [acc l]
-                           (reduce
-                            (fn [acc2 ls]
-                              (merge acc ls))
-                            {}
-                            (corpus/refine-action-seq l
-                                                      sampled-corpus)))
-                         {}
+        refined-actions (map
+                         (fn [l]
+                           {:actions l
+                            :refined (corpus/refine-action-seq l
+                                                               sampled-corpus)})
                          leaf-paths)]
-    (merge-with merge
-                {:action-seqs leaf-paths}
-                {:refine refined-actions}
-                {:pagination pagination-and-refinements})))
+    
+    {:actions refined-actions
+     :pagination pagination-and-refinements}))
 
 (defn stop?
   [x num-leaves]

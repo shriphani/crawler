@@ -161,8 +161,8 @@
                       []
                       (reverse an-action-seq))))]
 
-    (map
-     (fn [as]
+    (reduce
+     (fn [acc as]
        (let [docs-at-path (filter
                            (fn [[u x]]
                              (= (:path x)
@@ -232,8 +232,11 @@
              chosen-restriction (first
                                  (last
                                   (sort-by second (frequencies restrictions))))]
-         {[(if (empty? (rest as))
-             nil
-             (rest as))
-           (first as)] chosen-restriction}))
+         (merge
+          acc
+          {[(if (empty? (rest as))
+              nil
+              (rest as))
+            (first as)] chosen-restriction})))
+     {}
      action-steps)))

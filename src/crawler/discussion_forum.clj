@@ -49,7 +49,21 @@
   [x num-leaves]
   (let [estimated-model (estimate-model x)]
     (pprint estimated-model)
-    (>= (:visited x) num-leaves)))
+    (pprint
+     [:estimate
+      (map
+       (fn [l]
+         (corpus/estimate-yield l
+                                (:pagination estimated-model)
+                                (:corpus x)))
+       (:actions estimated-model))
+
+      :expected
+      (map
+       (fn [l]
+         (* (Math/pow 5 (count l)) 10))
+       (:actions estimated-model))])
+    (>= (:observed x) num-leaves)))
 
 (defn leaf?
   [model url-ds]

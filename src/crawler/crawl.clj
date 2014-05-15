@@ -502,7 +502,8 @@
                                                                           :body        (:body x)}))
                                                                  (catch Exception e nil))}))
                                              sampled-corpus)
-                                  :new-visited links-list})))
+                                  :new-visited links-list
+                                  :crawled (map :url links-and-texts)})))
       {}
       xpaths-and-urls)))
 
@@ -540,9 +541,10 @@
                       {entry-point {:body (:body body)
                                     :url entry-point
                                     :src-url nil
-                                    :src-text nil}})))
+                                    :src-text nil}}
+                      (set [entry-point]))))
   
-  ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit corpus]
+  ([url-queue visited lookahead leaf? extract stop? leaf-paths leaf-limit corpus observed]
      (do
        (Thread/sleep 1000)
        (utils/sayln :queue-size (count url-queue))
@@ -564,7 +566,8 @@
          (cond (or (empty? url-queue)
                    (stop? {:visited    (count visited)
                            :leaf-left  leaf-limit
-                           :body       body}))
+                           :body       body
+                           :observed   (count observed)}))
                (do
                  (utils/sayln :crawl-done)
                  {:state  {:url-queue  url-queue
@@ -592,7 +595,8 @@
                          {items :examples
                           leaf-paths-obs :leaf-paths
                           sampled-corpus :corpus
-                          new-visited :new-visited}
+                          new-visited :new-visited
+                          crawled :crawled}
                          (prepare-example (:xpath-nav-info state-action)
                                           (-> url-queue first :path)
                                           url
@@ -607,7 +611,9 @@
                                                {(:url x)
                                                 x}))
                                             {}
-                                            sampled-corpus))]
+                                            sampled-corpus))
+                         new-observed (clojure.set/union (set observed)
+                                                         (set crawled))]
                      (recur new-queue
                             (clojure.set/union (set visited)
                                                (set
@@ -622,7 +628,8 @@
                             stop?
                             (concat leaf-paths-obs leaf-paths)
                             leaf-limit
-                            new-corpus))))))))
+                            new-corpus
+                            new-observed))))))))
 
 (defn crawl-random
   ([entry-point leaf? extract stop?]
@@ -800,9 +807,10 @@
                                                   :src-url     nil
                                                   :body        (:body body)})
                                         [[entry-point]]
-                                        []))))
+                                        [])
+                                      (set [entry-point]))))
   
-  ([url-queue visited leaf? extract stop? leaf-paths corpus leaf-clusters]
+  ([url-queue visited leaf? extract stop? leaf-paths corpus leaf-clusters observed]
      (do
        (Thread/sleep 1000)
        (utils/sayln :queue-size (count url-queue))
@@ -824,7 +832,8 @@
                    (stop? {:visited    (count visited)
                            :body       body
                            :corpus     corpus
-                           :leaf-clusters leaf-clusters}))
+                           :leaf-clusters leaf-clusters
+                           :observed (count observed)}))
                (do
                  (utils/sayln :crawl-done)
                  {:state  {:url-queue  url-queue
@@ -848,12 +857,16 @@
                          {items :examples
                           leaf-paths-obs :leaf-paths
                           sampled-corpus :corpus
-                          new-visited :new-visited}
+                          new-visited :new-visited
+                          crawled :crawled}
                          (prepare-example (:xpath-nav-info state-action)
                                           (-> url-queue first :path)
                                           url
                                           leaf?)
 
+                         new-observed (clojure.set/union (set crawled)
+                                                         (set observed))
+                         
                          new-queue (concat (rest url-queue) items)
                          new-corpus (merge corpus
                                            (reduce
@@ -906,4 +919,5 @@
                             stop?
                             (concat leaf-paths-obs leaf-paths)
                             new-corpus
-                            new-leaf-clusters))))))))
+                            new-leaf-clusters
+                            new-observed))))))))

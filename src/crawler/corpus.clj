@@ -240,3 +240,92 @@
             (first as)] chosen-restriction})))
      {}
      action-steps)))
+
+(defn model-steps
+  "Produces a set of path sequences
+   leading to the dest"
+  [a-model]
+  (cons
+   nil
+   (rest
+    (reductions (fn [acc x]
+                  (cons x acc))
+                []
+                (reverse a-model)))))
+
+(defn estimate-yield
+  "Args:
+    a-model: a single path to leaf + refinements
+    pagination: a dictionary of pagination actions
+    corpus: the corpus to estimate yield at"
+  [a-model pagination corpus]
+  ;(println :corpus-size (count corpus))
+  (let [path-seqs (model-steps                   
+                   (:actions a-model))]
+    (reduce
+     (fn [acc step]
+       ;(println :acc acc)
+       ;(println :step step)
+       ;; (pprint
+       ;;  (map
+       ;;   (fn [[u x]]
+       ;;     (:path x))
+       ;;   (filter
+       ;;    (fn [[u x]]
+       ;;      (:leaf x))
+       ;;    corpus)))
+       (let [associated-docs (if (= (:parent-set acc) nil)
+                               (filter
+                                (fn [[u x]]
+                                  (and
+                                   (:leaf x)
+                                   (= (:path x)
+                                      step)))
+                                corpus)
+                               (filter
+                                (fn [[u x]]
+                                  (and
+                                   (some #{u} (:parent-set acc))
+                                   (= (:path x)
+                                      step)))
+                                corpus))
+
+             parent-set (set
+                         (map
+                          (fn [[u x]]
+                            (:src-url x))
+                          associated-docs))
+;             _ (println :docs (map first associated-docs))
+;             _ (println :parents parent-set)
+             
+             action-to-take (try (nth (reverse (:actions a-model)) (count step))
+                                 (catch Exception e nil))
+             
+             yield-at-step (if (nil? (:parent-set acc))
+                             1
+                             (apply
+                              max
+                              (map
+                               (fn [[u x]]
+                                 (let [state-action  (:xpath-nav-info
+                                                      (extractor/state-action (:body x)
+                                                                              {:url u}
+                                                                              {}
+                                                                              []))
+                                       
+                                       yield-record  (count
+                                                      (:hrefs-and-texts
+                                                       (first
+                                                        (filter
+                                                         #(= (:xpath %) action-to-take)
+                                                         state-action))))]
+                                   yield-record))
+                               associated-docs)))
+
+             yield-with-paging (if ((:paging-actions pagination) step)
+                                 (* 10 yield-at-step)
+                                 yield-at-step)]
+         {:parent-set parent-set
+          :yield (* (or (:yield acc) 1) yield-with-paging)}))
+     {}
+     (reverse path-seqs))))

@@ -28,11 +28,10 @@
    "https://amblesideonline.org/forum/"
    "http://www.doctornerdlove.com/forums/"])
 
-(defn test-site
+(defn download-corpora
   []
   (pmap
    (fn [site]
      (main/discussion-forum-crawler-3 site 100))
    test-entry-points))
-
 

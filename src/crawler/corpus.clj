@@ -89,6 +89,37 @@
       (read-corpus-file a-corpus-file)
       wrtr)))
 
+(defn refine-action
+  "Args:
+    src-page: The body of the source web-page
+    dest-pages: A set of destination pages from the src-page at
+                the specified action (plz don't supply more)
+    action: The actiont taken (not the SRC-action!!!!)
+    dest-page-test: A routine that accepts the source page
+                    [url info] and the dest page [url info] data
+                    structures
+
+  Returns:
+    An {:only :avoid} data structure to augment the XPath"
+  [src-data dest-datas action src-url dest-page-test]
+  (let [muscle (map
+                first
+                (filter
+                 #(dest-page-test src-data %)
+                 dest-datas))
+
+        fat (map
+             first
+             (filter
+              #(not
+                (dest-page-test src-data %))
+              dest-datas))]
+    (dom/refine-xpath-accuracy action
+                               (-> src-data second :body)
+                               src-url
+                               muscle
+                               fat)))
+
 (defn detect-pagination
   "Employs the simpler digit-based algorithm.
    Also refines the XPaths"

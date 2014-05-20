@@ -884,7 +884,7 @@
                                                (let [to-assign (.indexOf
                                                                 (map
                                                                  (fn [a-cluster]
-                                                                   (some
+                                                                   (every?
                                                                     (fn [c]
                                                                       (similarity/similar?
                                                                        (-> c new-corpus :body)

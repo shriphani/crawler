@@ -48,14 +48,15 @@
 (defn stop?
   [x num-leaves]
   (let [estimated-model (estimate-model x)]
-    (pprint estimated-model)
+    ;(pprint estimated-model)
     (pprint
      [:estimate
       (map
        (fn [l]
-         (corpus/estimate-yield l
-                                (:pagination estimated-model)
-                                (:corpus x)))
+         [l
+          (corpus/estimate-yield l
+                                 (:pagination estimated-model)
+                                 (:corpus x))])
        (:actions estimated-model))
 
       :expected

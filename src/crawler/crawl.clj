@@ -814,7 +814,7 @@
      (do
        (Thread/sleep 1000)
        (utils/sayln :queue-size (count url-queue))
-       (utils/sayln :visited (count visited))
+       (utils/sayln :observed (count observed))
        (utils/sayln :url (-> url-queue first :url))
        (utils/sayln :src-url (-> url-queue first :src-url))
        (utils/sayln :src-path (-> url-queue first :path))

@@ -107,8 +107,7 @@
                                                                    '()
                                                                    info)]
                                         {:xpath potential-xpath
-                                         :score (/ potential-score
-                                                   (count potential-hrefs-texts))
+                                         :score (count potential-hrefs-texts)
                                          :hrefs-and-texts potential-hrefs-texts}))
                                     xpaths-anchors-chars))]
 

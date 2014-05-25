@@ -59,11 +59,12 @@
                                  (:corpus x))])
        (:actions estimated-model))
 
-      :expected
-      (map
-       (fn [l]
-         (* (Math/pow 5 (count l)) 10))
-       (:actions estimated-model))])
+      ;:expected
+      ;; (map
+      ;;  (fn [l]
+      ;;    (* (Math/pow 5 (count l)) 10))
+      ;;  (:actions estimated-model))
+      :observed (:observed x)])
     (>= (:observed x) num-leaves)))
 
 (defn leaf?

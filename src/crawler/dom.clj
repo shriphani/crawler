@@ -513,6 +513,112 @@ id and class tag constraints are also added"
         {}
         xpaths-nodes-paths))))
 
+(defn eval-anchor-xpath-refined
+  "xpath: your generic XPath
+   refinement: {:only ### :avoid ###}
+   returns {:xpath X :hrefs X}"
+  ([xpath refinement processed-body url]
+     (eval-anchor-xpath-refined xpath refinement processed-body url []))
+  
+  ([xpath refinement processed-body url blacklist]
+     (let [anchor-nodes ($x:node+ xpath processed-body)
+
+           a-tags-hrefs (filter
+                                        ; the node must have a href
+                         (fn [a-tag]
+                           (and (-> a-tag
+                                    (.getAttributes)
+                                    (.getNamedItem "href"))
+                                (try
+                                  (not=
+                                   (-> a-tag
+                                       (.getAttributes)
+                                       (.getNamedItem "rel")
+                                       (.getValue))
+                                   "nofollow")
+                                  (catch NullPointerException e true))
+                                
+                                (not=
+                                 (uri/scheme
+                                  (-> a-tag
+                                      (.getAttributes)
+                                      (.getNamedItem "href")
+                                      (.getValue)))
+                                 "javascript")
+                                (not
+                                 (some
+                                  #{(uri/resolve-uri
+                                     url
+                                     (-> a-tag
+                                         (.getAttributes)
+                                         (.getNamedItem "href")
+                                         (.getValue)))}
+                                  (set blacklist)))))
+                         anchor-nodes)
+
+           nodes-paths  (map
+                         (fn [x]
+                           [(-> x :node ds-to-node) x])
+                         (filter
+                          (fn [x]
+                            (= (uri/host url) (-> x :href uri/host)))
+                          (map
+                           (fn [x]
+                             (let [link (-> x
+                                            (.getAttributes)
+                                            (.getNamedItem "href")
+                                            (.getValue))]
+                               {:node x
+                                :href (try
+                                        (uri/fragment
+                                         (uri/resolve-uri url link)
+                                         nil)
+                                        (catch Exception e nil))
+                                :text (.getTextContent x)}))
+                           a-tags-hrefs)))
+
+           only-restrictions (:only refinement)
+           avoid-restrictions (:avoid refinement)
+
+           restricted-to-only (filter
+                               (fn [[path info]]
+                                 (some
+                                  identity
+                                  (map
+                                   (fn [[p ns]]
+                                     (let [ns-set (set ns)]
+                                       (some #{(last
+                                                (nth path p))}
+                                             ns-set)))
+                                   only-restrictions)))
+                               nodes-paths)
+
+           restrict-avoid     (filter
+                               (fn [[path info]]
+                                 (some
+                                  identity
+                                  (map
+                                   (fn [[p ns]]
+                                     (let [ns-set (set ns)]
+                                       (not
+                                        (some #{(last
+                                                 (nth path p))}
+                                              ns-set))))
+                                   avoid-restrictions)))
+                               restricted-to-only)
+           
+           xpaths-nodes-paths (map
+                               (fn [[path an-info]]
+                                 [(path->xpath-no-position path) an-info])
+                               restrict-avoid)]
+       (reduce
+        (fn [acc [xpath an-info]]
+          (merge-with concat
+                      acc
+                      {xpath [an-info]}))
+        {}
+        xpaths-nodes-paths))))
+
 (defn refine-xpath-with-position
   [processed-body url xpath num-clusters]
   (let [nodes-paths (page-nodes-hrefs-text processed-body

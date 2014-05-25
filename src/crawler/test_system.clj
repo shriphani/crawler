@@ -13,7 +13,6 @@
    "http://www.ilovephilosophy.com/index.php"
    "http://phpbbarcade.jatek-vilag.com/index.php"
    "http://seattlebubble.com/forum/"
-   "http://forum.joomla.org/"
    "https://forum.librivox.org/index.php"
    
    ;; ipboard

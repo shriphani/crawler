@@ -334,24 +334,25 @@
              
              yield-at-step (if (nil? (:parent-set acc))
                              1
-                             (apply
-                              max
-                              (map
-                               (fn [[u x]]
-                                 (let [state-action  (:xpath-nav-info
-                                                      (extractor/state-action (:body x)
-                                                                              {:url u}
-                                                                              {}
-                                                                              []))
-                                       
-                                       yield-record  (count
-                                                      (:hrefs-and-texts
-                                                       (first
-                                                        (filter
-                                                         #(= (:xpath %) action-to-take)
-                                                         state-action))))]
-                                   yield-record))
-                               associated-docs)))
+                             (try (apply
+                                   max
+                                   (map
+                                    (fn [[u x]]
+                                      (let [state-action  (:xpath-nav-info
+                                                           (extractor/state-action (:body x)
+                                                                                   {:url u}
+                                                                                   {}
+                                                                                   []))
+                                            
+                                            yield-record  (count
+                                                           (:hrefs-and-texts
+                                                            (first
+                                                             (filter
+                                                              #(= (:xpath %) action-to-take)
+                                                              state-action))))]
+                                        yield-record))
+                                    associated-docs))
+                                  (catch Exception e 0)))
 
              yield-with-paging (if ((:paging-actions pagination) step)
                                  (* 10 yield-at-step)

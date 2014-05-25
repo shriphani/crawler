@@ -788,7 +788,7 @@
   "Crawler routine with an estimator for
    a stopping routine."
 
-  ([entry-point leaf? extract stop?]
+  ([entry-point leaf? extract stop? build-model]
      (let [body           (do (utils/download-with-cookie entry-point)
                               (utils/download-with-cookie entry-point))
            body-queue-ele {:url  entry-point
@@ -808,9 +808,11 @@
                                                   :body        (:body body)})
                                         [[entry-point]]
                                         [])
-                                      (set [entry-point]))))
+                                      (set [entry-point])
+                                      
+                                      build-model)))
   
-  ([url-queue visited leaf? extract stop? leaf-paths corpus leaf-clusters observed]
+  ([url-queue visited leaf? extract stop? leaf-paths corpus leaf-clusters observed build-model]
      (do
        (Thread/sleep 1000)
        (utils/sayln :queue-size (count url-queue))
@@ -839,9 +841,13 @@
                  {:state  {:url-queue  url-queue
                            :visited    visited
                            :leaf-paths leaf-paths}
-                 
-                  :model  (frequencies leaf-paths)
-                 
+                  
+                  :model  (build-model {:visited    (count visited)
+                                        :body       body
+                                        :corpus     corpus
+                                        :leaf-clusters leaf-clusters
+                                        :observed (count observed)})
+                  
                   :corpus corpus
                  
                   :prefix (uri/host (uri/uri url))
@@ -920,4 +926,5 @@
                             (concat leaf-paths-obs leaf-paths)
                             new-corpus
                             new-leaf-clusters
-                            new-observed))))))))
+                            new-observed
+                            build-model))))))))

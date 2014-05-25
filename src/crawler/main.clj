@@ -153,6 +153,8 @@
                                       (catch Exception e nil)))
         
         discussion-forum-stop? #(discussion/stop? % num-leaves)
+
+        discussion-forum-build-model discussion/estimate-model
         {state :state
          model :model
          corpus :corpus
@@ -161,7 +163,8 @@
         (crawl/crawl-with-estimation-example start-url
                                              discussion-forum-leaf?
                                              discussion/extractor
-                                             discussion-forum-stop?)]
+                                             discussion-forum-stop?
+                                             discussion-forum-build-model)]
     (dump-state-model-corpus-leaves state
                                     model
                                     corpus

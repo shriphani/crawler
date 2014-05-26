@@ -292,7 +292,9 @@
   [a-model pagination corpus]
   ;(println :corpus-size (count corpus))
   (let [path-seqs (model-steps                   
-                   (:actions a-model))]
+                   (:actions a-model))
+
+        refinements (:refined a-model)]
     (reduce
      (fn [acc step]
        ;(println :acc acc)
@@ -339,10 +341,15 @@
                                    (map
                                     (fn [[u x]]
                                       (let [state-action  (:xpath-nav-info
-                                                           (extractor/state-action (:body x)
-                                                                                   {:url u}
-                                                                                   {}
-                                                                                   []))
+                                                           (extractor/state-action-xpath
+                                                            action-to-take
+                                                            (or (try (refinements [step action-to-take])
+                                                                     (catch Exception e nil))
+                                                                {})
+                                                            (:body x)
+                                                            {:url u}
+                                                            {}
+                                                            []))
                                             
                                             yield-record  (count
                                                            (:hrefs-and-texts

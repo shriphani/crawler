@@ -2,6 +2,7 @@
   "Contains code to read and process a
    sampled model"
   (:require [clojure.java.io :as io]
+            [clojure.string :as string]
             [crawler.corpus :as corpus]
             [crawler.dom :as dom]
             [structural-similarity.xpath-text :as similarity])
@@ -13,65 +14,8 @@
   (with-open [rdr (io/reader a-model-file)]
     (-> rdr PushbackReader. read)))
 
-(defn read-corpus
-  [a-corpus-file]
-  (with-open [rdr (io/reader a-corpus-file)]
-    (-> rdr PushbackReader. read)))
-
-(defn not-paginated
-  [an-action-seq pagination]
-  (not
-   (some
-    (fn [[src-xpath actions]]
-      (some
-       (fn [action]
-         (let [paging-action (cons action src-xpath)]
-           (some
-            (fn [[x y]]
-              (= x y))
-            (map vector paging-action (reverse an-action-seq)))))
-       actions))
-    pagination)))
-
-(defn trim-pagination
-  [model pagination]
-  (filter
-   (fn [[action-seq _]]
-     (not-paginated action-seq pagination))
-   model))
-
-;; (defn fix-model
-;;   "Code that takes a sampled model and
-;;    fixes up the crawled model"
-;;   [model-file corpus-file]
-;;   (let [model       (read-model model-file)
-;;         corpus-data (corpus/read-corpus-file corpus-file)
-
-;;         model-trimmed (corpus/refine-model-with-positions model
-;;                                                           corpus-data)
-        
-;;         pagination (corpus/pagination-in-corpus corpus-data)
-;;         pagination-trimmed (into
-;;                             {}
-;;                             (map
-;;                              (fn [[action-seq paging-actions]]
-;;                                [action-seq
-;;                                 (map
-;;                                  (fn [paging-action]
-;;                                    (corpus/refine-pagination-with-positions action-seq
-;;                                                                             paging-action
-;;                                                                             corpus-data))
-;;                                  paging-actions)])
-;;                              pagination))]
-;;     {:action-seqs model-trimmed
-;;      :pagination-trimmed pagination-trimmed}))
-
-(defn inspect-action-seq
-  [action-seq corpus]
-  (map
-   first
-   (filter
-    (fn [[u x]]
-      (= (:src-xpath x)
-         action-seq))
-    corpus)))
+(defn associated-corpus-file
+  "Finds the corpus file that produced
+   provided model file"
+  [a-model-file]
+  (string/replace a-model-file #".model" ".corpus"))

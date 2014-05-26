@@ -580,32 +580,36 @@ id and class tag constraints are also added"
            only-restrictions (:only refinement)
            avoid-restrictions (:avoid refinement)
 
-           restricted-to-only (filter
-                               (fn [[path info]]
-                                 (some
-                                  identity
-                                  (map
-                                   (fn [[p ns]]
-                                     (let [ns-set (set ns)]
-                                       (some #{(last
-                                                (nth path p))}
-                                             ns-set)))
-                                   only-restrictions)))
-                               nodes-paths)
-
-           restrict-avoid     (filter
-                               (fn [[path info]]
-                                 (some
-                                  identity
-                                  (map
-                                   (fn [[p ns]]
-                                     (let [ns-set (set ns)]
-                                       (not
-                                        (some #{(last
-                                                 (nth path p))}
-                                              ns-set))))
-                                   avoid-restrictions)))
-                               restricted-to-only)
+           restricted-to-only (if-not (empty? only-restrictions)
+                                (filter
+                                 (fn [[path info]]
+                                   (some
+                                    identity
+                                    (map
+                                     (fn [[p ns]]
+                                       (let [ns-set (set ns)]
+                                         (some #{(last
+                                                  (nth path p))}
+                                               ns-set)))
+                                     only-restrictions)))
+                                 nodes-paths)
+                                nodes-paths)
+           
+           restrict-avoid     (if-not (empty? avoid-restrictions)
+                                (filter
+                                 (fn [[path info]]
+                                   (some
+                                    identity
+                                    (map
+                                     (fn [[p ns]]
+                                       (let [ns-set (set ns)]
+                                         (not
+                                          (some #{(last
+                                                   (nth path p))}
+                                                ns-set))))
+                                     avoid-restrictions)))
+                                 restricted-to-only)
+                                restricted-to-only)
            
            xpaths-nodes-paths (map
                                (fn [[path an-info]]

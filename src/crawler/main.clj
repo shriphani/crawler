@@ -191,9 +191,18 @@
                                          crawled-corpus))))
          actions)]
 
-    (map
-     (fn [as]
-       (execute/execute-model start-url as pagination))
+    (reduce
+     (fn [{blacklist :blacklist corpus :corpus} as]
+       (let [{new-blacklist :blacklist
+              new-corpus :corpus}
+             (execute/execute-model start-url as pagination blacklist corpus)]
+
+         {:blacklist (clojure.set/union new-blacklist
+                                        blacklist)
+          :corpus (merge new-blacklist
+                         new-corpus)}))
+     {:blacklist (set [])
+      :corpus {}}
      planned-model)))
 
 (defn -main

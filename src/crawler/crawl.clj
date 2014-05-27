@@ -258,7 +258,24 @@
                   action-seq
                   pagination
                   blacklist
+                  {}
                   {}))
+
+  ([entry-point leaf? stop? action-seq pagination blacklist old-corpus]
+     (do
+       (utils/sayln :blacklist-size (count blacklist))
+       (utils/sayln :corpus-size (count old-corpus))
+       (crawl-model {:content-queue [{:url entry-point}]
+                    :paging-queue []}
+                   (set [])
+                   0
+                   leaf?
+                   stop?
+                   action-seq
+                   pagination
+                   blacklist
+                   old-corpus
+                   {})))
 
   ([{content-q :content-queue
      paging-q :paging-queue}
@@ -269,6 +286,7 @@
     action-seq
     pagination
     blacklist
+    old-corpus
     corpus]
      (let [url  (-> content-q first :url)
            body (:body (utils/download-cache-with-cookie url))
@@ -340,6 +358,7 @@
                           action-seq
                           pagination
                           blacklist
+                          old-corpus
                           (merge corpus {(-> content-q first :url)
                                          body}))))
 
@@ -366,6 +385,7 @@
                          action-seq
                          pagination
                          blacklist
+                         old-corpus
                          corpus)))
                
                :else
@@ -439,6 +459,7 @@
                         action-seq
                         pagination
                         blacklist
+                        old-corpus
                         corpus)))))))
 
 (defn prepare-example

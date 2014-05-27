@@ -27,19 +27,30 @@
   (zero? n))
 
 (defn execute-model
-  [start-url action-seq pagination]
-  (utils/sayln :executing-model action-seq)
-  (let [paging-actions (:paging-actions pagination)
-        paging-refined (:refine pagination)
+  ([start-url action-seq pagination]
+     (execute-model start-url
+                    action-seq
+                    pagination
+                    (set [])
+                    {}))
+  
+  ([start-url action-seq pagination blacklist old-corpus]
+     (utils/sayln :executing-model action-seq)
+     (let [paging-actions (:paging-actions pagination)
+           paging-refined (:refine pagination)
 
-        leaf? (generate-leaf? (:actions action-seq))
+           leaf? (generate-leaf? (:actions action-seq))
 
-        {visited :visited
-         num-threads :num-leaves
-         corpus :corpus}
-        (crawl/crawl-model start-url
-                           leaf?
-                           stop?
-                           action-seq
-                           pagination)]
-    (utils/sayln :downloaded-discussions-count num-threads)))
+           {visited :visited
+            num-threads :num-leaves
+            corpus :corpus}
+           (crawl/crawl-model start-url
+                              leaf?
+                              stop?
+                              action-seq
+                              pagination
+                              blacklist
+                              old-corpus)]
+       (do (utils/sayln :downloaded-discussions-count num-threads)
+           {:blacklist visited
+            :corpus corpus}))))

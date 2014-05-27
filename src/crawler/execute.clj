@@ -32,9 +32,14 @@
   (let [paging-actions (:paging-actions pagination)
         paging-refined (:refine pagination)
 
-        leaf? (generate-leaf? (:actions action-seq))]
-    (crawl/crawl-model start-url
-                       leaf?
-                       stop?
-                       action-seq
-                       pagination)))
+        leaf? (generate-leaf? (:actions action-seq))
+
+        {visited :visited
+         num-threads :num-leaves
+         corpus :corpus}
+        (crawl/crawl-model start-url
+                           leaf?
+                           stop?
+                           action-seq
+                           pagination)]
+    (utils/sayln :downloaded-discussions-count num-threads)))

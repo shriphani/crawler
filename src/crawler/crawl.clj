@@ -198,7 +198,7 @@
 
 (defn xpath-to-pick
   [src-path action-seq]
-  (nth action-seq (count src-path)))
+  (nth (reverse action-seq) (count src-path)))
 
 (defn pagination-to-pick
   "Pick the next page (sort-of)
@@ -387,25 +387,27 @@
                                     (set (map :url paging-q))
                                     (set blacklist)))))
                                 (catch Exception e []))
-                     pagination-extracted (if (pagination src-xpath)
+
+                     _ (utils/sayln :the-pagination-xpath-is (paging-actions src-xpath))
+                     pagination-extracted (if (paging-actions src-xpath)
                                             (try
                                              (first
                                               (sort-by
-                                               :text
+                                               (fn [x]
+                                                 (Integer/parseInt (:text x)))
                                                (first
                                                 (vals
                                                  (dom/eval-anchor-xpath-refined
-                                                  (pagination src-xpath)
-                                                  ((:refined pagination) [src-xpath
-                                                                          (pagination src-xpath)])
+                                                  (paging-actions src-xpath)
+                                                  (paging-refined [src-xpath
+                                                                   (paging-actions src-xpath)])
                                                   (dom/html->xml-doc body)
                                                   (-> content-q first :url)
                                                   (clojure.set/union
                                                    visited
                                                    (set (map :url content-q))
                                                    (set (map :url paging-q))
-                                                   (set blacklist)))))
-                                               (pagination src-xpath)))
+                                                   (set blacklist)))))))
                                              (catch Exception e []))
                                             [])
                      pagination-extracted-hrefs (:href pagination-extracted)

@@ -521,8 +521,20 @@ id and class tag constraints are also added"
      (eval-anchor-xpath-refined xpath refinement processed-body url []))
   
   ([xpath refinement processed-body url blacklist]
-     (let [anchor-nodes ($x:node+ xpath processed-body)
+     (let [;anchor-nodes ($x:node+ xpath processed-body)
 
+           anchor-nodes (map
+                         :node
+                         (second
+                          (first
+                           (filter
+                            (fn [[x y]]
+                              (= x xpath))
+                            (xpaths-hrefs-tokens-no-position
+                             processed-body
+                             url
+                             blacklist)))))
+           
            a-tags-hrefs (filter
                                         ; the node must have a href
                          (fn [a-tag]

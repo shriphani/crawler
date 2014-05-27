@@ -4,6 +4,7 @@
             [crawler.corpus :as corpus]
             [crawler.crawl :as crawl]
             [crawler.discussion-forum :as discussion]
+            [crawler.execute :as execute]
             [clojure.java.io :as io]
             [crawler.model :as crawler-model]
             [crawler.rich-char-extractor :as rc-extractor]
@@ -172,26 +173,28 @@
                                     (str "example-scheduler-estimate-stopper-" prefix))))
 
 (defn execute-model-crawler
-  [start-url model num-leaves]
-  (let [stop-fn    (fn [{visited :visited}]
-                     (<= num-leaves visited))
+  [start-url model-file]
+  (let [model  (crawler-model/read-model model-file)
+        corpus-file (crawler-model/associated-corpus-file model-file)
+        crawled-corpus (corpus/read-corpus-file corpus-file)
 
-        leaf-fn    (fn [x] false) ;; FIX
+        actions    (:actions model)
+        pagination (:pagination model)
 
-        model      (crawler-model/read-model model)
-        
-        extract-fn (fn [page-src url-ds template-removed blacklist]
-                     (rc-extractor/state-action-model (first model)
-                                                      page-src
-                                                      url-ds
-                                                      template-removed
-                                                      blacklist))]
-    (let [{state :state model :model corpus :corpus prefix :prefix}
-          (crawl/crawl start-url
-                       leaf-fn
-                       extract-fn
-                       stop-fn)]
-      (dump-corpus corpus))))
+        planned-model 
+        (sort-by
+         (juxt #(-> % :actions count)
+               #(-
+                 (:yield
+                  (corpus/estimate-yield %
+                                         pagination
+                                         crawled-corpus))))
+         actions)]
+
+    (map
+     (fn [as]
+       (execute/execute-model start-url as pagination))
+     planned-model)))
 
 (defn -main
   [& args]

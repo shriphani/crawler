@@ -16,51 +16,25 @@
      #(- total (second %)))
     action-seqs)))
 
-(defn leaf?
-  [action-seq url-ds]
-  (= (reverse action-seq) (:src-xpath url-ds)))
+(defn generate-leaf?
+  [action-seq]
+  (fn [url-ds]
+    (= action-seq
+       (:src-xpath url-ds))))
 
 (defn stop?
-  [{num-leaves :num-leaves}]
-  (<= 1000000 num-leaves))
+  [{n :queue-size}]
+  (zero? n))
 
 (defn execute-model
-  [start-url action-seqs pagination blacklist limit]
-  (let [corpus (crawl/crawl-model start-url
-                                  leaf?
-                                  stop?
-                                  action-seqs
-                                  pagination
-                                  blacklist)
-        wrtr (io/writer (str (uri/host start-url)
-                             ".corpus")
-                        :append true)]
-    (do (clojure.pprint/pprint (:corpus corpus) wrtr)
-        {:num-leaves (:num-leaves corpus)
-         :visited (:visited corpus)})))
+  [start-url action-seq pagination]
+  (utils/sayln :executing-model action-seq)
+  (let [paging-actions (:paging-actions pagination)
+        paging-refined (:refine pagination)
 
-(defn execute
-  "A model contains keys like so:
-   :action-seq (a series of actions)
-   :pagination (what pagination to take for an action seq)"
-  ([start-url m]
-     (execute start-url m 1000))
-  
-  ([start-url {action-seqs :action-seq pagination :pagination} limit]
-     (let [planned-model (plan-model action-seqs)]
-       (reduce
-        (fn [acc [a-seq estimate]]
-          (do
-            (utils/sayln :executing a-seq)
-            (let [{num-leaves :num-leaves
-                   visited :visited}
-                  (execute-model start-url
-                                 (reverse a-seq)
-                                 pagination
-                                 (:visited acc)
-                                 limit)]
-              {:num-leaves (+ (:num-leaves acc) num-leaves)
-               :visited (clojure.set/union visited (:visited acc))})))
-        {:num-leaves 0
-         :visited []}
-        planned-model))))
+        leaf? (generate-leaf? (:actions action-seq))]
+    (crawl/crawl-model start-url
+                       leaf?
+                       stop?
+                       action-seq
+                       pagination)))

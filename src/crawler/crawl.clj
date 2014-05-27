@@ -271,16 +271,23 @@
     blacklist
     corpus]
      (let [url  (-> content-q first :url)
-           body (utils/download-cache-with-cookie url)
-           src-xpath (-> content-q first :src-xpath)]
+           body (:body (utils/download-cache-with-cookie url))
+           processed-body (try (dom/html->xml-doc body)
+                               (catch Exception e nil))
+           src-xpath (-> content-q first :src-xpath)
+
+           paging-actions (:paging-actions pagination)
+           paging-refined (:refine pagination)]
        (do
          (Thread/sleep 1000)
          (utils/sayln :left (count content-q))
-         (utils/sayln :paging (count paging-q))
+         (utils/sayln :paging-size (count paging-q))
          (utils/sayln :src-xpath src-xpath)
          (utils/sayln :cur-url url)
          (cond (or (stop? {:visited (count visited)
-                           :num-leaves num-leaves})
+                           :num-leaves num-leaves
+                           :queue-size (+ (count content-q)
+                                          (count paging-q))})
                    (and (empty? content-q)
                         (empty? paging-q)))
                (do (utils/sayln :crawl-done)
@@ -288,32 +295,36 @@
                     :num-leaves num-leaves
                     :visited visited})
                
-               (leaf? action-seq (first content-q))
+               (leaf? (first content-q))
                (do
                  (utils/sayln :reached-leaf)
-                 (let [pagination-extracted (if-not (pagination src-xpath)
-                                              nil
-                                              (reduce
-                                               concat
-                                               (map
-                                                (fn [p]
-                                                  (try
-                                                    (pagination-to-pick
-                                                     (first
-                                                      (vals
-                                                       (dom/eval-anchor-xpath
-                                                        p
-                                                        (dom/html->xml-doc body)
-                                                        (-> content-q first :url)
-                                                        (clojure.set/union
-                                                         visited
-                                                         (set (map :url content-q))
-                                                         (set (map :url paging-q))
-                                                         (set blacklist))))))
-                                                    (catch Exception e [])))
-                                                (pagination src-xpath))))]
-                   (utils/sayln pagination-extracted)
-                   (recur {:content-queue (if-not (empty? pagination-extracted)
+                 (let [paging-action        (paging-actions src-xpath)
+                       paging-refined       (paging-refined [src-xpath paging-action])
+                       _ (utils/sayln :pagination-xpath-is paging-action)
+                       pagination-extracted (try
+                                             (first
+                                              (sort-by
+                                               :text
+                                               (second
+                                                (dom/eval-anchor-xpath-refined
+                                                 paging-action
+                                                 paging-refined
+                                                 processed-body
+                                                 url
+                                                 (clojure.set/union visited
+                                                                    (set
+                                                                     (map :url
+                                                                          content-q))
+                                                                    (set
+                                                                     (map :url
+                                                                          content-q))
+                                                                    (set blacklist))))))
+                                             (catch Exception e nil))
+                       _ (utils/sayln :pagination-links-extracted-are pagination-extracted)]
+                   (utils/sayln :paging pagination-extracted)
+                   ;; at leaf, aggressively look for pagination
+                   (recur {:content-queue (if-not (or (empty? pagination-extracted)
+                                                      (nil? pagination-extracted))
                                             (cons
                                              {:url (:href pagination-extracted)
                                               :src-xpath src-xpath
@@ -323,7 +334,7 @@
                                             (rest content-q))
                            :paging-queue  paging-q}
                           (conj visited (-> content-q first :url))
-                          (+ 1 num-leaves)
+                          (inc num-leaves)
                           leaf?
                           stop?
                           action-seq
@@ -331,37 +342,44 @@
                           blacklist
                           (merge corpus {(-> content-q first :url)
                                          body}))))
-               
+
+               ;; there is some pagination left that
+               ;; you can pick up
                (and (empty? content-q)
-                    (not
-                     (empty? paging-q)))
-               (let [sorted-pagination-entries (sort-by
-                                                #(-> % :src-xpath count)
-                                                paging-q)
-                     chosen-entry (last sorted-pagination-entries)
-                     remaining-pagination (filter
-                                           (fn [x] (not= x chosen-entry))
-                                           paging-q)]
-                 (recur {:content-queue (concat [chosen-entry]
-                                                content-q)
-                         :paging-queue remaining-pagination}
-                        visited
-                        num-leaves
-                        leaf?
-                        stop?
-                        action-seq
-                        pagination
-                        blacklist
-                        corpus))
+                    (not (empty? paging-q)))
+               (do
+                 (utils/sayln :paging)
+                (let [sorted-pagination-entries (sort-by
+                                                 #(-> % :src-xpath count)
+                                                 paging-q)
+                      chosen-entry (last sorted-pagination-entries)
+                      remaining-pagination (filter
+                                            (fn [x] (not= x chosen-entry))
+                                            paging-q)]
+                  (recur {:content-queue (concat [chosen-entry]
+                                                 content-q)
+                          :paging-queue remaining-pagination}
+                         visited
+                         num-leaves
+                         leaf?
+                         stop?
+                         action-seq
+                         pagination
+                         blacklist
+                         corpus)))
                
                :else
-               (let [action (xpath-to-pick src-xpath action-seq)
+               (let [action  (xpath-to-pick src-xpath (:actions action-seq))
+                     refined ((:refined action-seq) [src-xpath action])
+
+                     _ (utils/sayln :applying-refinement refined)
                      extracted (try
                                 (first
                                  (vals
-                                  (dom/eval-anchor-xpath
+                                  (dom/eval-anchor-xpath-refined
                                    action
-                                   (dom/html->xml-doc body)
+                                   refined
+                                   processed-body
                                    (-> content-q first :url)
                                    (clojure.set/union
                                     visited
@@ -370,27 +388,33 @@
                                     (set blacklist)))))
                                 (catch Exception e []))
                      pagination-extracted (if (pagination src-xpath)
-                                            (reduce
-                                             concat
-                                             (map
-                                              (fn [p]
-                                                (try
-                                                  (first
-                                                   (vals
-                                                    (dom/eval-anchor-xpath
-                                                     p
-                                                     (dom/html->xml-doc body)
-                                                     (-> content-q first :url)
-                                                     (clojure.set/union
-                                                      visited
-                                                      (set (map :url content-q))
-                                                      (set (map :url paging-q))
-                                                      (set blacklist)))))
-                                                  (catch Exception e [])))
-                                              (pagination src-xpath)))
+                                            (try
+                                             (first
+                                              (sort-by
+                                               :text
+                                               (first
+                                                (vals
+                                                 (dom/eval-anchor-xpath-refined
+                                                  (pagination src-xpath)
+                                                  ((:refined pagination) [src-xpath
+                                                                          (pagination src-xpath)])
+                                                  (dom/html->xml-doc body)
+                                                  (-> content-q first :url)
+                                                  (clojure.set/union
+                                                   visited
+                                                   (set (map :url content-q))
+                                                   (set (map :url paging-q))
+                                                   (set blacklist)))))
+                                               (pagination src-xpath)))
+                                             (catch Exception e []))
                                             [])
-                     pagination-extracted-hrefs (map :href pagination-extracted)
+                     pagination-extracted-hrefs (:href pagination-extracted)
+
+                     _ (utils/sayln :pagination-specific-links-are pagination-extracted-hrefs)
+                     
                      extracted-hrefs (map :href extracted)
+
+                     _ (utils/sayln :links-extracted-are extracted-hrefs)
 
                      new-content-q (concat (rest content-q)
                                            (map
@@ -398,11 +422,11 @@
                                               {:url x
                                                :src-xpath (cons action src-xpath)})
                                             extracted-hrefs))
-                     new-paging-q (concat paging-q (map
-                                                    (fn [x]
-                                                      {:url x
-                                                       :src-xpath src-xpath})
-                                                    pagination-extracted-hrefs))]
+                     new-paging-q (if pagination-extracted-hrefs
+                                    (concat paging-q
+                                            [{:url pagination-extracted-hrefs
+                                              :src-xpath src-xpath}])
+                                    paging-q)]
                  (utils/sayln :items (count extracted-hrefs))
                  (recur {:content-queue new-content-q
                          :paging-queue new-paging-q}

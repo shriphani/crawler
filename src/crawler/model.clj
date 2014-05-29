@@ -27,9 +27,18 @@
 
    Focus on just avoids right now and trust
    the onlies"
-  [a-model-file a-corpus-file]
+  [a-model-file a-corpus-file a-leaves-file]
   (let [model (read-model a-model-file)
         downloaded-corpus (corpus/read-corpus-file a-corpus-file)
+        leaf-cluster (last
+                      (sort-by
+                       count
+                       (read-model a-leaves-file)))
+        leaf-examples (map
+                       (fn [l]
+                         (-> l downloaded-corpus :body))
+                       leaf-cluster)
+        
         corpus-urls (set
                      (map
                       (fn [[u x]]
@@ -98,7 +107,14 @@
                                    (fn [{x :xpath}]
                                      (if action-to-take-at-target
                                        (= x action-to-take-at-target)
-                                       true))
+                                       (let [num-matched (count
+                                                          (filter
+                                                           (fn [e]
+                                                             (similarity/similar? e bd))
+                                                           leaf-examples))]
+                                         (>= num-matched
+                                               (/ (count leaf-examples)
+                                                  2)))))
                                    xpaths-hrefs)))))
                             u)))
                        docs-at-src-xpath)]

@@ -67,78 +67,89 @@
           refined :refined}]
 
 ;       (println :old-refined refined)
-;       (println :new-refined )
-       (let [probed-refinement 
-             (reduce
-              (fn [acc [[src-xpath xpath-to-take] refinement]]
-                (let [docs-at-src-xpath (filter
-                                         (fn [[u x]]
-                                           (and (= (:path x)
-                                                   src-xpath)
-                                                (some #{u} corpus-urls)))
-                                         downloaded-corpus)
+                                        ;       (println :new-refined )
+       (if (empty?
+            (filter
+             (fn [[axn-pair x]]
+               (and (not
+                     (nil? x))
+                    (not
+                     (empty? (:avoid x)))))
+             refined))
+         {:actions axns
+          :refined refined}
+         (let [probed-refinement 
+               (reduce
+                (fn [acc [[src-xpath xpath-to-take] refinement]]
+                  (let [docs-at-src-xpath (filter
+                                           (fn [[u x]]
+                                             (and (= (:path x)
+                                                     src-xpath)
+                                                 (some #{u} corpus-urls)))
+                                          downloaded-corpus)
                       
-                      action-to-take-at-target (if (= (inc (count src-xpath))
-                                                      (count axns))
-                                                 nil
-                                                 (nth (reverse axns)
-                                                      (inc
-                                                       (count src-xpath))))
+                       action-to-take-at-target (if (= (inc (count src-xpath))
+                                                       (count axns))
+                                                  nil
+                                                  (nth (reverse axns)
+                                                       (inc
+                                                        (count src-xpath))))
                       
-                      new-refinements
+                       new-refinements
                       
-                      (map
-                       (fn [[u x]]
-                         (let [processed-doc (dom/html->xml-doc (:body x))]
-                           (dom/probe-refinements
-                            xpath-to-take
-                            refinement
-                            processed-doc
-                            (fn [l bd]
-                              (let [xpaths-hrefs (:xpath-nav-info
-                                                  (extractor/state-action
-                                                   bd
-                                                   {:url l}
-                                                   {}
-                                                   []))]
-                                (not
-                                 (empty?
-                                  (filter
-                                   (fn [{x :xpath}]
-                                     (if action-to-take-at-target
-                                       (= x action-to-take-at-target)
-                                       (let [num-matched (count
-                                                          (filter
-                                                           (fn [e]
-                                                             (similarity/similar? e bd))
-                                                           leaf-examples))]
-                                         (>= num-matched
-                                               (/ (count leaf-examples)
-                                                  2)))))
-                                   xpaths-hrefs)))))
-                            u)))
-                       docs-at-src-xpath)]
-                  ;; this is the new refinement
-                  (merge
-                   acc
-                   {[src-xpath xpath-to-take]
-                    (merge refinement
-                           {:avoid
-                            (first
-                             (last
-                              (sort-by
-                               second
-                               (frequencies new-refinements))))})})))
-              {}
-              (filter
-               (fn [[axn-pair refinement]]
-                 (not
-                  (or (nil? (:avoid refinement))
-                      (empty? (:avoid refinement)))))
-               refined))]
+                       (map
+                        (fn [[u x]]
+                          (let [processed-doc (dom/html->xml-doc (:body x))]
+                            (dom/probe-refinements
+                             xpath-to-take
+                             refinement
+                             processed-doc
+                             (fn [l bd]
+                               (let [xpaths-hrefs (:xpath-nav-info
+                                                   (extractor/state-action
+                                                    bd
+                                                    {:url l}
+                                                    {}
+                                                    []))]
+                                 (not
+                                  (empty?
+                                   (filter
+                                    (fn [{x :xpath}]
+                                      (if action-to-take-at-target
+                                        (= x action-to-take-at-target)
+                                        (let [num-matched (count
+                                                           (filter
+                                                            (fn [e]
+                                                              (similarity/similar? e bd))
+                                                            leaf-examples))]
+                                          (>= num-matched
+                                              (/ (count leaf-examples)
+                                                 2)))))
+                                    xpaths-hrefs)))))
+                             u)))
+                        docs-at-src-xpath)]
+                   ;; this is the new refinement
+                   (merge
+                    acc
+                    {[src-xpath xpath-to-take]
+                     (merge refinement
+                            {:avoid
+                             (first
+                              (last
+                               (sort-by
+                                second
+                                (frequencies new-refinements))))})})))
+               {}
+               (filter
+                (fn [[axn-pair refinement]]
+                  (not
+                   (or (nil? (:avoid refinement))
+                       (empty? (:avoid refinement)))))
+                refined))]
 
-         ;; now merge with the existing refinements
-         (let [updated-refinements {:refined (merge refined
-                                                    probed-refinement)}]
-           updated-refinements)))
+          ;; now merge with the existing refinements
+          (let [updated-refinements {:actions axns
+                                     :refined (merge refined
+                                                     probed-refinement)}]
+            updated-refinements))))
      actions-with-refinements)))

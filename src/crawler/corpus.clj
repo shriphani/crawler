@@ -265,10 +265,10 @@
                                   (sort-by second (frequencies restrictions))))]
          (merge
           acc
-          {[(if (empty? (rest as))
+          {[(if (empty? (rest (reverse as)))
               nil
-              (rest as))
-            (first as)] chosen-restriction})))
+              (rest (reverse as)))
+            (first (reverse as))] chosen-restriction})))
      {}
      action-steps)))
 

@@ -197,7 +197,7 @@
        (let [docs-at-path (filter
                            (fn [[u x]]
                              (= (:path x)
-                                as))
+                                (reverse as)))
                            corpus)
 
              action-taken-at-doc (try (nth (reverse an-action-seq) (count as))

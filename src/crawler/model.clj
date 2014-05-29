@@ -4,6 +4,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [crawler.corpus :as corpus]
+            [crawler.rich-char-extractor :as extractor]
             [crawler.dom :as dom]
             [structural-similarity.xpath-text :as similarity])
   (:use [clojure.pprint :only [pprint]])
@@ -19,3 +20,109 @@
    provided model file"
   [a-model-file]
   (string/replace a-model-file #".model" ".corpus"))
+
+(defn fix-model-restrictions
+  "Inspects the only-avoid refinements
+   and returns the newer only-avoid ideas.
+
+   Focus on just avoids right now and trust
+   the onlies"
+  [a-model-file a-corpus-file]
+  (let [model (read-model a-model-file)
+        downloaded-corpus (corpus/read-corpus-file a-corpus-file)
+        corpus-urls (set
+                     (map
+                      (fn [[u x]]
+                        (-> x :src-url))
+                      downloaded-corpus))
+        
+        ;; pagination refinements are trusted
+        ;; always
+        model-actions (:actions model)
+
+        actions-with-refinements (filter
+                                  (fn [{axns    :actions
+                                       refined :refined}]
+                                    (not
+                                     (empty?
+                                      (filter
+                                       (fn [[axn-pair x]]
+                                         (and (not
+                                               (nil? x))
+                                              (not
+                                               (empty? (:avoid x)))))
+                                       refined))))
+                                  model-actions)]
+    (map
+     (fn [{axns :actions
+          refined :refined}]
+
+;       (println :old-refined refined)
+;       (println :new-refined )
+       (let [probed-refinement 
+             (reduce
+              (fn [acc [[src-xpath xpath-to-take] refinement]]
+                (let [docs-at-src-xpath (filter
+                                         (fn [[u x]]
+                                           (and (= (:path x)
+                                                   src-xpath)
+                                                (some #{u} corpus-urls)))
+                                         downloaded-corpus)
+                      
+                      action-to-take-at-target (if (= (inc (count src-xpath))
+                                                      (count axns))
+                                                 nil
+                                                 (nth (reverse axns)
+                                                      (inc
+                                                       (count src-xpath))))
+                      
+                      new-refinements
+                      
+                      (map
+                       (fn [[u x]]
+                         (let [processed-doc (dom/html->xml-doc (:body x))]
+                           (dom/probe-refinements
+                            xpath-to-take
+                            refinement
+                            processed-doc
+                            (fn [l bd]
+                              (let [xpaths-hrefs (:xpath-nav-info
+                                                  (extractor/state-action
+                                                   bd
+                                                   {:url l}
+                                                   {}
+                                                   []))]
+                                (not
+                                 (empty?
+                                  (filter
+                                   (fn [{x :xpath}]
+                                     (if action-to-take-at-target
+                                       (= x action-to-take-at-target)
+                                       true))
+                                   xpaths-hrefs)))))
+                            u)))
+                       docs-at-src-xpath)]
+                  ;; this is the new refinement
+                  (merge
+                   acc
+                   {[src-xpath xpath-to-take]
+                    (merge refinement
+                           {:avoid
+                            (first
+                             (last
+                              (sort-by
+                               second
+                               (frequencies new-refinements))))})})))
+              {}
+              (filter
+               (fn [[axn-pair refinement]]
+                 (not
+                  (or (nil? (:avoid refinement))
+                      (empty? (:avoid refinement)))))
+               refined))]
+
+         ;; now merge with the existing refinements
+         (let [updated-refinements {:refined (merge refined
+                                                    probed-refinement)}]
+           updated-refinements)))
+     actions-with-refinements)))

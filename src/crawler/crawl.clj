@@ -367,26 +367,26 @@
                (and (empty? content-q)
                     (not (empty? paging-q)))
                (do
-                 (utils/sayln :paging)
-                (let [sorted-pagination-entries (sort-by
-                                                 #(-> % :src-xpath count)
-                                                 paging-q)
-                      chosen-entry (last sorted-pagination-entries)
-                      remaining-pagination (filter
-                                            (fn [x] (not= x chosen-entry))
-                                            paging-q)]
-                  (recur {:content-queue (concat [chosen-entry]
-                                                 content-q)
-                          :paging-queue remaining-pagination}
-                         visited
-                         num-leaves
-                         leaf?
-                         stop?
-                         action-seq
-                         pagination
-                         blacklist
-                         old-corpus
-                         corpus)))
+                 (utils/sayln :going-to-next-page)
+                 (let [sorted-pagination-entries (sort-by
+                                                  #(-> % :src-xpath count)
+                                                  paging-q)
+                       chosen-entry (last sorted-pagination-entries)
+                       remaining-pagination (filter
+                                             (fn [x] (not= x chosen-entry))
+                                             paging-q)]
+                   (recur {:content-queue (concat [chosen-entry]
+                                                  content-q)
+                           :paging-queue remaining-pagination}
+                          visited
+                          num-leaves
+                          leaf?
+                          stop?
+                          action-seq
+                          pagination
+                          blacklist
+                          old-corpus
+                          corpus)))
                
                :else
                (let [action  (xpath-to-pick src-xpath (:actions action-seq))

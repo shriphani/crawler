@@ -635,6 +635,137 @@ id and class tag constraints are also added"
         {}
         xpaths-nodes-paths))))
 
+(defn generate-refinement-candidates
+  "This routine exists to help a procedure
+   that produces links that we marked as unfit.
+
+   For now just focus on only URLs"
+  ([xpath refinement processed-body url]
+     (generate-refinement-candidates xpath refinement processed-body url []))
+
+  ([xpath refinement processed-body url blacklist]
+     
+     (let [avoid-restrictions (:avoid refinement)
+
+           anchor-nodes (map
+                         :node
+                         (second
+                          (first
+                           (filter
+                            (fn [[x y]]
+                            (= x xpath))
+                            (xpaths-hrefs-tokens-no-position
+                             processed-body
+                             url
+                           blacklist)))))
+           
+           a-tags-hrefs (filter
+                                        ; the node must have a href
+                         (fn [a-tag]
+                           (and (-> a-tag
+                                  (.getAttributes)
+                                  (.getNamedItem "href"))
+                                (try
+                                  (not=
+                                   (-> a-tag
+                                     (.getAttributes)
+                                     (.getNamedItem "rel")
+                                     (.getValue))
+                                   "nofollow")
+                                  (catch NullPointerException e true))
+                                
+                              (not=
+                               (uri/scheme
+                                (-> a-tag
+                                    (.getAttributes)
+                                    (.getNamedItem "href")
+                                    (.getValue)))
+                               "javascript")
+                              (not
+                               (some
+                                #{(uri/resolve-uri
+                                   url
+                                   (-> a-tag
+                                       (.getAttributes)
+                                       (.getNamedItem "href")
+                                       (.getValue)))}
+                                (set blacklist)))))
+                         anchor-nodes)
+           
+           nodes-paths  (map
+                         (fn [x]
+                           [(-> x :node ds-to-node) x])
+                         (filter
+                          (fn [x]
+                            (= (uri/host url) (-> x :href uri/host)))
+                          (map
+                           (fn [x]
+                             (let [link (-> x
+                                          (.getAttributes)
+                                          (.getNamedItem "href")
+                                          (.getValue))]
+                               {:node x
+                                :href (try
+                                        (uri/fragment
+                                         (uri/resolve-uri url link)
+                                         nil)
+                                        (catch Exception e nil))
+                                :text (.getTextContent x)}))
+                           a-tags-hrefs)))
+           
+           restricted-links (if-not (empty? avoid-restrictions)
+                              (map
+                               (fn [[p ns]]
+                                 (let [ns-set (set ns)]
+                                   [[p ns]
+                                    (map
+                                     #(-> % second :href)
+                                     (filter
+                                      (fn [[path nodes]]
+                                        (some #{(last (nth path p))}
+                                              ns-set))
+                                      nodes-paths))]))
+                             avoid-restrictions)
+                              [])]
+       restricted-links)))
+
+(defn probe-refinements
+  "Continue the sampling process to establish if
+   a bad example has been found"
+  ([xpath refinement processed-body muscle-fn url]
+     (probe-refinements xpath
+                        refinement
+                        processed-body
+                        muscle-fn
+                        url
+                        []))
+
+  ([xpath refinement processed-body muscle-fn url blacklist]
+     (let [problems (generate-refinement-candidates xpath
+                                                    refinement
+                                                    processed-body
+                                                    url
+                                                    blacklist)]
+       ;; returns a new set of refinements
+       (map
+        first
+        (filter
+         (fn [[refinement hrefs]]
+           (let [to-sample (utils/random-take 10 hrefs)]
+             ;; if no item here belongs in the muscle
+             ;; category, then we can let this refinement
+             ;; remain
+             (not
+              (some
+               identity
+               (map
+                (fn [a-link]
+                  (do (Thread/sleep 1000)
+                      (let [bd (:body (utils/download-cache-with-cookie a-link))]
+                        (muscle-fn a-link bd))))
+                to-sample)))))
+         problems)))))
+
 (defn refine-xpath-with-position
   [processed-body url xpath num-clusters]
   (let [nodes-paths (page-nodes-hrefs-text processed-body

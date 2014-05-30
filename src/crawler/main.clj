@@ -22,12 +22,12 @@
    [nil
     "--num-leaves N"
     "Specify a number of documents you want"
-    :default 500
+    :default 300
     :parse-fn #(Integer/parseInt %)]
    [nil "--refine" "Refine a model file"]
    [nil "--corpus CORPUS" "Specify a corpus"]
    [nil "--corpus-to-json CORPUS" "Convert corpus file to json file"]
-   [nil "--fix-model D" "Fix a model with pagination info"]
+   [nil "--fix-model D" "Fix a model with better :only, :avoid clauses"]
    [nil "--discussion-forum" "Execute a discussion forum crawl at entry point"]])
 
 (defn dump-state-model-corpus
@@ -232,8 +232,13 @@
           (corpus/corpus->json (:corpus-to-json options))
 
           (:discussion-forum options)
-          (discussion-forum-crawler (:start options)
-                                    (:num-docs options))
+          (discussion-forum-crawler-3 (:start options)
+                                      (:num-docs options))
+          
+          (:fix-model options)
+          (let [model-file (:fix-model options)
+
+                associated-corpus-file (:fix-model)])
           
           ;; (:fix-model options)
           ;; (let [directory (:fix-model options)

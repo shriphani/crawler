@@ -937,12 +937,15 @@
                                                (let [to-assign (.indexOf
                                                                 (map
                                                                  (fn [a-cluster]
-                                                                   (every?
-                                                                    (fn [c]
-                                                                      (similarity/similar?
-                                                                       (-> c new-corpus :body)
-                                                                       (:body x)))
-                                                                    a-cluster))
+                                                                   (let [num-matched (count
+                                                                                      (filter
+                                                                                       (fn [c]
+                                                                                         (similarity/similar?
+                                                                                          (-> c new-corpus :body)
+                                                                                          (:body x)))
+                                                                                       a-cluster))]
+                                                                     (>= num-matched (/ (count a-cluster)
+                                                                                        2))))
                                                                  clusters-so-far)
                                                                 true)]
                                                  (if (neg? to-assign)

@@ -233,7 +233,7 @@
 
           (:discussion-forum options)
           (discussion-forum-crawler-3 (:start options)
-                                      (:num-docs options))
+                                      (:num-leaves options))
           
           (:fix-model options)
           (let [model-file (:fix-model options)

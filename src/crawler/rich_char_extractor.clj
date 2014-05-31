@@ -1,10 +1,10 @@
 (ns crawler.rich-char-extractor
   "Character based extraction as opposed to token based extraction"
-  (require [clojure.set :as clj-set]
-           [crawler.dom :as dom]
-           [crawler.similarity :as similarity]
-           [net.cgrand.enlive-html :as html]
-           [crawler.utils :as utils]))
+  (:require [clojure.set :as clj-set]
+            [crawler.dom :as dom]
+            [crawler.similarity :as similarity]
+            [net.cgrand.enlive-html :as html]
+            [crawler.utils :as utils]))
 
 (defn remove-subsets
   [xpaths-hrefs-texts]

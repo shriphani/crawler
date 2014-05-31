@@ -547,7 +547,13 @@
                                                                   (leaf? {:anchor-text (:src-text x)
                                                                           :src-url     (:url x)
                                                                           :body        (:body x)}))
-                                                                 (catch Exception e nil))}))
+                                                                 (catch Exception e nil))
+
+                                                         :xpath-texts (if (:body x)
+                                                                        (similarity/char-frequency-representation
+                                                                         (similarity/page-text-xpaths
+                                                                          (:body x)))
+                                                                        {})}))
                                              sampled-corpus)
                                   :new-visited links-list
                                   :crawled (map :url links-and-texts)})))
@@ -725,7 +731,7 @@
              url-ds (if (= pick-from :first)
                       (-> url-queue first)
                       (-> url-queue last))]
-
+         
          (utils/sayln :url url)
          (utils/sayln :src-url src-url)
          (utils/sayln :src-path (:path url-ds))
@@ -838,8 +844,14 @@
   ([entry-point leaf? extract stop? build-model]
      (let [body           (do (utils/download-with-cookie entry-point)
                               (utils/download-with-cookie entry-point))
+           xpath-texts    (if (:body body)
+                            (similarity/char-frequency-representation
+                             (similarity/page-text-xpaths
+                              (:body body)))
+                            {})
            body-queue-ele {:url  entry-point
-                           :body (:body body)}]
+                           :body (:body body)
+                           :xpath-texts xpath-texts}]
        (crawl-with-estimation-example [body-queue-ele]
                                       [entry-point]
                                       leaf?
@@ -849,7 +861,8 @@
                                       {entry-point {:body (:body body)
                                                     :url entry-point
                                                     :src-url nil
-                                                    :src-text nil}}
+                                                    :src-text nil
+                                                    :xpath-texts xpath-texts}}
                                       (if (leaf? {:anchor-text nil
                                                   :src-url     nil
                                                   :body        (:body body)})
@@ -934,18 +947,25 @@
                                             []
                                             (reduce
                                              (fn [clusters-so-far x]
-                                               (let [to-assign (.indexOf
+                                               (let [x-xpaths  (:xpath-texts x)
+                                                     to-assign (.indexOf
                                                                 (map
                                                                  (fn [a-cluster]
-                                                                   (let [num-matched (count
-                                                                                      (filter
-                                                                                       (fn [c]
-                                                                                         (similarity/similar?
-                                                                                          (-> c new-corpus :body)
-                                                                                          (:body x)))
-                                                                                       a-cluster))]
-                                                                     (>= num-matched (/ (count a-cluster)
-                                                                                        2))))
+                                                                   ;; (let [num-matched (count
+                                                                   ;;                    (filter
+                                                                   ;;                     (fn [c]
+                                                                   ;;                       (similarity/similar?
+                                                                   ;;                        (-> c new-corpus :body)
+                                                                   ;;                        (:body x)))
+                                                                   ;;                     a-cluster))]
+                                                                   ;;   (>= num-matched (/ (count a-cluster)
+                                                                   ;;                      2)))
+                                                                   (some
+                                                                    (fn [c]
+                                                                      (similarity/similar-xpaths?
+                                                                       (-> c new-corpus :xpath-texts)
+                                                                       x-xpaths))
+                                                                    a-cluster))
                                                                  clusters-so-far)
                                                                 true)]
                                                  (if (neg? to-assign)

@@ -358,7 +358,8 @@ id and class tag constraints are also added"
                                (let [link (-> x
                                               (.getAttributes)
                                               (.getNamedItem "href")
-                                              (.getValue))]
+                                              (.getValue)
+                                              (StringEscapeUtils/unescapeHtml))]
                                  {:node x
                                   :href (try
                                           (uri/fragment
@@ -467,7 +468,8 @@ id and class tag constraints are also added"
                                   (-> a-tag
                                       (.getAttributes)
                                       (.getNamedItem "href")
-                                      (.getValue)))
+                                      (.getValue)
+                                      (StringEscapeUtils/unescapeHtml)))
                                  "javascript")
                                 (not
                                  (some
@@ -476,7 +478,8 @@ id and class tag constraints are also added"
                                      (-> a-tag
                                          (.getAttributes)
                                          (.getNamedItem "href")
-                                         (.getValue)))}
+                                         (.getValue)
+                                         (StringEscapeUtils/unescapeHtml)))}
                                   (set blacklist)))))
                          anchor-nodes)
 
@@ -491,7 +494,8 @@ id and class tag constraints are also added"
                              (let [link (-> x
                                             (.getAttributes)
                                             (.getNamedItem "href")
-                                            (.getValue))]
+                                            (.getValue)
+                                            (StringEscapeUtils/unescapeHtml))]
                                {:node x
                                 :href (try
                                         (uri/fragment
@@ -555,7 +559,8 @@ id and class tag constraints are also added"
                                   (-> a-tag
                                       (.getAttributes)
                                       (.getNamedItem "href")
-                                      (.getValue)))
+                                      (.getValue)
+                                      (StringEscapeUtils/unescapeHtml)))
                                  "javascript")
                                 (not
                                  (some
@@ -564,7 +569,8 @@ id and class tag constraints are also added"
                                      (-> a-tag
                                          (.getAttributes)
                                          (.getNamedItem "href")
-                                         (.getValue)))}
+                                         (.getValue)
+                                         (StringEscapeUtils/unescapeHtml)))}
                                   (set blacklist)))))
                          anchor-nodes)
 
@@ -579,7 +585,8 @@ id and class tag constraints are also added"
                              (let [link (-> x
                                             (.getAttributes)
                                             (.getNamedItem "href")
-                                            (.getValue))]
+                                            (.getValue)
+                                            (StringEscapeUtils/unescapeHtml))]
                                {:node x
                                 :href (try
                                         (uri/fragment
@@ -679,7 +686,8 @@ id and class tag constraints are also added"
                                 (-> a-tag
                                     (.getAttributes)
                                     (.getNamedItem "href")
-                                    (.getValue)))
+                                    (.getValue)
+                                    (StringEscapeUtils/unescapeHtml)))
                                "javascript")
                               (not
                                (some
@@ -688,7 +696,8 @@ id and class tag constraints are also added"
                                    (-> a-tag
                                        (.getAttributes)
                                        (.getNamedItem "href")
-                                       (.getValue)))}
+                                       (.getValue)
+                                       (StringEscapeUtils/unescapeHtml)))}
                                 (set blacklist)))))
                          anchor-nodes)
            
@@ -703,7 +712,8 @@ id and class tag constraints are also added"
                              (let [link (-> x
                                           (.getAttributes)
                                           (.getNamedItem "href")
-                                          (.getValue))]
+                                          (.getValue)
+                                          (StringEscapeUtils/unescapeHtml))]
                                {:node x
                                 :href (try
                                         (uri/fragment

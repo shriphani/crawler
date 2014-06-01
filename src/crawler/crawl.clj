@@ -493,9 +493,8 @@
               
               ;; sample 10 or 25% of the links (whichever is bigger)
               links-and-texts (utils/random-take
-                               ;; (max 10 (int (/ (count stuff)
-                               ;;                 4)))
-                               10
+                               (max 10 (int (/ (count stuff)
+                                               4)))
                                stuff)
 
               sampled-corpus  (filter

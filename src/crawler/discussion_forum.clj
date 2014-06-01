@@ -47,26 +47,27 @@
 
 (defn stop?
   [x num-leaves]
-  (let [estimated-model (estimate-model x)
+  (let [;estimated-model (estimate-model x)
 
-        estimated-yield (reduce
-                         (fn [acc l]
-                           (do (pprint l)
-                               (corpus/estimate-yield
-                                l
-                                (:pagination estimated-model)
-                                (:corpus x))
-                               (+ acc
-                                  (:yield
-                                   (corpus/estimate-yield
-                                    l
-                                    (:pagination estimated-model)
-                                    (:corpus x))))))
-                         0
-                         (:actions estimated-model))]
+        ;; estimated-yield (reduce
+        ;;                  (fn [acc l]
+        ;;                    (do (pprint l)
+        ;;                        (corpus/estimate-yield
+        ;;                         l
+        ;;                         (:pagination estimated-model)
+        ;;                         (:corpus x))
+        ;;                        (+ acc
+        ;;                           (:yield
+        ;;                            (corpus/estimate-yield
+        ;;                             l
+        ;;                             (:pagination estimated-model)
+        ;;                             (:corpus x))))))
+        ;;                  0
+        ;;                  (:actions estimated-model))
+        ]
                                         ;(pprint estimated-model)
     (do (utils/sayln :pages-observed-so-far (:observed x))
-        (utils/sayln :estimated-yield-thus-far estimated-yield)
+        ;(utils/sayln :estimated-yield-thus-far estimated-yield)
         (>= (:observed x) num-leaves))))
 
 (defn leaf?

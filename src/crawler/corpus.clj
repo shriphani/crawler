@@ -140,13 +140,49 @@
         action-and-pagination (distinct
                                (map
                                 (fn [[u x]]
-                                  [(-> x :path rest) (-> x :path first)])
+                                  (let [src-url (:src-url x)
+                                        src-bod (:body
+                                                 (a-corpus src-url))]
+                                    [[(if (nil? x)
+                                        nil
+                                        (-> x :path rest))
+                                      (-> x :path first)]
+                                     (similarity-cosine-char-freq (:body x)
+                                                                  src-bod)]))
                                 pagination-candidates))
 
         dest-page-test (fn [src-data dest-data]
                          (similar? (-> src-data second :body)
-                                   (-> dest-data second :body)))]
-    {:paging-actions (into {} action-and-pagination)
+                                   (-> dest-data second :body)))
+
+        paging-actions (reduce
+                        (fn [acc [[src-axn pg-axn] n]]
+                          (cond (not
+                                 ((:similarities acc)
+                                  [src-axn pg-axn]))
+                                (merge
+                                 acc
+                                 {:similarities (merge (:similarities acc)
+                                                       {[src-axn pg-axn] n})
+                                  :actions (merge (:actions acc)
+                                                  {src-axn pg-axn})})
+                                
+                                (< ((:similarities acc)
+                                    [src-axn pg-axn]))
+                                (merge
+                                 acc
+                                 {:similarities (merge (:similarities acc)
+                                                       {[src-axn pg-axn] n})
+                                  :actions (merge
+                                            (:actions acc)
+                                            {src-axn pg-axn})})
+                                
+                                :else
+                                acc))
+                        {:similarities {}
+                         :actions {}}
+                        action-and-pagination)]
+    {:paging-actions (:actions paging-actions)
      
      :refine  (into
                {}
@@ -177,7 +213,7 @@
                                            src-url
                                            dest-page-test))
                           grouped-by-source)))))]))
-                action-and-pagination))}))
+                (:actions paging-actions)))}))
 
 (defn refine-action-seq
   "Estimates the yield of a path from root to leaf"

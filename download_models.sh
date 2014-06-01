@@ -5,7 +5,7 @@ do
     do
         for site in $(less $site_file)
         do
-	  nohup condor_run \"lein trampoline run --discussion-forum --start \\\"$site\\\"\" &
+            nohup condor_run '"lein trampoline run --discussion-forum --start \"'$site'\""' &
         done
     done
 done

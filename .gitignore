@@ -23,3 +23,5 @@ logs/
 *.model
 *.corpus
 *.fuse*
+.condor*
+example-scheduler-*

@@ -143,7 +143,7 @@
                                   (let [src-url (:src-url x)
                                         src-bod (:body
                                                  (a-corpus src-url))]
-                                    [[(if (nil? x)
+                                    [[(if (empty? (-> x :path rest))
                                         nil
                                         (-> x :path rest))
                                       (-> x :path first)]
@@ -158,21 +158,22 @@
         paging-actions (reduce
                         (fn [acc [[src-axn pg-axn] n]]
                           (cond (not
-                                 ((:similarities acc)
-                                  [src-axn pg-axn]))
+                                 ((:similarities acc) src-axn))
                                 (merge
                                  acc
                                  {:similarities (merge (:similarities acc)
-                                                       {[src-axn pg-axn] n})
+                                                       {src-axn [pg-axn n]})
                                   :actions (merge (:actions acc)
                                                   {src-axn pg-axn})})
                                 
-                                (< ((:similarities acc)
-                                    [src-axn pg-axn]))
+                                (< (second
+                                    ((:similarities acc)
+                                     src-axn))
+                                   n)
                                 (merge
                                  acc
                                  {:similarities (merge (:similarities acc)
-                                                       {[src-axn pg-axn] n})
+                                                       {src-axn [pg-axn n]})
                                   :actions (merge
                                             (:actions acc)
                                             {src-axn pg-axn})})

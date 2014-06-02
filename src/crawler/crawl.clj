@@ -437,13 +437,12 @@
                      extracted-hrefs (map :href extracted)
 
                      _ (utils/sayln :links-extracted-are extracted-hrefs)
-
-                     new-content-q (concat (rest content-q)
-                                           (map
+                     
+                     new-content-q (concat (map
                                             (fn [x]
                                               {:url x
                                                :src-xpath (cons action src-xpath)})
-                                            extracted-hrefs))
+                                            extracted-hrefs)(rest content-q))
                      new-paging-q (if pagination-extracted-hrefs
                                     (concat paging-q
                                             [{:url pagination-extracted-hrefs

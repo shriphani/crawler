@@ -54,3 +54,41 @@
        (do (utils/sayln :downloaded-discussions-count num-threads)
            {:blacklist visited
             :corpus corpus}))))
+
+(defn budget-stop?
+  [budget]
+  (fn [{n :queue-size
+       v :visited}]
+    (utils/sayln "Deciding to stop")
+    (utils/sayln "Budget is:" budget)
+    (utils/sayln "Visited: " v)
+    (or (zero? n)
+        (>= v budget))))
+
+(defn execute-model-budget
+  "Experiment to check how good the crawler
+   is at fetching threads even with a super-limited
+   budget"
+  ([start-url action-seq pagination budget]
+     (execute-model-budget start-url
+                           action-seq
+                           pagination
+                           (set [])
+                           {}))
+
+  ([start-url action-seq pagination budget seen corpus]
+     (utils/sayln :executing-model-budget action-seq)
+     (let [leaf? (generate-leaf? (:actions action-seq))
+           
+           {visited :visited
+            num-threads :num-leaves
+            corpus :corpus}
+           (crawl/crawl-model start-url
+                              leaf?
+                              (budget-stop? budget)
+                              action-seq
+                              pagination
+                              seen
+                              {})]
+       {:visited visited
+        :corpus corpus})))

@@ -16,6 +16,7 @@
 (def crawler-options
   [[nil "--structure-driven" "Use the structure driven crawler"]
    [nil "--execute" "Execute a site model"]
+   [nil "--execute-budget" "Execute a model with a budget"]
    [nil "--start START" "Entry point for the structure driven crawler"]
    [nil "--example EXAMPLE" "Example leaf page url for the structure driven crawler"]
    [nil "--model MODEL" "Specify a model file (a model learned by the crawler)"]
@@ -23,6 +24,11 @@
     "--num-leaves N"
     "Specify a number of documents you want"
     :default 300
+    :parse-fn #(Integer/parseInt %)]
+   [nil
+    "--budget B"
+    "budget willing to expend"
+    :default 1000
     :parse-fn #(Integer/parseInt %)]
    [nil "--refine" "Refine a model file"]
    [nil "--corpus CORPUS" "Specify a corpus"]
@@ -205,6 +211,69 @@
       :corpus {}}
      planned-model)))
 
+(defn execute-model-budget-crawler
+  [start-url model-file budget]
+  (let [model  (crawler-model/read-model model-file)
+        corpus-file (crawler-model/associated-corpus-file model-file)
+        crawled-corpus (corpus/read-corpus-file corpus-file)
+
+        actions    (:actions model)
+        pagination (:pagination model)
+
+        planned-model 
+        (sort-by
+         (juxt #(-> % :actions count)
+               #(-
+                 (:yield
+                  (corpus/estimate-yield %
+                                         pagination
+                                         crawled-corpus))))
+         actions)]
+
+
+    (reduce
+     (fn [{budget-spent :budget-spent
+          corpus-downloaded :corpus} as]
+       (if (<= (- budget budget-spent)
+               0)
+         {:budget-spent budget-spent
+          :corpus corpus-downloaded}
+         (let [{corpus  :corpus
+                visited :visited}
+               (execute/execute-model-budget start-url
+                                             as
+                                             pagination
+                                             (- budget budget-spent)
+                                             [] ; no blacklist for now
+                                             corpus-downloaded)]
+           {:budget-spent (+ budget-spent (count visited))
+            :corpus (merge corpus corpus-downloaded)})))
+     {:budget-spent 0
+      :corpus {}}
+     planned-model)
+    
+    ;; (reduce
+    ;;  (fn [{budget-expended :budget-expended
+    ;;       corpus :corpus}
+    ;;      as]
+    ;;    (let [{corpus :corpus
+    ;;           leaves-downloaded :leaves}]
+    ;;     (execute/execute-model-budget start-url
+    ;;                                   as
+    ;;                                   pagination
+    ;;                                   (- budget budget-expended)
+    ;;                                   blacklist
+    ;;                                   corpus))
+       
+    ;;    {:blacklist (clojure.set/union new-blacklist
+    ;;                                   blacklist)
+    ;;     :corpus (merge new-blacklist
+    ;;                    new-corpus)})
+    ;;  {:budget-expended 0
+    ;;   :corpus {}}
+    ;;  planned-model)
+    ))
+
 (defn -main
   [& args]
   (let [options (-> args
@@ -235,10 +304,20 @@
           (discussion-forum-crawler-3 (:start options)
                                       (:num-leaves options))
           
-          (:fix-model options)
-          (let [model-file (:fix-model options)
+          (:execute-budget options)
+          (let [model-file (-> options :model)
+                model      (crawler-model/read-model model-file)
 
-                associated-corpus-file (:fix-model)])
+                start-url  (-> options :start)
+                budget     (-> options :budget)]
+            (execute-model-budget-crawler start-url
+                                          model
+                                          budget))
+          
+          ;; (:fix-model options)
+          ;; (let [model-file (:fix-model options)
+
+          ;;       associated-corpus-file (:fix-model)])
           
           ;; (:fix-model options)
           ;; (let [directory (:fix-model options)

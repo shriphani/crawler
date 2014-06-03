@@ -10,7 +10,8 @@
             [crawler.rich-char-extractor :as rc-extractor]
             [crawler.structure-driven :as structure-driven]
             [crawler.utils :as utils]
-            [me.raynes.fs :as fs])
+            [me.raynes.fs :as fs]
+            (org.bovinegenius [exploding-fish :as uri]))
   (:use [clojure.pprint :only [pprint]]))
 
 (def crawler-options
@@ -228,30 +229,33 @@
                   (corpus/estimate-yield %
                                          pagination
                                          crawled-corpus))))
-         actions)]
+         actions)
 
-
-    (reduce
-     (fn [{budget-spent :budget-spent
-          corpus-downloaded :corpus} as]
-       (if (<= (- budget budget-spent)
-               0)
-         {:budget-spent budget-spent
-          :corpus corpus-downloaded}
-         (let [{corpus  :corpus
-                visited :visited}
-               (execute/execute-model-budget start-url
-                                             as
-                                             pagination
-                                             (- budget budget-spent)
-                                             [] ; no blacklist for now
-                                             corpus-downloaded)]
-           {:budget-spent (+ budget-spent (count visited))
-            :corpus (merge corpus corpus-downloaded)})))
-     {:budget-spent 0
-      :corpus {}}
-     planned-model)
-    
+        final-corpus
+        (reduce
+         (fn [{budget-spent :budget-spent
+              corpus-downloaded :corpus} as]
+           (if (<= (- budget budget-spent)
+                   0)
+             {:budget-spent budget-spent
+              :corpus corpus-downloaded}
+             (let [{corpus  :corpus
+                    visited :visited}
+                   (execute/execute-model-budget start-url
+                                                 as
+                                                 pagination
+                                                 (- budget budget-spent)
+                                                 [] ; no blacklist for now
+                                                 corpus-downloaded)]
+               {:budget-spent (+ budget-spent (count visited))
+                :corpus (merge corpus corpus-downloaded)})))
+         {:budget-spent 0
+          :corpus {}}
+         planned-model)]
+    (let [date-file (str (utils/dated-filename (uri/host start-url) "")
+                         ".corpus")]
+      (with-open [corpus-wrtr (io/writer date-file)]
+        (pprint (:corpus final-corpus) corpus-wrtr)))
     ;; (reduce
     ;;  (fn [{budget-expended :budget-expended
     ;;       corpus :corpus}

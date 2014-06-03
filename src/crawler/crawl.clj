@@ -6,6 +6,7 @@
             [crawler.dom :as dom]
             [crawler.rich-extractor :as rich-extractor]
             [crawler.rich-char-extractor :as rich-char-extractor]
+            [crawler.shingles :as shingles]
             [crawler.template-removal :as template-removal]
             [crawler.utils :as utils]
             [clj-http.cookies :as cookies]
@@ -360,7 +361,8 @@
                           blacklist
                           old-corpus
                           (merge corpus {(-> content-q first :url)
-                                         body}))))
+                                         {:body body
+                                          :shingles (shingles/html-doc-4-grams body)}}))))
 
                ;; there is some pagination left that
                ;; you can pick up

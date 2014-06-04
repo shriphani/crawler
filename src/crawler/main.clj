@@ -196,21 +196,30 @@
                   (corpus/estimate-yield %
                                          pagination
                                          crawled-corpus))))
-         actions)]
+         actions)
 
-    (reduce
-     (fn [{blacklist :blacklist corpus :corpus} as]
-       (let [{new-blacklist :blacklist
-              new-corpus :corpus}
-             (execute/execute-model start-url as pagination blacklist corpus)]
+        final-corpus
+        (reduce
+         (fn [{visited :visited corpus :corpus} as]
+           (let [{new-visited :visited
+                  new-corpus :corpus}
+                 (execute/execute-model start-url
+                                        as
+                                        pagination
+                                        [] ; no blacklist for now
+                                        corpus)]
 
-         {:blacklist (clojure.set/union new-blacklist
-                                        blacklist)
-          :corpus (merge new-blacklist
-                         new-corpus)}))
-     {:blacklist (set [])
-      :corpus {}}
-     planned-model)))
+             {:visited (clojure.set/union new-visited
+                                          visited)
+              :corpus (merge corpus
+                             new-corpus)}))
+         {:visited (set [])
+          :corpus {}}
+         planned-model)]
+    (let [date-file (str (utils/dated-filename (str "full-website-corpus-"(uri/host start-url)) "")
+                         ".corpus")]
+      (with-open [corpus-wrtr (io/writer date-file)]
+        (pprint (:corpus final-corpus) corpus-wrtr)))))
 
 (defn execute-model-budget-crawler
   [start-url model-file budget]

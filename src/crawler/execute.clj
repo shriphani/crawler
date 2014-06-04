@@ -22,10 +22,6 @@
     (= action-seq
        (:src-xpath url-ds))))
 
-(defn stop?
-  [{n :queue-size}]
-  (zero? n))
-
 (defn execute-model
   ([start-url action-seq pagination]
      (execute-model start-url
@@ -34,26 +30,22 @@
                     (set [])
                     {}))
   
-  ([start-url action-seq pagination blacklist old-corpus]
+  ([start-url action-seq pagination seen old-corpus]
      (utils/sayln :executing-model action-seq)
-     (let [paging-actions (:paging-actions pagination)
-           paging-refined (:refine pagination)
+     (let [leaf? (generate-leaf? (:actions action-seq))
 
-           leaf? (generate-leaf? (:actions action-seq))
-
-           {visited :visited
+           {new-visited :visited
             num-threads :num-leaves
             corpus :corpus}
            (crawl/crawl-model start-url
                               leaf?
-                              stop?
+                              (fn [x] false) ;; don't stop till you get enough!
                               action-seq
                               pagination
-                              blacklist
+                              seen
                               old-corpus)]
-       (do (utils/sayln :downloaded-discussions-count num-threads)
-           {:blacklist visited
-            :corpus corpus}))))
+       {:visited new-visited
+        :corpus corpus})))
 
 (defn budget-stop?
   [budget]

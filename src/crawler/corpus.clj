@@ -405,3 +405,34 @@
           :yield (* (or (:yield acc) 1) yield-with-paging)}))
      {}
      (reverse path-seqs))))
+
+(defn remove-pagination-from-actions
+  [model]
+  (let [actions    (:actions model)
+        pagination (:pagination model)
+
+        paging-actions (:paging-actions pagination)
+        paging-refined (:refine pagination)]
+    {:actions (filter
+               (fn [{axns :actions
+                    refined :refined}]
+                 (let [path-taken (if (= 1 (count axns))
+                                    nil
+                                    (rest axns))
+                       path-to-take (first axns)
+
+                       refinement (refined [path-taken path-to-take])]
+                   (some
+                    (fn [[path paging-axn]]
+                      (let [danger-axn (cons paging-axn
+                                             path)
+                            axns-prefix (reverse
+                                         (take
+                                          (count danger-axn)
+                                          (reverse axns)))]
+                        (not
+                         (and (= axns-prefix danger-axn)
+                              (= refinement (paging-refined [path paging-axn]))))))
+                    paging-actions)))
+               actions)
+     :pagination paging-actions}))

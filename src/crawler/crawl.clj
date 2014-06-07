@@ -337,6 +337,7 @@
        (utils/sayln :cur-url url)
        (utils/sayln :encountered-documents seen-seq)
        (utils/sayln :corpus-size (count corpus))
+       (utils/sayln :old-corpus-size (count old-corpus))
        (cond (or (stop? {:visited (count visited)
                          :num-leaves num-leaves
                          :queue-size (+ (count content-q)
@@ -380,7 +381,7 @@
                  (utils/sayln :paging pagination-extracted)
                  ;; at leaf, aggressively look for pagination
                  (if-not (and
-                          (<= (count corpus) 100)
+                          (<= (count corpus) 1000)
                           (seen? body old-corpus))
                    (recur {:content-queue (if-not (or (empty? pagination-extracted)
                                                       (nil? pagination-extracted))
@@ -547,7 +548,7 @@
                        identity
                        (map
                         (fn [{a-link :href text :text}]
-                          (when-not (some #{a-link} (:visited acc))
+                          (when-not (some #{a-link} (:new-visited acc))
                             {:url  a-link
                              :path (cons xpath src-path)
                              :src-url url

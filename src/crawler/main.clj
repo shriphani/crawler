@@ -179,8 +179,22 @@
                                     leaf-clusters
                                     (str "example-scheduler-estimate-stopper-" prefix))))
 
+(defn fix-model
+  [model-file]
+  (let [corpus-file (crawler-model/associated-corpus-file model-file)
+        leaves-file (crawler-model/associated-leaves-file model-file)
+
+        the-model (crawler-model/read-model model-file)]
+    (when-not (:fixed the-model)
+      (let [no-paging-model (corpus/remove-pagination-from-actions the-model)
+
+            fixed-model (merge {:fixed true} no-paging-model)]
+        (with-open [wrtr (io/writer model-file)]
+          (pprint fixed-model wrtr))))))
+
 (defn execute-model-crawler
   [start-url model-file]
+  (fix-model model-file) ; this is a preliminary first step - needed
   (let [model  (crawler-model/read-model model-file)
         corpus-file (crawler-model/associated-corpus-file model-file)
         crawled-corpus (corpus/read-corpus-file corpus-file)
@@ -226,7 +240,7 @@
   (let [model  (crawler-model/read-model model-file)
         corpus-file (crawler-model/associated-corpus-file model-file)
         crawled-corpus (corpus/read-corpus-file corpus-file)
-
+        
         actions    (:actions model)
         pagination (:pagination model)
 

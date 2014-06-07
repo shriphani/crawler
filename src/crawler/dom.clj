@@ -735,7 +735,7 @@ id and class tag constraints are also added"
                                         (some #{(last (nth path p))}
                                               ns-set))
                                       nodes-paths))]))
-                             avoid-restrictions)
+                               avoid-restrictions)
                               [])]
        restricted-links)))
 
@@ -749,6 +749,44 @@ id and class tag constraints are also added"
                         muscle-fn
                         url
                         []))
+
+  ([xpath refinement processed-body muscle-fn url blacklist]
+     (let [problems (generate-refinement-candidates xpath
+                                                    refinement
+                                                    processed-body
+                                                    url
+                                                    blacklist)]
+       ;; returns a new set of refinements
+       (map
+        first
+        (filter
+         (fn [[refinement hrefs]]
+           (let [to-sample (utils/random-take 10 hrefs)]
+             ;; if no item here belongs in the muscle
+             ;; category, then we can let this refinement
+             ;; remain
+             (not
+              (some
+               identity
+               (map
+                (fn [a-link]
+                  (do (Thread/sleep 1000)
+                      (let [bd (:body (utils/download-cache-with-cookie a-link))]
+                        (muscle-fn a-link bd))))
+                to-sample)))))
+         problems)))))
+
+(defn probe-refinements-onlies
+  "Continue the sampling process to establish if
+   a bad example has been found. This routine operates
+   with the only segment"
+  ([xpath refinement processed-body muscle-fn url]
+     (probe-refinements-onlies xpath
+                               refinement
+                               processed-body
+                               muscle-fn
+                               url
+                               []))
 
   ([xpath refinement processed-body muscle-fn url blacklist]
      (let [problems (generate-refinement-candidates xpath

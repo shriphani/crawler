@@ -27,18 +27,9 @@
   [a-model-file]
   (string/replace a-model-file #".model" ".leaves"))
 
-(defn fix-model-restrictions
-  "Inspects the only-avoid refinements
-   and returns the newer only-avoid ideas.
-
-   Focus on just avoids right now and trust
-   the onlies.
-
-   Actually not trusting the online too.
-   Gotta fix that stuff"
-  [a-model-file a-corpus-file a-leaves-file]
-  (let [model (read-model a-model-file)
-        downloaded-corpus (corpus/read-corpus-file a-corpus-file)
+(defn fix-model-restrictions-model-read
+  [model a-corpus-file a-leaves-file]
+  (let [downloaded-corpus (corpus/read-corpus-file a-corpus-file)
         leaf-cluster (last
                       (sort-by
                        count
@@ -78,18 +69,18 @@
           refined :refined}]
 
 ;       (println :old-refined refined)
-                                        ;       (println :new-refined )
+                                        ;       (println :new-refined
+                                       ;       )
        (if (empty?
             (filter
              (fn [[axn-pair x]]
-               (not
-                (and (nil? (:avoid refined))
-                     (empty? (:avoid refined))
-                     (nil? (:only refined))
-                     (empty? (:only refined)))))
+               (do (or
+                    (not (empty? (:avoid x)))
+                    (not (empty? (:only x))))))
              refined))
-         {:actions axns
-          :refined refined}
+         (do ;(println :not-refining refined)
+          {:actions axns
+           :refined refined})
          (let [probed-refinement 
                (reduce
                 (fn [acc [[src-xpath xpath-to-take] refinement]]
@@ -112,7 +103,7 @@
                         (map
                          (fn [[u x]]
                            (let [processed-doc (dom/html->xml-doc (:body x))]
-                             (dom/probe-refinements
+                             (dom/probe-refinements-onlies
                               xpath-to-take
                               refinement
                               processed-doc
@@ -167,3 +158,18 @@
                                                       probed-refinement)}]
              updated-refinements))))
      model-actions)))
+
+(defn fix-model-restrictions
+  "Inspects the only-avoid refinements
+   and returns the newer only-avoid ideas.
+
+   Focus on just avoids right now and trust
+   the onlies.
+
+   Actually not trusting the online too.
+   Gotta fix that stuff"
+  [a-model-file a-corpus-file a-leaves-file]
+  (let [model (read-model a-model-file)]
+    (fix-model-restrictions-model-read model
+                                       a-corpus-file
+                                       a-leaves-file)))

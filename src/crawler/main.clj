@@ -187,8 +187,11 @@
         the-model (crawler-model/read-model model-file)]
     (when-not (:fixed the-model)
       (let [no-paging-model (corpus/remove-pagination-from-actions the-model)
-
-            fixed-model (merge {:fixed true} no-paging-model)]
+            avoids-fixed    (merge no-paging-model
+                                   {:actions (crawler-model/fix-model-restrictions-model-read no-paging-model
+                                                                                              corpus-file
+                                                                                              leaves-file)})
+            fixed-model (merge {:fixed true} avoids-fixed)]
         (with-open [wrtr (io/writer model-file)]
           (pprint fixed-model wrtr))))))
 

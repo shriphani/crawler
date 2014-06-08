@@ -344,29 +344,9 @@
                                           model
                                           budget))
           
-          ;; (:fix-model options)
-          ;; (let [model-file (:fix-model options)
-
-          ;;       associated-corpus-file (:fix-model)])
-          
-          ;; (:fix-model options)
-          ;; (let [directory (:fix-model options)
-          ;;       model-file (.getAbsolutePath
-          ;;                   (first
-          ;;                    (filter
-          ;;                     #(re-find #"\.model$" (.getAbsolutePath %))
-          ;;                     (file-seq (io/file directory)))))
-          ;;       corpus-file (.getAbsolutePath
-          ;;                    (first
-          ;;                     (filter
-          ;;                      #(re-find #"\.corpus$" (.getAbsolutePath %))
-          ;;                      (file-seq (io/file directory)))))
-
-          ;;       fixed-model
-          ;;       (crawler-model/fix-model model-file
-          ;;                                corpus-file)]
-          ;;   (pprint fixed-model (io/writer (str (:fix-model options)
-          ;;                                       "pruned-model"))))
+          (:fix-model options)
+          (let [model-file (:fix-model options)]
+            (fix-model model-file))
           
           :else
           (println "Pick one bruh"))))

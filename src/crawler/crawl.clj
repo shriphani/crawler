@@ -616,9 +616,11 @@
                                                                  (catch Exception e nil))
 
                                                          :xpath-texts (if (:body x)
-                                                                        (similarity/char-frequency-representation
-                                                                         (similarity/page-text-xpaths
-                                                                          (:body x)))
+                                                                        (try
+                                                                         (similarity/char-frequency-representation
+                                                                          (similarity/page-text-xpaths
+                                                                           (:body x)))
+                                                                         (catch Exception e {}))
                                                                         {})}))
                                              sampled-corpus)
                                   :new-visited links-list
